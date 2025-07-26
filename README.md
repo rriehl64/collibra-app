@@ -1,6 +1,6 @@
-# Collibra App - Data Governance Platform
+# Data Literacy Support - Data Governance Platform
 
-A modern React-based web application that implements core features of the Collibra data governance platform, designed to help organizations discover, understand, and trust their data with intelligent data governance solutions.
+A modern React-based web application designed to improve data literacy and governance within organizations, helping teams discover, understand, and trust their data with intelligent data governance solutions.
 
 ## Table of Contents
 
@@ -18,7 +18,7 @@ A modern React-based web application that implements core features of the Collib
 
 ## Overview
 
-The Collibra App is a demonstration platform for data governance that helps organizations manage their data assets, policies, and workflows in a centralized location. It provides tools for data cataloging, governance policies, analytics, and integration capabilities.
+The Data Literacy Support platform is a comprehensive solution for data governance that helps organizations manage their data assets, policies, and workflows in a centralized location. It provides tools for data cataloging, governance policies, analytics, and integration capabilities while focusing on improving data literacy across the organization.
 
 This application showcases how modern data governance tools can help teams:
 - Discover and catalog data across the organization
@@ -88,8 +88,8 @@ The application features a modern, responsive UI built with Material-UI (MUI) th
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/rbriehl/collibra-app.git
-   cd collibra-app
+   git clone https://github.com/rbriehl/data-literacy-support.git
+   cd data-literacy-support
    ```
 
 2. Install dependencies:
@@ -127,7 +127,7 @@ The application consists of both a frontend React application and a backend Expr
 ## Project Structure
 
 ```
-collibra-app/
+data-literacy-support/
 ├── docs/                # Documentation files
 ├── public/              # Static assets
 ├── src/
