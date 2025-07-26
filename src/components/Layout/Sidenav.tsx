@@ -1,0 +1,119 @@
+import React from 'react';
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemButton,
+  Box,
+  Divider,
+} from '@mui/material';
+import {
+  Storage as StorageIcon,
+  Security as SecurityIcon,
+  Analytics as AnalyticsIcon,
+  IntegrationInstructions as IntegrationIcon,
+  Dashboard as DashboardIcon,
+  Description as DescriptionIcon,
+  Settings as SettingsIcon,
+  School as SchoolIcon,
+} from '@mui/icons-material';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+const DRAWER_WIDTH = 240;
+
+const menuItems = [
+  { text: 'Dashboard', icon: DashboardIcon, path: '/' },
+  { text: 'Collibra 101', icon: SchoolIcon, path: '/learn101' },
+  { text: 'Data Catalog', icon: StorageIcon, path: '/data-catalog' },
+  { text: 'Asset Types', icon: StorageIcon, path: '/asset-types' },
+  { text: 'Data Governance', icon: SecurityIcon, path: '/data-governance' },
+  { text: 'DG vs MDM', icon: SecurityIcon, path: '/dgvsmdm' },
+  { text: 'Data Steward', icon: SecurityIcon, path: '/data-steward' },
+  { text: 'Analytics', icon: AnalyticsIcon, path: '/analytics' },
+  { text: 'Integration', icon: IntegrationIcon, path: '/integration' },
+];
+
+const secondaryMenuItems = [
+  { text: 'Documentation', icon: DescriptionIcon, path: '/docs' },
+  { text: 'Settings', icon: SettingsIcon, path: '/settings' },
+];
+
+const Sidenav = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const isCurrentPath = (path: string) => {
+    return location.pathname === path;
+  };
+
+  return (
+    <Drawer
+      variant="permanent"
+      sx={{
+        width: DRAWER_WIDTH,
+        flexShrink: 0,
+        '& .MuiDrawer-paper': {
+          width: DRAWER_WIDTH,
+          boxSizing: 'border-box',
+          borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+          backgroundColor: 'background.paper',
+        },
+      }}
+    >
+      <Box sx={{ overflow: 'auto', mt: 8 }}>
+        <List>
+          {menuItems.map((item) => (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton
+                selected={isCurrentPath(item.path)}
+                onClick={() => navigate(item.path)}
+                sx={{
+                  '&.Mui-selected': {
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: 'primary.dark',
+                    },
+                    '& .MuiListItemIcon-root': {
+                      color: 'white',
+                    },
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 40,
+                    color: isCurrentPath(item.path) ? 'white' : 'inherit',
+                  }}
+                >
+                  <item.icon />
+                </ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Divider sx={{ my: 2 }} />
+        <List>
+          {secondaryMenuItems.map((item) => (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton
+                selected={isCurrentPath(item.path)}
+                onClick={() => navigate(item.path)}
+              >
+                <ListItemIcon sx={{ minWidth: 40 }}>
+                  <item.icon />
+                </ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
+    </Drawer>
+  );
+};
+
+export default Sidenav;

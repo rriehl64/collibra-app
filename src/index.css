@@ -1,0 +1,80 @@
+:root {
+  --collibra-primary: #0C1F3F;
+  --collibra-blue: #1785FB;
+  --collibra-green: #7BC144;
+  --collibra-gray-100: #F5F6F7;
+  --collibra-gray-200: #E8E9EB;
+  --collibra-gray-800: #2D3436;
+  --gradient-start: #1785FB;
+  --gradient-end: #00A8B3;
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: white;
+  color: var(--collibra-gray-800);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.btn {
+  border: none;
+  border-radius: 4px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background-color: var(--collibra-green);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #6CAD3D;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--collibra-blue);
+  border: 2px solid var(--collibra-blue);
+}
+
+.btn-secondary:hover {
+  background-color: rgba(23, 133, 251, 0.1);
+}
+
+input, select, textarea {
+  border: 1px solid var(--collibra-gray-200);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-size: 16px;
+  color: var(--collibra-gray-800);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--collibra-primary);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 2.5rem;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 2rem;
+  line-height: 1.3;
+}
