@@ -140,6 +140,14 @@ The following credentials are available for testing:
    - Password: password123
    - Access: Basic user features
 
+### Dashboard Preview
+
+After logging in as an admin user, you'll see the main dashboard with data governance metrics:
+
+![Admin Dashboard](public/images/admin-dashboard.png)
+
+*The dashboard provides an overview of your data governance ecosystem including data assets, domains, compliance metrics, and open tasks. Interactive visualizations show asset distribution by domain and compliance status.*
+
 
 The application consists of both a frontend React application and a backend Express server.
 
