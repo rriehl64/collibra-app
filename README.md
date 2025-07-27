@@ -144,7 +144,7 @@ The following credentials are available for testing:
 
 After logging in as an admin user, you'll see the main dashboard with data governance metrics:
 
-![Admin Dashboard](https://raw.githubusercontent.com/rbriehl/data-literacy-support/main/images/admin-dashboard.png)
+![Admin Dashboard](images/admin-dashboard.png)
 
 *The dashboard provides an overview of your data governance ecosystem including data assets, domains, compliance metrics, and open tasks. Interactive visualizations show asset distribution by domain and compliance status.*
 
@@ -152,7 +152,7 @@ After logging in as an admin user, you'll see the main dashboard with data gover
 
 The application includes a comprehensive learning path with Collibra 101 courses:
 
-![Collibra 101](https://raw.githubusercontent.com/rbriehl/data-literacy-support/main/images/collibra-101.png)
+![Collibra 101](images/collibra-101.png)
 
 *The learning section offers structured courses on data intelligence fundamentals, governance best practices, data catalog management, business glossary usage, data quality monitoring, and Collibra Ranger. Each course includes interactive modules with progress tracking.*
 
