@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Typography,
@@ -26,6 +26,9 @@ import {
   FormGroup,
   FormControlLabel,
   Popover,
+  CircularProgress,
+  Alert,
+  Pagination,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -39,19 +42,10 @@ import {
   StarBorder as StarBorderIcon,
 } from '@mui/icons-material';
 
-type CertificationType = 'certified' | 'pending' | 'none';
+import { DataAsset, dataAssetService } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
-interface DataAsset {
-  id: string;
-  name: string;
-  type: string;
-  domain: string;
-  owner: string;
-  lastModified: string;
-  status: string;
-  tags: string[];
-  certification: CertificationType;
-}
+type CertificationType = 'certified' | 'pending' | 'none';
 
 interface Filters {
   types: string[];
@@ -60,218 +54,201 @@ interface Filters {
   certifications: CertificationType[];
 }
 
-const mockDataAssets: DataAsset[] = [
+// Sample data for fallback during development
+const sampleDataAssets: DataAsset[] = [
   {
-    id: '1',
+    _id: '1',
     name: 'Customer Data Warehouse',
     type: 'Database',
     domain: 'Customer Analytics',
     owner: 'Sarah Chen',
-    lastModified: '2025-01-22',
+    lastModified: new Date('2025-01-22'),
     status: 'Production',
     tags: ['PII', 'Customer', 'Sales'],
     certification: 'certified',
   },
   {
-    id: '2',
+    _id: '2',
     name: 'Sales Transactions',
     type: 'Table',
     domain: 'Sales',
     owner: 'Mike Johnson',
-    lastModified: '2025-01-21',
+    lastModified: new Date('2025-01-21'),
     status: 'Production',
     tags: ['Sales', 'Finance', 'Transactions'],
     certification: 'certified',
   },
   {
-    id: '3',
+    _id: '3',
     name: 'Marketing Campaign Results',
     type: 'Report',
     domain: 'Marketing',
     owner: 'Emma Davis',
-    lastModified: '2025-01-20',
+    lastModified: new Date('2025-01-20'),
     status: 'Development',
     tags: ['Marketing', 'Analytics'],
     certification: 'pending',
-  },
-  {
-    id: '4',
-    name: 'Product Inventory Database',
-    type: 'Database',
-    domain: 'Supply Chain',
-    owner: 'Alex Thompson',
-    lastModified: '2025-01-19',
-    status: 'Production',
-    tags: ['Inventory', 'Products', 'Supply Chain'],
-    certification: 'certified',
-  },
-  {
-    id: '5',
-    name: 'HR Employee Records',
-    type: 'Table',
-    domain: 'Human Resources',
-    owner: 'Maria Garcia',
-    lastModified: '2025-01-18',
-    status: 'Production',
-    tags: ['HR', 'PII', 'Employees'],
-    certification: 'certified',
-  },
-  {
-    id: '6',
-    name: 'Financial Reports Q4 2024',
-    type: 'Report',
-    domain: 'Finance',
-    owner: 'David Kim',
-    lastModified: '2025-01-17',
-    status: 'Production',
-    tags: ['Finance', 'Quarterly Reports'],
-    certification: 'certified',
-  },
-  {
-    id: '7',
-    name: 'Customer Feedback Analysis',
-    type: 'Report',
-    domain: 'Customer Experience',
-    owner: 'Rachel Brown',
-    lastModified: '2025-01-16',
-    status: 'Development',
-    tags: ['Customer', 'Feedback', 'Analytics'],
-    certification: 'pending',
-  },
-  {
-    id: '8',
-    name: 'Supply Chain Metrics',
-    type: 'Dashboard',
-    domain: 'Supply Chain',
-    owner: 'Tom Wilson',
-    lastModified: '2025-01-15',
-    status: 'Production',
-    tags: ['Supply Chain', 'Metrics', 'KPI'],
-    certification: 'certified',
-  },
-  {
-    id: '9',
-    name: 'Product Catalog Master',
-    type: 'Table',
-    domain: 'Product Management',
-    owner: 'Lisa Zhang',
-    lastModified: '2025-01-14',
-    status: 'Production',
-    tags: ['Products', 'Catalog', 'Master Data'],
-    certification: 'certified',
-  },
-  {
-    id: '10',
-    name: 'Social Media Analytics',
-    type: 'Dashboard',
-    domain: 'Marketing',
-    owner: 'James Wilson',
-    lastModified: '2025-01-13',
-    status: 'Development',
-    tags: ['Social Media', 'Marketing', 'Analytics'],
-    certification: 'pending',
-  },
-  {
-    id: '11',
-    name: 'Vendor Management System',
-    type: 'Database',
-    domain: 'Procurement',
-    owner: 'Sophie Martin',
-    lastModified: '2025-01-12',
-    status: 'Production',
-    tags: ['Vendors', 'Procurement', 'Contracts'],
-    certification: 'certified',
-  },
-  {
-    id: '12',
-    name: 'Customer Service Logs',
-    type: 'Table',
-    domain: 'Customer Support',
-    owner: 'Chris Taylor',
-    lastModified: '2025-01-11',
-    status: 'Production',
-    tags: ['Customer Support', 'Service', 'Logs'],
-    certification: 'certified',
-  },
-  {
-    id: '13',
-    name: 'Compliance Documentation',
-    type: 'Document',
-    domain: 'Legal',
-    owner: 'Patricia Lee',
-    lastModified: '2025-01-10',
-    status: 'Production',
-    tags: ['Legal', 'Compliance', 'Documentation'],
-    certification: 'certified',
   }
 ];
 
-const DataCatalog = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentTab, setCurrentTab] = useState(0);
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [isLoading, setIsLoading] = useState(false);
+const DataCatalog: React.FC = () => {
+  const { user } = useAuth();
+  const [searchText, setSearchText] = useState('');
+  const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(null);
+  const [tabValue, setTabValue] = useState(0);
   const [filters, setFilters] = useState<Filters>({
     types: [],
     domains: [],
     statuses: [],
     certifications: [],
   });
+  const [starredAssets, setStarredAssets] = useState<string[]>([]);
+  
+  // State for API data
+  const [dataAssets, setDataAssets] = useState<DataAsset[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalAssets, setTotalAssets] = useState<number>(0);
+  const limit = 10; // Items per page
 
-  // Extract unique values for filters
-  const uniqueTypes = Array.from(new Set(mockDataAssets.map(asset => asset.type)));
-  const uniqueDomains = Array.from(new Set(mockDataAssets.map(asset => asset.domain)));
-  const uniqueStatuses = Array.from(new Set(mockDataAssets.map(asset => asset.status)));
+  // Get unique values for filters from our current data
+  const availableTypes = Array.from(new Set(dataAssets.map((asset) => asset.type || '')));
+  const availableDomains = Array.from(new Set(dataAssets.map((asset) => asset.domain || '')));
+  const availableStatuses = Array.from(new Set(dataAssets.map((asset) => asset.status || '')));
+
+  // Fetch data assets from API
+  useEffect(() => {
+    const fetchDataAssets = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const searchParams: Record<string, any> = {
+          page,
+          limit,
+          sort: '-lastModified'
+        };
+        
+        // Apply filters if they exist
+        if (filters.types.length > 0) {
+          searchParams.type = filters.types.join(',');
+        }
+        
+        if (filters.domains.length > 0) {
+          searchParams.domain = filters.domains.join(',');
+        }
+        
+        if (filters.statuses.length > 0) {
+          searchParams.status = filters.statuses.join(',');
+        }
+        
+        if (filters.certifications.length > 0) {
+          searchParams.certification = filters.certifications.join(',');
+        }
+        
+        // If search text exists, use search endpoint
+        let result;
+        if (searchText.trim()) {
+          result = await dataAssetService.searchDataAssets(searchText, searchParams);
+        } else {
+          result = await dataAssetService.getDataAssets(searchParams);
+        }
+        
+        setDataAssets(result.assets);
+        setTotalAssets(result.total);
+        setTotalPages(Math.ceil(result.total / limit));
+      } catch (err) {
+        console.error('Error fetching data assets:', err);
+        setError('Failed to load data assets. Please try again.');
+        // Fallback to sample data in development
+        if (process.env.NODE_ENV === 'development') {
+          setDataAssets(sampleDataAssets);
+          setTotalAssets(sampleDataAssets.length);
+          setTotalPages(1);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchDataAssets();
+  }, [searchText, filters, page]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setCurrentTab(newValue);
+    setTabValue(newValue);
   };
 
-  const toggleFavorite = (id: string) => {
-    setFavorites(prev => 
+  const handleToggleStar = (id: string) => {
+    setStarredAssets(prev => 
       prev.includes(id) ? prev.filter(fid => fid !== id) : [...prev, id]
     );
   };
 
-  const handleFilterClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
+  // Handle search with debounce
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setSearchText(value);
+    // Reset to first page when search changes
+    setPage(1);
+  };
+  
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
+
+  const handleFilterClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setFilterAnchorEl(event.currentTarget);
   };
 
   const handleFilterClose = () => {
-    setAnchorEl(null);
+    setFilterAnchorEl(null);
+  };
+
+  // Type guard to check if a value is a CertificationType
+  const isCertificationType = (value: string): value is CertificationType => {
+    return ['certified', 'pending', 'none'].includes(value);
   };
 
   const handleFilterChange = (
     filterType: keyof Filters,
-    value: string | CertificationType
+    value: string,
+    checked: boolean
   ) => {
-    setFilters(prev => {
-      if (filterType === 'certifications' && typeof value !== 'string') {
-        const certArray = prev.certifications;
-        return {
-          ...prev,
-          certifications: certArray.includes(value)
-            ? certArray.filter(item => item !== value)
-            : [...certArray, value]
-        };
+    setFilters(prevFilters => {
+      const updatedFilters = { ...prevFilters };
+      
+      if (checked) {
+        if (filterType === 'certifications') {
+          // Type check for certifications
+          if (isCertificationType(value)) {
+            updatedFilters.certifications = [...updatedFilters.certifications, value];
+          }
+        } else {
+          // For other string[] types
+          updatedFilters[filterType] = [...updatedFilters[filterType], value] as any;
+        }
+      } else {
+        // Remove value from filter
+        if (filterType === 'certifications') {
+          updatedFilters.certifications = updatedFilters.certifications.filter(
+            item => item !== value
+          );
+        } else {
+          updatedFilters[filterType] = updatedFilters[filterType].filter(
+            item => item !== value
+          ) as any;
+        }
       }
       
-      if (filterType !== 'certifications' && typeof value === 'string') {
-        const array = prev[filterType] as string[];
-        return {
-          ...prev,
-          [filterType]: array.includes(value)
-            ? array.filter(item => item !== value)
-            : [...array, value]
-        };
-      }
-      
-      return prev;
+      return updatedFilters;
     });
+    
+    // Reset to first page when filters change
+    setPage(1);
   };
 
-  const clearFilters = () => {
+  const handleClearFilters = () => {
     setFilters({
       types: [],
       domains: [],
@@ -280,38 +257,20 @@ const DataCatalog = () => {
     });
   };
 
-  const filteredAssets = mockDataAssets.filter(asset => {
-    const searchMatch = !searchTerm || 
-      asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.domain.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.owner.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asset.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-
-    const typeMatch = filters.types.length === 0 || filters.types.includes(asset.type);
-    const domainMatch = filters.domains.length === 0 || filters.domains.includes(asset.domain);
-    const statusMatch = filters.statuses.length === 0 || filters.statuses.includes(asset.status);
-    const certificationMatch = filters.certifications.length === 0 || filters.certifications.includes(asset.certification);
-
-    // Tab-specific filtering
-    const tabMatch = (() => {
-      switch (currentTab) {
-        case 0: // All Assets
-          return true;
-        case 1: // Recently Modified
+  // Filter displayed assets based on tabs
+  const displayedAssets = tabValue === 0 
+    ? dataAssets 
+    : tabValue === 1 
+      ? dataAssets.filter(asset => {
           const thirtyDaysAgo = new Date();
           thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-          return new Date(asset.lastModified) >= thirtyDaysAgo;
-        case 2: // Favorites
-          return favorites.includes(asset.id);
-        case 3: // Pending Certification
-          return asset.certification === 'pending';
-        default:
-          return true;
-      }
-    })();
-
-    return searchMatch && typeMatch && domainMatch && statusMatch && certificationMatch && tabMatch;
-  });
+          return asset.lastModified && new Date(asset.lastModified) >= thirtyDaysAgo;
+        })
+      : tabValue === 2
+        ? dataAssets.filter(asset => asset._id && starredAssets.includes(asset._id))
+        : tabValue === 3
+          ? dataAssets.filter(asset => asset.certification === 'pending')
+          : dataAssets;
 
   const activeFiltersCount = Object.values(filters).reduce(
     (count, filterArray) => count + filterArray.length,
@@ -320,24 +279,33 @@ const DataCatalog = () => {
 
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
-      {/* Hero Section */}
-      <Box sx={{ 
-        bgcolor: 'primary.main', 
-        color: 'white', 
-        py: 6,
-        mb: 4,
-        mt: 8
-      }}>
-        <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
-          <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
-            Data Catalog
-          </Typography>
-          <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
-            Discover, understand, and manage your data assets in one place
-          </Typography>
-          
+      <Box
+        sx={{
+          bgcolor: 'background.paper',
+          pt: 2,
+          pb: 6,
+          boxShadow: 1,
+          mt: 8
+        }}
+      >
+        <Container maxWidth="lg">
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h4" component="h1" gutterBottom>
+              Data Catalog
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Browse and discover data assets across the organization
+            </Typography>
+            {error && (
+              <Alert severity="error" sx={{ mt: 2 }}>
+                {error}
+              </Alert>
+            )}
+          </Box>
+
           {/* Search Bar */}
           <Paper
+            component="form"
             sx={{
               p: '2px 4px',
               display: 'flex',
@@ -346,7 +314,7 @@ const DataCatalog = () => {
               bgcolor: 'white'
             }}
           >
-            <IconButton sx={{ p: '10px' }}>
+            <IconButton sx={{ p: '10px' }} aria-label="search">
               <SearchIcon />
             </IconButton>
             <TextField
@@ -355,15 +323,19 @@ const DataCatalog = () => {
               variant="standard"
               InputProps={{ 
                 disableUnderline: true,
-                sx: { color: 'text.primary' }
+                'aria-label': 'search data assets'
               }}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchText}
+              onChange={handleSearch}
             />
             <IconButton 
               sx={{ p: '10px' }}
               onClick={handleFilterClick}
               color={activeFiltersCount > 0 ? "primary" : "default"}
+              aria-label="filter list"
+              aria-haspopup="true"
+              aria-controls="filter-menu"
+              aria-expanded={Boolean(filterAnchorEl)}
             >
               <FilterIcon />
               {activeFiltersCount > 0 && (
@@ -383,45 +355,137 @@ const DataCatalog = () => {
               )}
             </IconButton>
           </Paper>
+
+          {/* Tabs */}
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3, mt: 3 }}>
+            <Tabs 
+              value={tabValue} 
+              onChange={handleTabChange}
+              aria-label="data asset categories"
+            >
+              <Tab label="All Assets" id="tab-0" aria-controls="tabpanel-0" />
+              <Tab label="Recently Modified" id="tab-1" aria-controls="tabpanel-1" />
+              <Tab label="Favorites" id="tab-2" aria-controls="tabpanel-2" />
+              <Tab label="Pending Certification" id="tab-3" aria-controls="tabpanel-3" />
+            </Tabs>
+          </Box>
         </Container>
       </Box>
 
-      <Container maxWidth="lg">
-        {/* Quick Stats */}
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          {[
-            { icon: <DatabaseIcon />, label: 'Total Assets', value: '2,547' },
-            { icon: <TableIcon />, label: 'Data Tables', value: '1,283' },
-            { icon: <TimelineIcon />, label: 'Reports', value: '864' },
-            { icon: <DescriptionIcon />, label: 'Documents', value: '400' },
-          ].map((stat) => (
-            <Grid item xs={12} sm={6} md={3} key={stat.label}>
-              <Card>
-                <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <Box sx={{ color: 'primary.main' }}>{stat.icon}</Box>
-                  <Box>
-                    <Typography variant="h4" component="div">{stat.value}</Typography>
-                    <Typography color="text.secondary">{stat.label}</Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-
-        {/* Tabs */}
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <Tabs value={currentTab} onChange={handleTabChange}>
-            <Tab label="All Assets" />
-            <Tab label="Recently Modified" />
-            <Tab label="Favorites" />
-            <Tab label="Pending Certification" />
-          </Tabs>
-        </Box>
-
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        {/* Filters Popover */}
+        <Popover
+          id="filter-menu"
+          open={Boolean(filterAnchorEl)}
+          anchorEl={filterAnchorEl}
+          onClose={handleFilterClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+        >
+          <Box sx={{ p: 3, maxWidth: 400, maxHeight: 400, overflow: 'auto' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="h6">Filters</Typography>
+              <Button 
+                size="small" 
+                onClick={handleClearFilters}
+                disabled={activeFiltersCount === 0}
+              >
+                Clear All
+              </Button>
+            </Box>
+            <Divider sx={{ mb: 2 }} />
+            
+            {/* Types Filter */}
+            <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+              Asset Type
+            </Typography>
+            <FormGroup sx={{ mb: 2 }}>
+              {availableTypes.map((type) => (
+                <FormControlLabel
+                  key={type}
+                  control={
+                    <Checkbox
+                      checked={filters.types.includes(type)}
+                      onChange={(e) => handleFilterChange('types', type, e.target.checked)}
+                      size="small"
+                    />
+                  }
+                  label={type}
+                />
+              ))}
+            </FormGroup>
+            
+            {/* Domains Filter */}
+            <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+              Domain
+            </Typography>
+            <FormGroup sx={{ mb: 2 }}>
+              {availableDomains.map((domain) => (
+                <FormControlLabel
+                  key={domain}
+                  control={
+                    <Checkbox
+                      checked={filters.domains.includes(domain)}
+                      onChange={(e) => handleFilterChange('domains', domain, e.target.checked)}
+                      size="small"
+                    />
+                  }
+                  label={domain}
+                />
+              ))}
+            </FormGroup>
+            
+            {/* Status Filter */}
+            <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+              Status
+            </Typography>
+            <FormGroup sx={{ mb: 2 }}>
+              {availableStatuses.map((status) => (
+                <FormControlLabel
+                  key={status}
+                  control={
+                    <Checkbox
+                      checked={filters.statuses.includes(status)}
+                      onChange={(e) => handleFilterChange('statuses', status, e.target.checked)}
+                      size="small"
+                    />
+                  }
+                  label={status}
+                />
+              ))}
+            </FormGroup>
+            
+            {/* Certification Filter */}
+            <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+              Certification
+            </Typography>
+            <FormGroup>
+              {(['certified', 'pending', 'none'] as CertificationType[]).map((cert) => (
+                <FormControlLabel
+                  key={cert}
+                  control={
+                    <Checkbox
+                      checked={filters.certifications.includes(cert)}
+                      onChange={(e) => handleFilterChange('certifications', cert, e.target.checked)}
+                      size="small"
+                    />
+                  }
+                  label={cert === 'certified' ? 'Certified' : cert === 'pending' ? 'Pending Certification' : 'Not Certified'}
+                />
+              ))}
+            </FormGroup>
+          </Box>
+        </Popover>
+        
         {/* Data Assets Table */}
-        <TableContainer component={Paper} sx={{ mb: 4, mt: 2 }}>
-          <Table>
+        <TableContainer component={Paper} sx={{ mb: 4 }}>
+          <Table aria-label="data assets table">
             <TableHead>
               <TableRow>
                 <TableCell></TableCell>
@@ -435,167 +499,98 @@ const DataCatalog = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredAssets.map((asset) => (
-                <TableRow key={asset.id} hover>
-                  <TableCell>
-                    <IconButton 
-                      size="small" 
-                      onClick={() => toggleFavorite(asset.id)}
-                      sx={{ color: 'primary.main' }}
-                    >
-                      {favorites.includes(asset.id) ? <StarIcon /> : <StarBorderIcon />}
-                    </IconButton>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="body2">{asset.name}</Typography>
-                      {asset.certification === 'certified' && (
-                        <Chip 
-                          size="small" 
-                          label="Certified" 
-                          color="primary" 
-                          sx={{ height: 20 }} 
-                        />
-                      )}
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+                      <CircularProgress aria-label="Loading data assets" />
                     </Box>
                   </TableCell>
-                  <TableCell>{asset.type}</TableCell>
-                  <TableCell>{asset.domain}</TableCell>
-                  <TableCell>{asset.owner}</TableCell>
-                  <TableCell>
-                    <Chip 
-                      size="small" 
-                      label={asset.status} 
-                      color={asset.status === 'Production' ? 'success' : 'warning'}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      {asset.tags.map(tag => (
-                        <Chip 
-                          key={tag} 
-                          label={tag} 
-                          size="small" 
-                          variant="outlined"
-                          sx={{ height: 20 }} 
-                        />
-                      ))}
-                    </Box>
-                  </TableCell>
-                  <TableCell>{asset.lastModified}</TableCell>
                 </TableRow>
-              ))}
+              ) : displayedAssets.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    <Box sx={{ textAlign: 'center', my: 2 }}>
+                      <Typography>No data assets found</Typography>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                displayedAssets.map((asset) => (
+                  <TableRow key={asset._id} hover>
+                    <TableCell>
+                      <IconButton 
+                        size="small" 
+                        onClick={() => asset._id && handleToggleStar(asset._id)}
+                        aria-label={asset._id && starredAssets.includes(asset._id) ? 'Remove from favorites' : 'Add to favorites'}
+                      >
+                        {asset._id && starredAssets.includes(asset._id) ? <StarIcon color="primary" /> : <StarBorderIcon />}
+                      </IconButton>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2">{asset.name}</Typography>
+                        {asset.certification === 'certified' && (
+                          <Chip 
+                            size="small" 
+                            label="Certified" 
+                            color="primary" 
+                            sx={{ height: 20 }} 
+                          />
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell>{asset.type}</TableCell>
+                    <TableCell>{asset.domain}</TableCell>
+                    <TableCell>{asset.owner}</TableCell>
+                    <TableCell>
+                      <Chip 
+                        size="small" 
+                        label={asset.status} 
+                        color={asset.status === 'Production' ? 'success' : 'warning'}
+                        sx={{ height: 20 }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                        {asset.tags && asset.tags.map((tag) => (
+                          <Chip 
+                            key={tag} 
+                            label={tag} 
+                            size="small" 
+                            variant="outlined"
+                            sx={{ height: 20 }} 
+                          />
+                        ))}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      {asset.lastModified 
+                        ? new Date(asset.lastModified).toLocaleDateString() 
+                        : 'N/A'}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </TableContainer>
 
-        {/* Action Buttons */}
-        <Box sx={{ display: 'flex', gap: 2, mb: 4 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<StorageIcon />}
-          >
-            Register New Asset
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<DescriptionIcon />}
-          >
-            Import Metadata
-          </Button>
-        </Box>
-      </Container>
-
-      {/* Filter Menu */}
-      <Popover
-        open={Boolean(anchorEl)}
-        anchorEl={anchorEl}
-        onClose={handleFilterClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-      >
-        <Box sx={{ p: 2, width: 300 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h6">Filters</Typography>
-            <Button size="small" onClick={clearFilters}>Clear all</Button>
+        {/* Pagination */}
+        {!loading && totalPages > 1 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Pagination 
+              count={totalPages} 
+              page={page} 
+              onChange={handlePageChange} 
+              color="primary" 
+              showFirstButton 
+              showLastButton
+              aria-label="Data catalog pagination"
+            />
           </Box>
-
-          <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>Type</Typography>
-          <FormGroup>
-            {uniqueTypes.map(type => (
-              <FormControlLabel
-                key={type}
-                control={
-                  <Checkbox
-                    checked={filters.types.includes(type)}
-                    onChange={() => handleFilterChange('types', type)}
-                    size="small"
-                  />
-                }
-                label={type}
-              />
-            ))}
-          </FormGroup>
-
-          <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>Domain</Typography>
-          <FormGroup>
-            {uniqueDomains.map(domain => (
-              <FormControlLabel
-                key={domain}
-                control={
-                  <Checkbox
-                    checked={filters.domains.includes(domain)}
-                    onChange={() => handleFilterChange('domains', domain)}
-                    size="small"
-                  />
-                }
-                label={domain}
-              />
-            ))}
-          </FormGroup>
-
-          <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>Status</Typography>
-          <FormGroup>
-            {uniqueStatuses.map(status => (
-              <FormControlLabel
-                key={status}
-                control={
-                  <Checkbox
-                    checked={filters.statuses.includes(status)}
-                    onChange={() => handleFilterChange('statuses', status)}
-                    size="small"
-                  />
-                }
-                label={status}
-              />
-            ))}
-          </FormGroup>
-
-          <Typography variant="subtitle2" sx={{ mt: 2, mb: 1 }}>Certification</Typography>
-          <FormGroup>
-            {(['certified', 'pending', 'none'] as const).map((cert) => (
-              <FormControlLabel
-                key={cert}
-                control={
-                  <Checkbox
-                    checked={filters.certifications.includes(cert)}
-                    onChange={() => handleFilterChange('certifications', cert)}
-                    size="small"
-                  />
-                }
-                label={cert.charAt(0).toUpperCase() + cert.slice(1)}
-              />
-            ))}
-          </FormGroup>
-        </Box>
-      </Popover>
+        )}
+      </Container>
     </Box>
   );
 };

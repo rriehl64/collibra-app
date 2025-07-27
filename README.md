@@ -99,6 +99,48 @@ The application features a modern, responsive UI built with Material-UI (MUI) th
 
 ### Running the Application
 
+1. Start the development server:
+   ```bash
+   npm run dev
+   ```
+   This will start both the React frontend (port 3005) and the Node.js backend (port 3001).
+
+2. Seed the database with sample data:
+   ```bash
+   node server/seeder.js -i
+   ```
+   This will populate the database with sample users, data assets, and policies.
+
+3. Access the application at: http://localhost:3005
+
+### Development Tools
+
+The application includes a DevTools panel (visible only in development mode) that provides helpful features for developers:
+
+- **Quick Login Buttons**: Login instantly as admin, data steward, or regular user
+- **Auto Form Fill**: Fill the login form with predefined credentials
+- **Environment Information**: View current environment settings
+
+### Login Credentials
+
+The following credentials are available for testing:
+
+1. **Admin User**
+   - Email: admin@example.com
+   - Password: admin123!
+   - Access: Full administrative access
+
+2. **Data Steward**
+   - Email: steward@example.com
+   - Password: password123
+   - Access: Data governance and stewardship features
+
+3. **Regular User**
+   - Email: user@example.com
+   - Password: password123
+   - Access: Basic user features
+
+
 The application consists of both a frontend React application and a backend Express server.
 
 1. **Development Mode** (runs both frontend and backend):
