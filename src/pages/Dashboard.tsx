@@ -15,7 +15,8 @@ import {
   ListItemIcon,
   CircularProgress,
   Button,
-  useTheme
+  useTheme,
+  Alert
 } from '@mui/material';
 import { 
   TrendingUp as TrendingUpIcon,
@@ -26,23 +27,78 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { dataAssetService } from '../services/api';
+import DashboardService from '../services/dashboardService';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+
+// Define interfaces for dashboard data
+interface DashboardMetrics {
+  dataAssets: {
+    total: number;
+    newThisMonth: number;
+  };
+  dataDomains: {
+    total: number;
+    active: number;
+  };
+  compliance: {
+    percentage: number;
+    changeFromLastMonth: number;
+  };
+  tasks: {
+    open: number;
+    urgent: number;
+  };
+  charts: {
+    domainDistribution: Array<{
+      domain: string;
+      count: number;
+      percentage: number;
+    }>;
+    complianceStatus: Array<{
+      status: string;
+      count: number;
+    }>;
+  };
+}
+
+interface Activity {
+  id: number;
+  type: string;
+  user: string;
+  timestamp: Date;
+  details: Record<string, any>;
+}
 
 const Dashboard: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [recentAssets, setRecentAssets] = useState<any[]>([]);
+  const [dashboardMetrics, setDashboardMetrics] = useState<DashboardMetrics | null>(null);
+  const [activities, setActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
+        // Fetch dashboard metrics
+        const metrics = await DashboardService.getDashboardMetrics();
+        setDashboardMetrics(metrics);
+        
+        // Fetch recent data assets
         const assets = await dataAssetService.getRecentDataAssets(5);
-        setRecentAssets(assets); // Already limited to 5 items in the service
+        setRecentAssets(assets);
+        
+        // Fetch activities
+        const recentActivities = await DashboardService.getRecentActivities();
+        setActivities(recentActivities);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        setError('Failed to load dashboard data. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -51,33 +107,53 @@ const Dashboard: React.FC = () => {
     fetchDashboardData();
   }, []);
 
-  // Sample data for charts
-  const domainDistributionData = [
-    { name: 'Finance', value: 8 },
-    { name: 'Sales', value: 6 },
-    { name: 'HR', value: 4 },
-    { name: 'IT', value: 12 },
-    { name: 'Marketing', value: 5 },
-  ];
-  
+  // Chart configuration
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
-  const assetComplianceData = [
-    { name: 'Compliant', count: 18 },
-    { name: 'Needs Review', count: 7 },
-    { name: 'Non-Compliant', count: 3 }
-  ];
+  // Format domain distribution data for the pie chart
+  const getDomainDistributionData = () => {
+    if (!dashboardMetrics?.charts.domainDistribution) return [];
+    
+    return dashboardMetrics.charts.domainDistribution.map(item => ({
+      name: item.domain,
+      value: item.count,
+      percentage: item.percentage
+    }));
+  };
 
+  // Format compliance status data for the bar chart
+  const getComplianceStatusData = () => {
+    if (!dashboardMetrics?.charts.complianceStatus) return [];
+    
+    return dashboardMetrics.charts.complianceStatus.map(item => ({
+      name: item.status,
+      count: item.count
+    }));
+  };
+
+  // Format timestamp to relative time
+  const formatRelativeTime = (timestamp: Date) => {
+    const now = new Date();
+    const date = new Date(timestamp);
+    const diffMs = now.getTime() - date.getTime();
+    const diffSec = Math.round(diffMs / 1000);
+    const diffMin = Math.round(diffSec / 60);
+    const diffHour = Math.round(diffMin / 60);
+    const diffDay = Math.round(diffHour / 24);
+
+    if (diffSec < 60) return 'just now';
+    if (diffMin < 60) return `${diffMin} minute${diffMin > 1 ? 's' : ''} ago`;
+    if (diffHour < 24) return `${diffHour} hour${diffHour > 1 ? 's' : ''} ago`;
+    if (diffDay < 30) return `${diffDay} day${diffDay > 1 ? 's' : ''} ago`;
+    
+    return date.toLocaleDateString();
+  };
+
+  // Mock notifications - would come from a real API in production
   const notificationsData = [
     { id: 1, message: 'New data asset "Customer Analytics Dashboard" was added', time: '2 hours ago' },
     { id: 2, message: 'Policy update for GDPR compliance standards', time: 'Yesterday' },
     { id: 3, message: 'Data quality review pending for Finance Database', time: '3 days ago' }
-  ];
-
-  const tasks = [
-    { id: 1, task: 'Review new data assets', status: 'pending' },
-    { id: 2, task: 'Update data governance policy', status: 'completed' },
-    { id: 3, task: 'Approve access requests (3)', status: 'urgent' }
   ];
 
   return (
@@ -94,6 +170,10 @@ const Dashboard: React.FC = () => {
           Here's an overview of your data governance ecosystem
         </Typography>
       </Box>
+      
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>
+      )}
       
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
@@ -119,10 +199,10 @@ const Dashboard: React.FC = () => {
                   Data Assets
                 </Typography>
                 <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-                  28
+                  {dashboardMetrics?.dataAssets.total || 0}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  +3 this month
+                  +{dashboardMetrics?.dataAssets.newThisMonth || 0} this month
                 </Typography>
               </Paper>
             </Grid>
@@ -143,10 +223,10 @@ const Dashboard: React.FC = () => {
                   Data Domains
                 </Typography>
                 <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-                  5
+                  {dashboardMetrics?.dataDomains.total || 0}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  All active
+                  {dashboardMetrics?.dataDomains.active || 0} active
                 </Typography>
               </Paper>
             </Grid>
@@ -167,10 +247,11 @@ const Dashboard: React.FC = () => {
                   Compliance
                 </Typography>
                 <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-                  84%
+                  {dashboardMetrics?.compliance.percentage || 0}%
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  +2% from last month
+                  {dashboardMetrics && dashboardMetrics.compliance.changeFromLastMonth > 0 ? '+' : ''}
+                  {dashboardMetrics?.compliance.changeFromLastMonth || 0}% from last month
                 </Typography>
               </Paper>
             </Grid>
@@ -191,10 +272,10 @@ const Dashboard: React.FC = () => {
                   Open Tasks
                 </Typography>
                 <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-                  7
+                  {dashboardMetrics?.tasks.open || 0}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  3 urgent
+                  {dashboardMetrics?.tasks.urgent || 0} urgent
                 </Typography>
               </Paper>
             </Grid>
@@ -218,16 +299,16 @@ const Dashboard: React.FC = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={domainDistributionData}
+                      data={getDomainDistributionData()}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percentage }) => `${name} ${percentage}%`}
                     >
-                      {domainDistributionData.map((entry, index) => (
+                      {getDomainDistributionData().map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
@@ -253,7 +334,7 @@ const Dashboard: React.FC = () => {
                 </Typography>
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
-                    data={assetComplianceData}
+                    data={getComplianceStatusData()}
                     margin={{
                       top: 20,
                       right: 30,

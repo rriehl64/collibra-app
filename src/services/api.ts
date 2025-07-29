@@ -486,6 +486,22 @@ export const dataAssetService = {
       throw new Error('Network error while searching data assets');
     }
   },
+  
+  /**
+   * Get suggestions for search autocomplete
+   */
+  getSuggestions: async (query: string): Promise<any[]> => {
+    try {
+      const response = await api.get<ApiResponse<any[]>>('/data-assets/suggestions', { 
+        params: { q: query } 
+      });
+      
+      return response.data.data || [];
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+      return [];
+    }
+  },
 };
 
 // Policy services
