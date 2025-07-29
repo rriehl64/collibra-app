@@ -10,6 +10,11 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 const DataAsset = require('./models/DataAsset');
 const Policy = require('./models/Policy');
+const Domain = require('./models/Domain');
+const Task = require('./models/Task');
+
+// Load seeders
+const seedDashboardData = require('./seeders/dashboardSeed');
 
 // Load env vars
 dotenv.config();
@@ -363,6 +368,10 @@ const importData = async () => {
     const createdPolicies = await Policy.insertMany(policiesWithOwner);
     console.log(`${createdPolicies.length} policies created`);
     
+    // Seed dashboard data (domains, tasks, update assets)
+    await seedDashboardData();
+    console.log('Dashboard data seeded successfully');
+    
     console.log('Data import completed successfully');
     process.exit(0);
   } catch (err) {
@@ -377,6 +386,8 @@ const deleteData = async () => {
     await User.deleteMany();
     await DataAsset.deleteMany();
     await Policy.deleteMany();
+    await Domain.deleteMany();
+    await Task.deleteMany();
     
     console.log('All data deleted successfully');
     process.exit(0);

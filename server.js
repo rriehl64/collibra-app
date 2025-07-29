@@ -17,6 +17,7 @@ connectDB();
 const dataAssets = require('./server/routes/dataAssets');
 const auth = require('./server/routes/auth');
 const policies = require('./server/routes/policies');
+const dashboard = require('./server/routes/dashboard');
 
 const app = express();
 
@@ -87,6 +88,7 @@ app.get('/docs/:file', (req, res) => {
 app.use('/api/v1/data-assets', dataAssets);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/policies', policies);
+app.use('/api/v1/dashboard', dashboard);
 
 // Only serve static files and handle React routing in production mode
 if (process.env.NODE_ENV === 'production') {

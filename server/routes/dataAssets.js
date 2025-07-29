@@ -4,7 +4,8 @@ const {
   getDataAsset,
   createDataAsset,
   updateDataAsset,
-  deleteDataAsset
+  deleteDataAsset,
+  getSuggestions
 } = require('../controllers/dataAssets');
 
 // Create router
@@ -16,6 +17,9 @@ const { protect, authorize } = require('../middleware/auth');
 router.route('/')
   .get(getDataAssets)
   .post(protect, authorize('admin', 'data-steward'), createDataAsset);
+
+router.route('/suggestions')
+  .get(getSuggestions);
 
 router.route('/:id')
   .get(getDataAsset)
