@@ -270,6 +270,8 @@ data-literacy-support/
 
 The platform is being enhanced with comprehensive data asset management capabilities, focusing on accessibility, visual relationship mapping, and integrated governance features. See the [detailed design document](./docs/DATA_ASSET_DESIGN.md) for full implementation plans.
 
+**Last Updated: July 29, 2025**
+
 ### Key Enhancements
 
 1. **Accessible Card-Based Interface**
