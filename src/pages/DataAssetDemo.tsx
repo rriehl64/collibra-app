@@ -22,12 +22,13 @@ const DataAssetDemo: React.FC = () => {
       status: 'Production',
       tags: ['customers', 'data warehouse', 'critical'],
       certification: 'certified',
+      stewards: ['Jane Smith', 'David Wilson'],
       updatedAt: '2025-07-25T14:30:00Z',
       createdAt: '2025-01-15T09:00:00Z',
       governance: {
         complianceStatus: 'Compliant',
         policies: [
-          { name: 'PII Handling', description: 'Policy for personally identifiable information', status: 'Active' }
+          'PII Handling', 'Data Privacy', 'GDPR Compliance'
         ]
       },
       qualityMetrics: {
@@ -46,12 +47,13 @@ const DataAssetDemo: React.FC = () => {
       status: 'Development',
       tags: ['sales', 'analytics', 'executive'],
       certification: 'pending',
+      stewards: ['Robert Johnson', 'Emily Chen'],
       updatedAt: '2025-07-28T10:15:00Z',
       createdAt: '2025-06-20T13:45:00Z',
       governance: {
         complianceStatus: 'Non-Compliant',
         policies: [
-          { name: 'Data Accuracy', description: 'Standards for data accuracy in reports', status: 'Violation' }
+          'Data Accuracy', 'Data Quality Standards'
         ]
       },
       qualityMetrics: {
@@ -70,12 +72,13 @@ const DataAssetDemo: React.FC = () => {
       status: 'Production',
       tags: ['api', 'products', 'inventory'],
       certification: 'certified',
+      stewards: ['Alex Chen', 'Sarah Johnson'],
       updatedAt: '2025-07-15T16:20:00Z',
       createdAt: '2025-03-10T11:30:00Z',
       governance: {
         complianceStatus: 'Compliant',
         policies: [
-          { name: 'API Security', description: 'Standards for API authentication and authorization', status: 'Active' }
+          'API Security', 'Authentication Standards', 'Authorization Controls'
         ]
       },
       qualityMetrics: {

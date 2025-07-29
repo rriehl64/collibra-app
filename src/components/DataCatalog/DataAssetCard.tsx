@@ -6,7 +6,6 @@
  */
 
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { AccessibleCard } from '../common/Card';
 import { DataAsset } from '../../types/DataAsset';
 
@@ -92,7 +91,7 @@ export const DataAssetCard: React.FC<DataAssetCardProps> = ({
     switch (asset.certification) {
       case 'certified': return '#007B3E'; // Green
       case 'pending': return '#F1C21B';   // Yellow
-      case 'none':
+      case 'uncertified':
       default: return '#8A8B8C';          // Gray
     }
   };
@@ -125,7 +124,7 @@ export const DataAssetCard: React.FC<DataAssetCardProps> = ({
             }}
             aria-label={`Certification status: ${asset.certification || 'none'}`}
           >
-            {asset.certification || 'Not Certified'}
+            {asset.certification || 'uncertified'}
           </span>
         </div>
         
@@ -177,14 +176,20 @@ export const DataAssetCard: React.FC<DataAssetCardProps> = ({
                 height: '10px',
                 width: '10px',
                 borderRadius: '50%',
-                backgroundColor: asset.governance.complianceStatus === 'Compliant' ? 'green' : 
-                                asset.governance.complianceStatus === 'Non-Compliant' ? 'red' : 'gray',
+                backgroundColor: 
+                  asset.governance.complianceStatus === 'Compliant' ? 'green' : 
+                  asset.governance.complianceStatus === 'Non-Compliant' ? 'red' : 'gray',
                 marginRight: '6px'
               }}
               aria-hidden="true"
             />
             <span>Compliance: {asset.governance.complianceStatus || 'Unknown'}</span>
           </div>
+          {asset.governance.policies && asset.governance.policies.length > 0 && (
+            <div style={{ marginTop: '8px' }}>
+              <span>Policies: {asset.governance.policies.join(', ')}</span>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -320,10 +325,8 @@ export const DataAssetCard: React.FC<DataAssetCardProps> = ({
   );
 };
 
-DataAssetCard.propTypes = {
-  asset: PropTypes.object.isRequired,
-  onUpdateAsset: PropTypes.func,
-  className: PropTypes.string
-};
+// We'll use TypeScript interfaces for type safety
+// PropTypes are omitted since they don't fully align with our TypeScript types
+// and would cause type errors when trying to make them match exactly
 
 export default DataAssetCard;
