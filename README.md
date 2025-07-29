@@ -33,9 +33,10 @@ This application showcases how modern data governance tools can help teams:
 
 1. **Data Catalog**
    - Comprehensive data asset discovery and metadata management
-   - Search and filter capabilities for data assets
+   - Advanced search and filter capabilities for data assets
    - Tagging and categorization of data
    - Certification workflow visualization
+   - Predictive search suggestions with history management
 
 2. **Data Governance**
    - Centralized policy management
@@ -182,6 +183,71 @@ The application consists of both a frontend React application and a backend Expr
    npm run build
    ```
 
+## Data Catalog Search Functionality
+
+The Data Catalog page features a powerful, accessible search system with predictive suggestions and comprehensive filtering capabilities.
+
+### Search Implementation
+
+#### Core Components
+
+1. **Debounced Search Input**
+   - Implements 500ms delay to optimize API calls during typing
+   - Prevents excessive server requests while providing real-time feedback
+
+2. **Predictive Search Suggestions**
+   - Combines data from multiple sources:
+     - Common predefined search terms
+     - Existing data asset names, types, and domains
+     - User-specific tags and categories
+   - Special handling for partial matches (e.g., "Mar" returns "Marketing")
+   - Case-insensitive matching for improved user experience
+   - Highlights matched text portions for visual clarity
+
+3. **Search History Management**
+   - Saves recent searches to localStorage
+   - Displays recent searches in the suggestions dropdown
+   - Allows quick reuse of previous search terms
+
+4. **Accessibility Features**
+   - Full keyboard navigation support
+   - ARIA attributes for screen reader compatibility
+   - Visible focus indicators for keyboard users
+   - Clear visual feedback for loading states
+
+5. **Visual Feedback**
+   - Loading indicators during search operations
+   - Clear search button for easy reset
+   - Result count display showing total matches
+   - No results messaging with helpful guidance
+
+#### Technical Implementation
+
+```typescript
+// Core search flow:
+1. User types in search box → handleSearch() triggered
+2. Input stored in searchText state with debounce (500ms)
+3. Predictive suggestions generated while typing
+4. When debounced value changes → API call or sample data filtering
+5. Results displayed with matched text highlighting
+6. Search history updated in localStorage
+```
+
+#### Development Features
+
+In development mode, the search includes:
+- Comprehensive debug logging for search term processing
+- Sample data with multiple Marketing-related entries for testing
+- Case-insensitive filtering across all data asset fields
+- Fallback data for offline development
+
+#### Search UX Improvements
+
+- Bold highlighting of matched text in suggestions and results
+- Categorized suggestions by type (predictive vs. recent)
+- Keyboard shortcut support (Escape to close, Enter to select)
+- Mobile-optimized interface with appropriate touch targets
+
 ## Project Structure
 
 ```
@@ -200,6 +266,32 @@ data-literacy-support/
 └── tsconfig.json        # TypeScript configuration
 ```
 
+## Data Asset Management Enhancement
+
+The platform is being enhanced with comprehensive data asset management capabilities, focusing on accessibility, visual relationship mapping, and integrated governance features. See the [detailed design document](./docs/DATA_ASSET_DESIGN.md) for full implementation plans.
+
+### Key Enhancements
+
+1. **Accessible Card-Based Interface**
+   - Full card click-to-edit functionality with keyboard support
+   - Section 508 compliant components with proper ARIA attributes
+   - Visible focus indicators and clear interaction patterns
+
+2. **Data Relationship Visualization**
+   - Interactive network graphs showing asset connections
+   - Data lineage visualization with Sankey diagrams
+   - Hierarchical views of parent-child relationships
+
+3. **Governance Integration**
+   - Embedded quality metrics with visual indicators
+   - Certification workflow tracking
+   - Policy compliance dashboards
+
+4. **Quality Metrics Reporting**
+   - Visual representation of completeness, accuracy, and consistency
+   - Trend analysis for quality improvement tracking
+   - Comparative analysis against similar assets
+
 ## Development Roadmap
 
 ### Phase 1: Core Infrastructure & UI (Complete)
@@ -213,11 +305,13 @@ data-literacy-support/
 ### Phase 2: Enhanced Features (In Progress)
 | Task | Description | Level of Effort | Status |
 |------|-------------|----------------|--------|
-| MongoDB Integration | Replace mock data with MongoDB database | Medium (3-5 days) | Not Started |
-| User Authentication | Implement user login, registration, and profiles | Medium (3-5 days) | Not Started |
-| Data Asset Details | Create detailed views for data assets | Medium (3-4 days) | Not Started |
-| Advanced Search | Implement advanced search functionality | Medium (3-4 days) | Not Started |
-| Data Lineage Visualization | Create interactive data lineage diagrams | High (5-7 days) | Not Started |
+| MongoDB Integration | Replace mock data with MongoDB database | Medium (3-5 days) | Complete |
+| User Authentication | Implement user login, registration, and profiles | Medium (3-5 days) | Complete |
+| Data Asset Details | Create detailed views for data assets | Medium (3-4 days) | In Progress |
+| Advanced Search | Implement advanced search functionality | Medium (3-4 days) | Complete |
+| Data Lineage Visualization | Create interactive data lineage diagrams | High (5-7 days) | In Progress |
+| Accessible Card Interface | Implement click-anywhere-to-edit card components | Medium (3-4 days) | In Progress |
+| Quality Metrics Dashboard | Create data quality visualization components | Medium (4-5 days) | Not Started |
 
 ### Phase 3: Business Logic Implementation (Planned)
 | Task | Description | Level of Effort | Status |
