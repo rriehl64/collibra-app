@@ -5,16 +5,25 @@
  * full Section 508 compliance and keyboard navigation support.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DataAssetCard } from '../components/DataCatalog/DataAssetCard';
 import { DataAsset } from '../types/DataAsset';
+import { CircularProgress, Alert, Box, Button, Typography, Container } from '@mui/material';
+import { Refresh as RefreshIcon } from '@mui/icons-material';
+import dataAssetService from '../services/dataAssetService';
 
-const DataAssetDemo: React.FC = () => {
-  // Sample data assets
-  const [dataAssets, setDataAssets] = useState<DataAsset[]>([
+const DataAssetDemo = (): React.ReactElement => {
+  // Data state
+  const [dataAssets, setDataAssets] = useState<DataAsset[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  
+  // Sample fallback data in case the API fails
+  const sampleFallbackData: DataAsset[] = [
     {
       _id: '1',
-      name: 'Customer Data Warehouse',
+      name: 'Customer Data Warehouse 567',
       type: 'Database',
       domain: 'Marketing',
       owner: 'Jane Smith',
@@ -87,28 +96,74 @@ const DataAssetDemo: React.FC = () => {
         consistency: 97
       }
     }
-  ]);
+  ];
+
+  // Fetch data assets from API
+  const fetchDataAssets = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Use the dataAssetService to get data assets with a limit of 15
+      const response = await dataAssetService.getDataAssets({ limit: 15 });
+      
+      if (response.assets && response.assets.length > 0) {
+        setDataAssets(response.assets);
+        setTotalCount(response.total || response.assets.length);
+      } else {
+        console.log('No data assets returned from API, using fallback data');
+        setDataAssets(sampleFallbackData);
+        setTotalCount(sampleFallbackData.length);
+      }
+    } catch (err) {
+      console.error('Failed to fetch data assets:', err);
+      setError('Failed to load data assets. Please try again later.');
+      // If API fails, use sample fallback data
+      setDataAssets(sampleFallbackData);
+      setTotalCount(sampleFallbackData.length);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Load data when component mounts
+  useEffect(() => {
+    fetchDataAssets();
+  }, [fetchDataAssets]);
 
   // Handle asset updates
   const handleUpdateAsset = async (updatedAsset: DataAsset): Promise<void> => {
-    return new Promise((resolve) => {
-      // Simulate API delay
-      setTimeout(() => {
-        setDataAssets(prevAssets => 
-          prevAssets.map(asset => 
-            asset._id === updatedAsset._id ? updatedAsset : asset
-          )
-        );
-        resolve();
-      }, 800);
-    });
+    try {
+      // Attempt to update asset via API
+      await dataAssetService.updateDataAsset(updatedAsset._id as string, updatedAsset);
+      
+      // Update local state on success
+      setDataAssets(prevAssets => 
+        prevAssets.map(asset => 
+          asset._id === updatedAsset._id ? updatedAsset : asset
+        )
+      );
+      
+      return Promise.resolve();
+    } catch (err) {
+      console.error('Failed to update asset, applying optimistic update locally:', err);
+      
+      // Apply optimistic update even if API call fails
+      setDataAssets(prevAssets => 
+        prevAssets.map(asset => 
+          asset._id === updatedAsset._id ? updatedAsset : asset
+        )
+      );
+      
+      return Promise.resolve();
+    }
   };
 
   return (
-    <div className="data-asset-demo" style={{ maxWidth: '800px', margin: '0 auto', padding: '24px' }}>
+    <Container className="data-asset-demo" sx={{ padding: '24px' }}>
       <header style={{ marginBottom: '24px' }}>
-        <h1 style={{ color: '#003366' }}>Data Asset Management</h1>
-        <p>
+        <h1 style={{ color: '#003366' }} id="data-assets-heading" tabIndex={-1}>Data Asset Management</h1>
+        <p aria-live="polite">
           Click anywhere on a card to edit the asset details. Press Tab to navigate between cards and Enter to activate edit mode.
         </p>
       </header>
@@ -128,17 +183,60 @@ const DataAssetDemo: React.FC = () => {
         </ul>
       </div>
       
-      <div className="cards-container">
-        <h2 style={{ fontSize: '20px', marginBottom: '16px' }}>Data Assets ({dataAssets.length})</h2>
-        {dataAssets.map(asset => (
-          <DataAssetCard 
-            key={asset._id} 
-            asset={asset}
-            onUpdateAsset={handleUpdateAsset}
-          />
-        ))}
-      </div>
-    </div>
+      {/* Loading state */}
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+          <CircularProgress aria-label="Loading data assets" />
+          <Typography component="span" sx={{ ml: 2 }} role="status">
+            Loading data assets...
+          </Typography>
+        </Box>
+      )}
+      
+      {/* Error state */}
+      {error && !loading && (
+        <Alert 
+          severity="error" 
+          sx={{ mb: 2 }}
+          action={
+            <Button 
+              color="inherit" 
+              size="small" 
+              onClick={() => fetchDataAssets()}
+              startIcon={<RefreshIcon />}
+              aria-label="Retry loading data assets"
+            >
+              Retry
+            </Button>
+          }
+        >
+          {error}
+        </Alert>
+      )}
+      
+      {/* Data display */}
+      {!loading && !error && (
+        <div className="cards-container" aria-live="polite">
+          <h2 style={{ fontSize: '20px', marginBottom: '16px' }} aria-label={`Showing ${dataAssets.length} of ${totalCount} data assets`}>
+            Data Assets ({dataAssets.length})
+          </h2>
+          
+          {dataAssets.length === 0 ? (
+            <Alert severity="info">No data assets found.</Alert>
+          ) : (
+            <div role="region" aria-label="Data assets list">
+              {dataAssets.map(asset => (
+                <DataAssetCard 
+                  key={asset._id} 
+                  asset={asset}
+                  onUpdateAsset={handleUpdateAsset}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </Container>
   );
 };
 

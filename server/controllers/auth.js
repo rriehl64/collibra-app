@@ -238,9 +238,13 @@ const sendTokenResponse = (user, statusCode, res) => {
   // Create token
   const token = user.getSignedJwtToken();
   
+  // Default to 30 days if JWT_COOKIE_EXPIRE is not set
+  const expiresIn = process.env.JWT_COOKIE_EXPIRE ? 
+    parseInt(process.env.JWT_COOKIE_EXPIRE) : 30;
+    
   const options = {
     expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+      Date.now() + expiresIn * 24 * 60 * 60 * 1000
     ),
     httpOnly: true
   };

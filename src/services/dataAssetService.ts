@@ -7,7 +7,7 @@ import { DataAsset } from '../types/DataAsset';
 import elasticSearchService from './elasticSearchService';
 
 // API base URL from environment
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002/api/v1';
 
 // Response type from API
 interface ApiResponse<T> {

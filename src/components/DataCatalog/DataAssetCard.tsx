@@ -8,6 +8,7 @@
 import React, { useState } from 'react';
 import { AccessibleCard } from '../common/Card';
 import { DataAsset } from '../../types/DataAsset';
+import { getDomainColorScheme } from '../../utils/domainColors';
 
 interface DataAssetCardProps {
   /** The data asset to display */
@@ -95,6 +96,9 @@ export const DataAssetCard: React.FC<DataAssetCardProps> = ({
       default: return '#8A8B8C';          // Gray
     }
   };
+
+  // Get domain-specific color scheme
+  const domainColorScheme = getDomainColorScheme(asset.domain);
 
   // View mode content
   const viewContent = (
@@ -311,14 +315,19 @@ export const DataAssetCard: React.FC<DataAssetCardProps> = ({
   return (
     <AccessibleCard
       title={asset.name}
-      subtitle={`${asset.type} • Last updated ${new Date(asset.updatedAt || Date.now()).toLocaleDateString()}`}
+      subtitle={`Last updated: ${new Date(asset.updatedAt || '').toLocaleDateString()}`}
       editComponent={editContent}
       onEdit={handleEdit}
       onSave={handleSave}
-      loading={isLoading}
       className={className}
-      tooltip={`Click to edit ${asset.name}`}
-      testId={`data-asset-card-${asset._id}`}
+      testId={`asset-card-${asset._id}`}
+      loading={isLoading}
+      customStyle={{
+        backgroundColor: domainColorScheme.background,
+        borderLeft: `4px solid ${domainColorScheme.border}`,
+        color: domainColorScheme.text,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }}
     >
       {viewContent}
     </AccessibleCard>

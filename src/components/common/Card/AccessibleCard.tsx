@@ -41,6 +41,8 @@ interface AccessibleCardProps {
   loading?: boolean;
   /** Custom test ID for testing */
   testId?: string;
+  /** Custom styling for the card */
+  customStyle?: React.CSSProperties;
 }
 
 export const AccessibleCard: React.FC<AccessibleCardProps> = ({
@@ -55,7 +57,8 @@ export const AccessibleCard: React.FC<AccessibleCardProps> = ({
   tooltip,
   disabled = false,
   loading = false,
-  testId = 'accessible-card'
+  testId = 'accessible-card',
+  customStyle = {}
 }) => {
   // Refs for focus management
   const cardRef = useRef<HTMLDivElement>(null);
@@ -124,7 +127,8 @@ export const AccessibleCard: React.FC<AccessibleCardProps> = ({
         padding: '16px',
         margin: '8px 0',
         transition: 'all 0.2s ease',
-        boxShadow: isFocused ? '0 0 0 2px #003366' : 'none',
+        boxShadow: isFocused ? `0 0 0 2px ${typeof customStyle.borderLeft === 'string' && customStyle.borderLeft.includes(' ') ? customStyle.borderLeft.split(' ')[2] : '#003366'}` : 'none',
+        ...customStyle
       }}
     >
       {/* Card Header */}

@@ -145,7 +145,7 @@ exports.getDataAssets = async (req, res) => {
       
       // Set up pagination
       const page = parseInt(req.query.page, 10) || 1;
-      const limit = parseInt(req.query.limit, 10) || 10;
+      const limit = parseInt(req.query.limit, 10) || 15;
       const startIndex = (page - 1) * limit;
       const endIndex = page * limit;
       const totalPages = Math.ceil(total / limit);
@@ -199,7 +199,7 @@ exports.getDataAssets = async (req, res) => {
     // Pagination result
     const pagination = {};
     const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 10;
+    const limit = parseInt(req.query.limit, 10) || 15; // Changed default limit to 15
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
     

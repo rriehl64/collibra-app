@@ -21,13 +21,28 @@ const dashboard = require('./server/routes/dashboard');
 
 const app = express();
 
-// Enable CORS for specific origin
+// Enable CORS for frontend and development origins
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3002',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = process.env.CORS_ORIGIN ? 
+      process.env.CORS_ORIGIN.split(',') : 
+      ['http://localhost:3006', 'http://localhost:3002'];
+      
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true, // Allow cookies to be sent with requests
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['Content-Length', 'X-Total-Count']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Access-Control-Allow-Origin', 'Origin', 'Accept'],
+  exposedHeaders: ['Content-Length', 'X-Total-Count', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 };
 
 // Apply CORS middleware
@@ -115,7 +130,13 @@ app.use((err, req, res, next) => {
   });
 });
 
-const port = process.env.PORT || 3001;  
+const port = process.env.PORT || 3002;
+
+// Debug environment variables
+console.log('Current environment variables:');
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('API URL in backend:', process.env.REACT_APP_API_URL || 'not set');
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
   console.log('Documentation path:', path.join(__dirname, 'docs'));

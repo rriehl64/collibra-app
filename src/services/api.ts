@@ -5,7 +5,10 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
 // Set API base URL from env variable
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002/api/v1';
+
+// Force correct port for all API calls regardless of environment variables
+axios.defaults.baseURL = 'http://localhost:3002/api/v1';
 
 // Create Axios instance
 const api = axios.create({
@@ -25,6 +28,7 @@ api.interceptors.request.use(
     
     // Add token to headers if it exists
     if (token) {
+      // Ensure we're using Bearer authentication format
       config.headers.Authorization = `Bearer ${token}`;
     }
     

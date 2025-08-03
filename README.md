@@ -46,6 +46,25 @@ This application showcases how modern data governance tools can help teams:
 
 ## Features
 
+### Recent Improvements
+
+#### Domain-Based Color Coding
+- Implemented 508-compliant color schemes for data asset cards based on domains
+- Each domain (Customer, Finance, Marketing, Operations, Product, HR) has distinct visual styling
+- Enhanced visual differentiation with proper contrast ratios and focus indicators
+- Consistent styling applied across both Data Catalog and Data Assets pages
+
+#### Authentication and API Connection Fixes
+- Fixed API port configuration to consistently use port 3002
+- Updated CORS settings to allow requests from both frontend and backend
+- Added proper cookie handling with JWT token authentication
+- Implemented default expiration fallback for authentication tokens
+
+#### User Interface Enhancements
+- Added visual indicators for focus states that match domain colors
+- Improved search functionality with debounced queries and search history
+- Enhanced keyboard navigation and screen reader compatibility
+
 ### Current Features
 
 1. **Data Catalog**
@@ -98,11 +117,29 @@ The application features a modern, responsive UI built with Material-UI (MUI) th
 
 ### Prerequisites
 
+- Node.js (v16+)
+- MongoDB
+- npm or yarn
+
 - Node.js (v16 or higher)
 - npm (v8 or higher)
 - Git
 
 ### Installation
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd collibra-app
+
+# Install dependencies
+npm install
+
+# Install server dependencies
+cd server
+npm install
+cd ..
+```
 
 1. Clone the repository:
    ```bash
@@ -116,6 +153,22 @@ The application features a modern, responsive UI built with Material-UI (MUI) th
    ```
 
 ### Running the Application
+
+```bash
+# Start the backend server (runs on port 3002)
+npm run server
+
+# In a separate terminal, start the React frontend (runs on port 3006)
+npm start
+```
+
+### Authentication
+
+The application comes with pre-seeded user accounts:
+
+- Admin: `admin@example.com` / `admin123!`
+- Data Steward: `steward@example.com` / `password123`
+- Regular User: `user@example.com` / `password123`
 
 1. Start the development server:
    ```bash

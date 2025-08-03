@@ -29,7 +29,38 @@ yarn-error.log*
 
 # temporary files
 *.bak
+*.backup
+*.backup*
+*.bak*
+*_backup*
+*_backup
+*.tsx.original
+*.tsx.bak*
+*.tsx.before_fix
+*.tsx.pre_fix_backup
+*.tsx.prefinal_backup
+*.tsx.final_backup*
+*.broken.*
+*.working.*
 check-mongodb.js
+check-collections.js
+check-users.js
+
+# fix scripts
+fix*.js
+fix*.sh
+*-fix.js
+fixed/
+fixes/
+*.fix.js
+update-*.js
+sync-*.js
+set-env-vars.sh
+replace_*.js
+accurate-fix.js
+direct-fix.js
+direct_fix.js
+clean_ending.js
 
 # scripts and samples
 /scripts
