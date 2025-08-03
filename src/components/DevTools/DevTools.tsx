@@ -50,7 +50,7 @@ const DevTools: React.FC = () => {
   // Direct API login without going through the React context
   const directApiLogin = async (email: string, password: string) => {
     try {
-      const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1';
+      const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:3002/api/v1';
       const response = await axios.post(`${apiBaseUrl}/auth/login`, { email, password }, {
         withCredentials: true
       });

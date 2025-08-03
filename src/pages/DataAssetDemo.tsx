@@ -15,10 +15,11 @@ import dataAssetService from '../services/dataAssetService';
 const DataAssetDemo = (): React.ReactElement => {
   // Data state
   const [dataAssets, setDataAssets] = useState<DataAsset[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState<number>(0);
-  
+  const [successMessage, setSuccessMessage] = useState<string>('');
+
   // Sample fallback data in case the API fails
   const sampleFallbackData: DataAsset[] = [
     {
@@ -111,16 +112,21 @@ const DataAssetDemo = (): React.ReactElement => {
         setDataAssets(response.assets);
         setTotalCount(response.total || response.assets.length);
       } else {
-        console.log('No data assets returned from API, using fallback data');
-        setDataAssets(sampleFallbackData);
-        setTotalCount(sampleFallbackData.length);
+        console.log('No data assets returned from API');
+        setDataAssets([]);
+        setTotalCount(0);
+        setError('No data assets found. Please check your connection or permissions.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch data assets:', err);
-      setError('Failed to load data assets. Please try again later.');
-      // If API fails, use sample fallback data
-      setDataAssets(sampleFallbackData);
-      setTotalCount(sampleFallbackData.length);
+      
+      // Set specific error message based on error type
+      const errorMessage = err.message || 'Failed to load data assets. Please try again later.';
+      setError(errorMessage);
+      
+      // Don't use sample fallback data anymore - show empty state
+      setDataAssets([]);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
@@ -131,31 +137,42 @@ const DataAssetDemo = (): React.ReactElement => {
     fetchDataAssets();
   }, [fetchDataAssets]);
 
-  // Handle asset updates
-  const handleUpdateAsset = async (updatedAsset: DataAsset): Promise<void> => {
+  // Handle updating an asset
+  // Handle updating an asset
+  const updateAsset = async (id: string, updatedData: Partial<DataAsset>) => {
+    // Store original data before optimistic update for potential rollback
+    const originalAssets = [...dataAssets];
+    
     try {
-      // Attempt to update asset via API
-      await dataAssetService.updateDataAsset(updatedAsset._id as string, updatedAsset);
-      
-      // Update local state on success
+      // Optimistically update the UI
       setDataAssets(prevAssets => 
         prevAssets.map(asset => 
-          asset._id === updatedAsset._id ? updatedAsset : asset
+          asset._id === id ? { ...asset, ...updatedData } : asset
         )
       );
       
-      return Promise.resolve();
-    } catch (err) {
-      console.error('Failed to update asset, applying optimistic update locally:', err);
+      // Clear any previous errors
+      setError(null);
       
-      // Apply optimistic update even if API call fails
-      setDataAssets(prevAssets => 
-        prevAssets.map(asset => 
-          asset._id === updatedAsset._id ? updatedAsset : asset
-        )
-      );
+      // Call API to update in backend
+      await dataAssetService.updateDataAsset(id, updatedData);
       
-      return Promise.resolve();
+      // Show success notification
+      setSuccessMessage('Data asset updated successfully');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (err: any) {
+      console.error('Failed to update data asset:', err);
+      
+      // Roll back optimistic update
+      setDataAssets(originalAssets);
+      
+      // Show specific error message to user
+      setError(err.message || 'Failed to update data asset. Please try again.');
+      
+      // Clear error message after 5 seconds
+      setTimeout(() => setError(''), 5000);
     }
   };
 
@@ -191,6 +208,17 @@ const DataAssetDemo = (): React.ReactElement => {
             Loading data assets...
           </Typography>
         </Box>
+      )}
+      
+      {/* Success message */}
+      {successMessage && (
+        <Alert 
+          severity="success" 
+          sx={{ mb: 2 }}
+          onClose={() => setSuccessMessage('')}
+        >
+          {successMessage}
+        </Alert>
       )}
       
       {/* Error state */}
@@ -229,7 +257,7 @@ const DataAssetDemo = (): React.ReactElement => {
                 <DataAssetCard 
                   key={asset._id} 
                   asset={asset}
-                  onUpdateAsset={handleUpdateAsset}
+                  onUpdateAsset={(updatedAsset: DataAsset) => updateAsset(updatedAsset._id as string, updatedAsset)}
                 />
               ))}
             </div>

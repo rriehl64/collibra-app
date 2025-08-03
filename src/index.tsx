@@ -1,3 +1,6 @@
+// Force port redirection before any other imports
+import './services/apiUrlFixer';
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Accessible Data Asset Components Test</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    h1 {
+      color: #7BC144;
+      margin-bottom: 16px;
+    }
+    .card {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      position: relative;
+      background-color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+    }
+    .card:hover {
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .card:focus {
+      outline: 2px solid #1785FB;
+      box-shadow: 0 0 0 4px rgba(23, 133, 251, 0.3);
+    }
+    .card h2 {
+      margin-top: 0;
+      color: #0C1F3F;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    .badge.certified {
+      background-color: #7BC144;
+      color: white;
+    }
+    .badge.pending {
+      background-color: #FFD700;
+      color: #333;
+    }
+    .badge.uncertified {
+      background-color: #f0f0f0;
+      color: #666;
+    }
+    .row {
+      display: flex;
+      margin-bottom: 8px;
+    }
+    .label {
+      flex: 0 0 120px;
+      font-weight: bold;
+      color: #666;
+    }
+    .value {
+      flex: 1;
+    }
+    .metrics {
+      display: flex;
+      margin-top: 16px;
+      gap: 16px;
+    }
+    .metric {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      border-radius: 8px;
+      background-color: #f5f6f7;
+    }
+    .metric-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1785FB;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: #666;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+    .keyboard-instructions {
+      margin-top: 24px;
+      padding: 16px;
+      background-color: #e6f7ff;
+      border-left: 4px solid #1785FB;
+      margin-bottom: 24px;
+    }
+    .keyboard-instructions h2 {
+      margin-top: 0;
+      color: #1785FB;
+    }
+    ul.keyboard-list {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    ul.keyboard-list li {
+      margin-bottom: 8px;
+    }
+    .key {
+      display: inline-block;
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.2);
+      font-family: monospace;
+      font-size: 13px;
+      padding: 2px 6px;
+      margin: 0 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Accessible Data Asset Components</h1>
+    <p>This page demonstrates the accessible data asset card components with keyboard navigation and screen reader support.</p>
+    
+    <div class="keyboard-instructions">
+      <h2>Keyboard Navigation Instructions</h2>
+      <p>These cards are fully accessible with the following keyboard shortcuts:</p>
+      <ul class="keyboard-list">
+        <li><span class="key">Tab</span> - Move focus to the next card or interactive element</li>
+        <li><span class="key">Enter</span> or <span class="key">Space</span> - Activate a card to edit it</li>
+        <li><span class="key">Escape</span> - Cancel editing mode</li>
+        <li><span class="key">Ctrl</span> + <span class="key">Enter</span> - Save changes in edit mode</li>
+      </ul>
+      <p>Screen reader announcements will guide you through the interaction process.</p>
+    </div>
+
+    <!-- Sample Data Asset Cards - Simplified static HTML versions -->
+    <div class="card" tabindex="0" role="button" aria-label="Customer Data Warehouse card, click to edit">
+      <div class="badge certified">Certified</div>
+      <h2>Customer Data Warehouse</h2>
+      
+      <div class="row">
+        <span class="label">Type:</span>
+        <span class="value">Database</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Domain:</span>
+        <span class="value">Marketing</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Owner:</span>
+        <span class="value">Jane Smith</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Description:</span>
+        <span class="value">Central repository for all customer data including demographics, purchase history, and interaction data.</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Status:</span>
+        <span class="value">Production</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Policies:</span>
+        <span class="value">PII Handling, Data Privacy, GDPR Compliance</span>
+      </div>
+      
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-value">92%</div>
+          <div class="metric-label">Completeness</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">88%</div>
+          <div class="metric-label">Accuracy</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">95%</div>
+          <div class="metric-label">Consistency</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card" tabindex="0" role="button" aria-label="Sales Analytics Dashboard card, click to edit">
+      <div class="badge pending">Pending</div>
+      <h2>Sales Analytics Dashboard</h2>
+      
+      <div class="row">
+        <span class="label">Type:</span>
+        <span class="value">Dashboard</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Domain:</span>
+        <span class="value">Sales</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Owner:</span>
+        <span class="value">Robert Johnson</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Description:</span>
+        <span class="value">Executive dashboard showing sales performance metrics, trends, and forecasts.</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Status:</span>
+        <span class="value">Development</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Policies:</span>
+        <span class="value">Data Accuracy, Data Quality Standards</span>
+      </div>
+      
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-value">75%</div>
+          <div class="metric-label">Completeness</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">68%</div>
+          <div class="metric-label">Accuracy</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">72%</div>
+          <div class="metric-label">Consistency</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card" tabindex="0" role="button" aria-label="Product Catalog API card, click to edit">
+      <div class="badge certified">Certified</div>
+      <h2>Product Catalog API</h2>
+      
+      <div class="row">
+        <span class="label">Type:</span>
+        <span class="value">API</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Domain:</span>
+        <span class="value">Product</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Owner:</span>
+        <span class="value">Alex Chen</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Description:</span>
+        <span class="value">RESTful API providing access to the current product catalog with pricing and inventory information.</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Status:</span>
+        <span class="value">Production</span>
+      </div>
+      
+      <div class="row">
+        <span class="label">Policies:</span>
+        <span class="value">API Security, Authentication Standards, Authorization Controls</span>
+      </div>
+      
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-value">98%</div>
+          <div class="metric-label">Completeness</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">95%</div>
+          <div class="metric-label">Accuracy</div>
+        </div>
+        <div class="metric">
+          <div class="metric-value">97%</div>
+          <div class="metric-label">Consistency</div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      // Simple accessibility enhancements
+      document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.card');
+        
+        cards.forEach(card => {
+          // Keyboard handling
+          card.addEventListener('keydown', function(e) {
+            // Enter or Space to activate
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              alert('In a real implementation, this would open the edit mode for this card. In our React component, this triggers the edit state and focuses the first form field.');
+            }
+          });
+          
+          // Click handling
+          card.addEventListener('click', function() {
+            alert('In a real implementation, this would open the edit mode for this card. In our React component, this triggers the edit state and focuses the first form field.');
+          });
+        });
+      });
+    </script>
+  </div>
+</body>
+</html>

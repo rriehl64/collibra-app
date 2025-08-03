@@ -27,6 +27,7 @@ const menuItems = [
   { text: 'Dashboard', icon: DashboardIcon, path: '/' },
   { text: 'Collibra 101', icon: SchoolIcon, path: '/learn101' },
   { text: 'Data Catalog', icon: StorageIcon, path: '/data-catalog' },
+  { text: 'Data Assets', icon: StorageIcon, path: '/data-assets' },
   { text: 'Asset Types', icon: StorageIcon, path: '/asset-types' },
   { text: 'Data Governance', icon: SecurityIcon, path: '/data-governance' },
   { text: 'DG vs MDM', icon: SecurityIcon, path: '/dgvsmdm' },

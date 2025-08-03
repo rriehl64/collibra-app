@@ -7,8 +7,9 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 // Set API base URL from env variable
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002/api/v1';
 
-// Force correct port for all API calls regardless of environment variables
+// For consistency, ensure all API calls use port 3002
 axios.defaults.baseURL = 'http://localhost:3002/api/v1';
+export { API_BASE_URL };
 
 // Create Axios instance
 const api = axios.create({

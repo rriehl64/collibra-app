@@ -1,6 +1,9 @@
 import axios from 'axios';
 import { API_URL } from 'config';
 
+// Force correct API URL regardless of what's in config or env variables
+const DASHBOARD_API_URL = 'http://localhost:3002/api/v1';
+
 // Define interfaces for dashboard data
 interface DashboardMetrics {
   dataAssets: {
@@ -61,7 +64,7 @@ const DashboardService = {
    */
   getDashboardMetrics: async (): Promise<DashboardMetrics> => {
     try {
-      const response = await axios.get(`${API_URL}/dashboard/metrics`, {
+      const response = await axios.get(`${DASHBOARD_API_URL}/dashboard/metrics`, {
         withCredentials: true
       });
       
@@ -80,7 +83,7 @@ const DashboardService = {
    */
   getRecentActivities: async (): Promise<Activity[]> => {
     try {
-      const response = await axios.get(`${API_URL}/dashboard/activities`, {
+      const response = await axios.get(`${DASHBOARD_API_URL}/dashboard/activities`, {
         withCredentials: true
       });
       
@@ -99,7 +102,7 @@ const DashboardService = {
    */
   getSystemHealth: async (): Promise<SystemHealth> => {
     try {
-      const response = await axios.get(`${API_URL}/dashboard/health`, {
+      const response = await axios.get(`${DASHBOARD_API_URL}/dashboard/health`, {
         withCredentials: true
       });
       

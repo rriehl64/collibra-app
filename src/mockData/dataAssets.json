@@ -1,0 +1,312 @@
+{
+  "dataAssets": [
+    {
+      "_id": "688c291934a602337a6085a3",
+      "name": "Customer Data Warehouse 100",
+      "type": "Database",
+      "domain": "Customer",
+      "owner": "Data Management Team",
+      "description": "Central repository for customer data including demographics, transactions, and preferences",
+      "lastModified": "2025-08-01T02:40:25.513Z",
+      "status": "Production",
+      "tags": [
+        "Customer",
+        "Data Warehouse",
+        "Production"
+      ],
+      "certification": "certified",
+      "lineage": {
+        "sources": [
+          "688c291934a602337a6085a5"
+        ],
+        "targets": [
+          "688c291934a602337a6085b9"
+        ]
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085a5",
+      "name": "Sales Transactions",
+      "type": "Table",
+      "domain": "Sales",
+      "owner": "Sales Operations",
+      "description": "Contains all sales transaction records with customer IDs, products, amounts, and dates",
+      "lastModified": "2025-08-01T02:40:25.528Z",
+      "status": "Production",
+      "tags": [
+        "Sales",
+        "Transactions",
+        "Revenue"
+      ],
+      "certification": "certified",
+      "lineage": {
+        "sources": [],
+        "targets": [
+          "688c291934a602337a6085a3"
+        ]
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085a7",
+      "name": "Marketing Campaign Performance",
+      "type": "Dashboard",
+      "domain": "Marketing",
+      "owner": "Marketing Analytics",
+      "description": "Interactive dashboard showing key performance metrics for all marketing campaigns",
+      "lastModified": "2025-08-01T02:40:25.531Z",
+      "status": "Production",
+      "tags": [
+        "Marketing",
+        "Analytics",
+        "KPI"
+      ],
+      "certification": "certified",
+      "lineage": {
+        "sources": [],
+        "targets": []
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085a9",
+      "name": "Customer Segmentation Model",
+      "type": "API",
+      "domain": "Data Science",
+      "owner": "Data Science Team",
+      "description": "Machine learning model API that categorizes customers into segments based on behavior",
+      "lastModified": "2025-08-01T02:40:25.534Z",
+      "status": "Development",
+      "tags": [
+        "ML",
+        "Customer Segmentation",
+        "API"
+      ],
+      "certification": "pending",
+      "lineage": {
+        "sources": [],
+        "targets": []
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085ab",
+      "name": "Product Catalog",
+      "type": "Table",
+      "domain": "Product",
+      "owner": "Product Management",
+      "description": "Complete catalog of all products with descriptions, pricing, and inventory information",
+      "lastModified": "2025-08-01T02:40:25.537Z",
+      "status": "Production",
+      "tags": [
+        "Product",
+        "Catalog",
+        "Inventory"
+      ],
+      "certification": "certified",
+      "lineage": {
+        "sources": [],
+        "targets": []
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085ad",
+      "name": "Financial Reporting",
+      "type": "Report",
+      "domain": "Finance",
+      "owner": "Finance Team",
+      "description": "Quarterly and annual financial reports including P&L, balance sheets, and cash flow",
+      "lastModified": "2025-08-01T02:40:25.539Z",
+      "status": "Production",
+      "tags": [
+        "Finance",
+        "Reporting",
+        "Compliance"
+      ],
+      "certification": "certified",
+      "lineage": {
+        "sources": [],
+        "targets": []
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085af",
+      "name": "Customer Feedback Analysis",
+      "type": "Dashboard",
+      "domain": "Customer",
+      "owner": "Customer Success",
+      "description": "Analysis of customer feedback from surveys, support tickets, and social media",
+      "lastModified": "2025-08-01T02:40:25.542Z",
+      "status": "Production",
+      "tags": [
+        "Customer",
+        "Feedback",
+        "Sentiment Analysis"
+      ],
+      "certification": "certified",
+      "lineage": {
+        "sources": [],
+        "targets": []
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085b1",
+      "name": "HR Employee Directory",
+      "type": "Table",
+      "domain": "HR",
+      "owner": "Human Resources",
+      "description": "Employee directory with contact information and department organization",
+      "lastModified": "2025-08-01T02:40:25.544Z",
+      "status": "Production",
+      "tags": [
+        "HR",
+        "Employee",
+        "Directory"
+      ],
+      "certification": "certified",
+      "lineage": {
+        "sources": [],
+        "targets": []
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085b3",
+      "name": "Supply Chain Logistics",
+      "type": "Dashboard",
+      "domain": "Operations",
+      "owner": "Supply Chain Team",
+      "description": "Real-time dashboard of supply chain metrics, shipments, and inventory levels",
+      "lastModified": "2025-08-01T02:40:25.548Z",
+      "status": "Development",
+      "tags": [
+        "Supply Chain",
+        "Logistics",
+        "Operations"
+      ],
+      "certification": "pending",
+      "lineage": {
+        "sources": [],
+        "targets": []
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085b5",
+      "name": "Compliance Documentation",
+      "type": "Document",
+      "domain": "Legal",
+      "owner": "Legal Department",
+      "description": "Documentation of regulatory compliance procedures and policies",
+      "lastModified": "2025-08-01T02:40:25.552Z",
+      "status": "Production",
+      "tags": [
+        "Compliance",
+        "Legal",
+        "Documentation"
+      ],
+      "certification": "certified",
+      "lineage": {
+        "sources": [],
+        "targets": []
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085b7",
+      "name": "Sales Performance Dashboard",
+      "type": "Dashboard",
+      "domain": "Sales",
+      "owner": "Sales Operations",
+      "description": "Interactive dashboard showing sales team performance metrics and goal tracking",
+      "lastModified": "2025-08-01T02:40:25.554Z",
+      "status": "Production",
+      "tags": [
+        "Sales",
+        "Performance",
+        "Dashboard"
+      ],
+      "certification": "certified",
+      "lineage": {
+        "sources": [],
+        "targets": []
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085b9",
+      "name": "Customer 360 View",
+      "type": "API",
+      "domain": "Customer",
+      "owner": "Data Integration Team",
+      "description": "API providing a unified view of customer data across all systems",
+      "lastModified": "2025-08-01T02:40:25.556Z",
+      "status": "Production",
+      "tags": [
+        "Customer",
+        "Integration",
+        "API"
+      ],
+      "certification": "certified",
+      "lineage": {
+        "sources": [
+          "688c291934a602337a6085a3"
+        ],
+        "targets": []
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085bb",
+      "name": "Inventory Management System",
+      "type": "Database",
+      "domain": "Operations",
+      "owner": "Warehouse Management",
+      "description": "System tracking all inventory movements, stock levels, and warehouse locations",
+      "lastModified": "2025-08-01T02:40:25.558Z",
+      "status": "Production",
+      "tags": [
+        "Inventory",
+        "Warehouse",
+        "Operations"
+      ],
+      "certification": "certified",
+      "lineage": {
+        "sources": [],
+        "targets": []
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085bd",
+      "name": "Website Analytics",
+      "type": "Dashboard",
+      "domain": "Marketing",
+      "owner": "Digital Marketing",
+      "description": "Real-time and historical analytics of website visitor behavior and conversions",
+      "lastModified": "2025-08-01T02:40:25.559Z",
+      "status": "Production",
+      "tags": [
+        "Web Analytics",
+        "Marketing",
+        "Digital"
+      ],
+      "certification": "certified",
+      "lineage": {
+        "sources": [],
+        "targets": []
+      }
+    },
+    {
+      "_id": "688c291934a602337a6085bf",
+      "name": "Research and Development Projects",
+      "type": "Document",
+      "domain": "R&D",
+      "owner": "R&D Department",
+      "description": "Documentation of ongoing research and development projects and innovations",
+      "lastModified": "2025-08-01T02:40:25.561Z",
+      "status": "Development",
+      "tags": [
+        "Research",
+        "Development",
+        "Innovation"
+      ],
+      "certification": "pending",
+      "lineage": {
+        "sources": [],
+        "targets": []
+      }
+    }
+  ]
+}

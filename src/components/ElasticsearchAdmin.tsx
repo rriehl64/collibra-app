@@ -58,7 +58,7 @@ const ElasticsearchAdmin = () => {
     try {
       // This would normally call an API endpoint to get cluster health
       // For now, we'll mock this with a direct service call
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1';
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002/api/v1';
       const response = await axios.get(`${API_URL}/elasticsearch/health`);
       
       setStats(response.data);
@@ -107,7 +107,7 @@ const ElasticsearchAdmin = () => {
     
     try {
       // This would normally call an API endpoint to delete the index
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api/v1';
+      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002/api/v1';
       await axios.delete(`${API_URL}/elasticsearch/index`);
       
       setSuccess('Successfully deleted Elasticsearch index');
