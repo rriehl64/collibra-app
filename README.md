@@ -10,14 +10,14 @@ A modern React-based web application designed to improve data literacy and gover
 - Traditional Cost: $24,000
 
 ### Windsurf Cost
-- Monthly Rate: $39/user
+- Monthly Rate: $15/user
 - Days Used: 30
-- Actual Cost: $39.00
+- Actual Cost: $15.00
 
 ### Cost Savings
-- Total Savings: $23,961.00
-- Cost Reduction: 99.84%
-- ROI: 61,438%
+- Total Savings: $23,985.00
+- Cost Reduction: 99.94%
+- ROI: 159,900%
 
 ## Table of Contents
 
