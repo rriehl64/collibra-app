@@ -63,6 +63,18 @@ A modern React-based web application designed to improve data literacy and gover
 - Improved Documentation: Automatically generated documentation and clear code patterns
 - Knowledge Sharing: System captures decisions and approaches for future reference
 
+## Application Screenshots
+
+Below are screenshots of the key pages and features of the Data Literacy Support platform:
+
+### Data Catalog Dashboard
+![Data Catalog Dashboard](./public/images/Dashboard.png)
+*The Data Catalog dashboard shows all data assets with their domains, types, and certification status, following 508 compliance standards*
+
+### Data Asset Details and Search
+![Data Asset Details and Search](./public/images/Dashboard1.png)
+*Detailed view of data assets with enhanced search functionality, showing proper keyboard accessibility and visual indicators*
+
 ## Table of Contents
 
 - [Overview](#overview)
