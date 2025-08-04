@@ -8,7 +8,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DataAssetCard } from '../components/DataCatalog/DataAssetCard';
 import { DataAsset } from '../types/DataAsset';
-import { CircularProgress, Alert, Box, Button, Typography, Container } from '@mui/material';
+import { CircularProgress, Alert, Box, Button, Typography, Container, Grid } from '@mui/material';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import dataAssetService from '../services/dataAssetService';
 
@@ -20,84 +20,8 @@ const DataAssetDemo = (): React.ReactElement => {
   const [totalCount, setTotalCount] = useState<number>(0);
   const [successMessage, setSuccessMessage] = useState<string>('');
 
-  // Sample fallback data in case the API fails
-  const sampleFallbackData: DataAsset[] = [
-    {
-      _id: '1',
-      name: 'Customer Data Warehouse 567',
-      type: 'Database',
-      domain: 'Marketing',
-      owner: 'Jane Smith',
-      description: 'Central repository for all customer data including demographics, purchase history, and interaction data.',
-      status: 'Production',
-      tags: ['customers', 'data warehouse', 'critical'],
-      certification: 'certified',
-      stewards: ['Jane Smith', 'David Wilson'],
-      updatedAt: '2025-07-25T14:30:00Z',
-      createdAt: '2025-01-15T09:00:00Z',
-      governance: {
-        complianceStatus: 'Compliant',
-        policies: [
-          'PII Handling', 'Data Privacy', 'GDPR Compliance'
-        ]
-      },
-      qualityMetrics: {
-        completeness: 92,
-        accuracy: 88,
-        consistency: 95
-      }
-    },
-    {
-      _id: '2',
-      name: 'Sales Analytics Dashboard',
-      type: 'Dashboard',
-      domain: 'Sales',
-      owner: 'Robert Johnson',
-      description: 'Executive dashboard showing sales performance metrics, trends, and forecasts.',
-      status: 'Development',
-      tags: ['sales', 'analytics', 'executive'],
-      certification: 'pending',
-      stewards: ['Robert Johnson', 'Emily Chen'],
-      updatedAt: '2025-07-28T10:15:00Z',
-      createdAt: '2025-06-20T13:45:00Z',
-      governance: {
-        complianceStatus: 'Non-Compliant',
-        policies: [
-          'Data Accuracy', 'Data Quality Standards'
-        ]
-      },
-      qualityMetrics: {
-        completeness: 75,
-        accuracy: 68,
-        consistency: 72
-      }
-    },
-    {
-      _id: '3',
-      name: 'Product Catalog API',
-      type: 'API',
-      domain: 'Product',
-      owner: 'Alex Chen',
-      description: 'RESTful API providing access to the current product catalog with pricing and inventory information.',
-      status: 'Production',
-      tags: ['api', 'products', 'inventory'],
-      certification: 'certified',
-      stewards: ['Alex Chen', 'Sarah Johnson'],
-      updatedAt: '2025-07-15T16:20:00Z',
-      createdAt: '2025-03-10T11:30:00Z',
-      governance: {
-        complianceStatus: 'Compliant',
-        policies: [
-          'API Security', 'Authentication Standards', 'Authorization Controls'
-        ]
-      },
-      qualityMetrics: {
-        completeness: 98,
-        accuracy: 95,
-        consistency: 97
-      }
-    }
-  ];
+  // No longer using sample fallback data - always using backend data
+
 
   // Fetch data assets from API
   const fetchDataAssets = useCallback(async () => {
@@ -252,15 +176,17 @@ const DataAssetDemo = (): React.ReactElement => {
           {dataAssets.length === 0 ? (
             <Alert severity="info">No data assets found.</Alert>
           ) : (
-            <div role="region" aria-label="Data assets list">
+            <Grid container spacing={3} role="region" aria-label="Data assets list">
               {dataAssets.map(asset => (
-                <DataAssetCard 
-                  key={asset._id} 
-                  asset={asset}
-                  onUpdateAsset={(updatedAsset: DataAsset) => updateAsset(updatedAsset._id as string, updatedAsset)}
-                />
+                <Grid item xs={12} sm={6} md={4} key={asset._id}>
+                  <DataAssetCard 
+                    key={asset._id} 
+                    asset={asset}
+                    onUpdateAsset={(updatedAsset: DataAsset) => updateAsset(updatedAsset._id as string, updatedAsset)}
+                  />
+                </Grid>
               ))}
-            </div>
+            </Grid>
           )}
         </div>
       )}
