@@ -14,7 +14,7 @@ const DataAssetSchema = new mongoose.Schema({
   type: {
     type: String,
     required: [true, 'Please specify the asset type'],
-    enum: ['Database', 'Table', 'Report', 'Dashboard', 'Document', 'API']
+    enum: ['Database', 'Table', 'Report', 'Dashboard', 'Document', 'API', 'Data Warehouse']
   },
   domain: {
     type: String,
