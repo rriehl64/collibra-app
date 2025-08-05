@@ -39,6 +39,85 @@ exports.getDataAssets = async (req, res) => {
       const searchTerm = req.query.q;
       console.log(`Processing search for term: "${searchTerm}"`);
       
+      // Check for specific asset type searches
+      const assetTypeSearch = searchTerm.match(/(.*)\s+assets?$/i);
+      let specificAssetType = null;
+      
+      if (assetTypeSearch && assetTypeSearch[1]) {
+        // Extract the asset type from the search term
+        specificAssetType = assetTypeSearch[1].trim();
+        console.log(`Detected asset type search for: "${specificAssetType}"`);
+        
+        // Create specific query for asset type search
+        if (specificAssetType.toLowerCase() === 'business term') {
+          // Exact match for Business Term type
+          query = { type: 'Business Term' };
+          console.log(`Filtering specifically for Business Term asset type`);
+          if (debug) {
+            console.log('Type-specific query:', JSON.stringify(query));
+          }
+          return;
+        } else if (specificAssetType.toLowerCase() === 'policy') {
+          // Exact match for Policy type
+          query = { type: 'Policy' };
+          console.log(`Filtering specifically for Policy asset type`);
+          if (debug) {
+            console.log('Type-specific query:', JSON.stringify(query));
+          }
+          return;
+        } else if (specificAssetType.toLowerCase() === 'dashboard') {
+          // Exact match for Dashboard type
+          query = { type: 'Dashboard' };
+          console.log(`Filtering specifically for Dashboard asset type`);
+          if (debug) {
+            console.log('Type-specific query:', JSON.stringify(query));
+          }
+          return;
+        } else if (specificAssetType.toLowerCase() === 'report') {
+          // Exact match for Report type
+          query = { type: 'Report' };
+          console.log(`Filtering specifically for Report asset type`);
+          if (debug) {
+            console.log('Type-specific query:', JSON.stringify(query));
+          }
+          return;
+        } else if (specificAssetType.toLowerCase() === 'api') {
+          // Exact match for API type
+          query = { type: 'API' };
+          console.log(`Filtering specifically for API asset type`);
+          if (debug) {
+            console.log('Type-specific query:', JSON.stringify(query));
+          }
+          return;
+        } else if (specificAssetType.toLowerCase().includes('data warehouse') || 
+                  specificAssetType.toLowerCase().includes('warehouse')) {
+          // Match for Data Warehouse type
+          query = { type: 'Data Warehouse' };
+          console.log(`Filtering specifically for Data Warehouse asset type`);
+          if (debug) {
+            console.log('Type-specific query:', JSON.stringify(query));
+          }
+          return;
+        } else if (specificAssetType.toLowerCase().includes('database')) {
+          // Match for Database type
+          query = { type: 'Database' };
+          console.log(`Filtering specifically for Database asset type`);
+          if (debug) {
+            console.log('Type-specific query:', JSON.stringify(query));
+          }
+          return;
+        } else if (specificAssetType.toLowerCase().includes('table')) {
+          // Match for Table type
+          query = { type: 'Table' };
+          console.log(`Filtering specifically for Table asset type`);
+          if (debug) {
+            console.log('Type-specific query:', JSON.stringify(query));
+          }
+          return;
+        }
+      }
+      
+      // Regular search processing for non-specific type searches
       // Split search into terms for multi-word searches
       const searchTerms = searchTerm.split(/\s+/).filter(term => term.length > 0);
       console.log(`Search terms after splitting: ${JSON.stringify(searchTerms)}`);

@@ -71,15 +71,8 @@ const searchDataAssets = async (
   } catch (error) {
     console.error('Error searching data assets:', error);
     
-    // In development mode, use sample data
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Using sample data in development mode');
-      return {
-        assets: [],
-        pagination: { page: params.page || 1, limit: params.limit || 10, totalPages: 0 },
-        total: 0
-      };
-    }
+    // Always throw the error to ensure we don't use mock data
+    console.error('Error searching data assets - no fallback used');
     
     throw new Error('Failed to search data assets');
   }
@@ -177,16 +170,8 @@ const getDataAssets = async (
   } catch (error) {
     console.error('Error fetching data assets:', error);
     
-    // In development mode, use sample data
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Using sample data in development mode');
-      // This would be replaced with your actual sample data in the DataCatalog component
-      return {
-        assets: [],
-        pagination: { page: params.page || 1, limit: params.limit || 10, totalPages: 0 },
-        total: 0
-      };
-    }
+    // Always throw the error to ensure we don't use mock data
+    console.error('Error fetching data assets - no fallback used');
     
     throw new Error('Failed to fetch data assets');
   }

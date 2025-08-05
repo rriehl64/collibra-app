@@ -18,6 +18,11 @@ import {
   Description as DescriptionIcon,
   Settings as SettingsIcon,
   School as SchoolIcon,
+  Business as BusinessIcon,
+  Category as CategoryIcon,
+  Book as BookIcon,
+  Domain as DomainIcon,
+  Class as SubjectIcon,
 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -28,6 +33,11 @@ const menuItems = [
   { text: 'Collibra 101', icon: SchoolIcon, path: '/learn101' },
   { text: 'Data Catalog', icon: StorageIcon, path: '/data-catalog' },
   { text: 'Data Assets', icon: StorageIcon, path: '/data-assets' },
+  { text: 'Business Processes', icon: BusinessIcon, path: '/assets/business-processes' },
+  { text: 'Data Categories', icon: CategoryIcon, path: '/assets/data-categories' },
+  { text: 'Data Concepts', icon: BookIcon, path: '/assets/data-concepts' },
+  { text: 'Data Domains', icon: DomainIcon, path: '/assets/data-domains' },
+  { text: 'Subject Categories', icon: SubjectIcon, path: '/assets/subject-categories' },
   { text: 'Asset Types', icon: StorageIcon, path: '/asset-types' },
   { text: 'Data Governance', icon: SecurityIcon, path: '/data-governance' },
   { text: 'DG vs MDM', icon: SecurityIcon, path: '/dgvsmdm' },

@@ -90,9 +90,22 @@ const Login: React.FC = () => {
           mt: 8
         }}
       >
-        <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-          Sign In
-        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
+          <Typography 
+            variant="h4" 
+            component="h1" 
+            sx={{ 
+              color: '#003366', 
+              fontWeight: 700,
+              mb: 1
+            }}
+          >
+            E-Unify
+          </Typography>
+          <Typography variant="h5" component="h2">
+            Sign In
+          </Typography>
+        </Box>
 
         {formError && (
           <Alert severity="error" sx={{ width: '100%', mb: 2 }}>

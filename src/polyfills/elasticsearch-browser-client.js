@@ -19,8 +19,8 @@ class Client {
       const { index, body } = params;
       const endpoint = `${this.baseUrl}/${index}/_search`;
       
-      // For development, mock the search response if we're not connected to a real ES instance
-      if (!this.baseUrl.includes('localhost') || !window.location.hostname.includes('localhost')) {
+      // Always try to connect to the real Elasticsearch instance, no fallbacks
+      try {
         // Make actual API call to Elasticsearch
         const headers = {
           'Content-Type': 'application/json',
@@ -43,34 +43,11 @@ class Client {
         }
         
         return await response.json();
-      } else {
-        // For development: return mock data that matches the expected structure
-        console.log('Using mock Elasticsearch data (development mode)');
+      } catch (error) {
+        console.error('Elasticsearch search error:', error);
         
-        // Extract search text from query if available
-        const searchText = body?.query?.bool?.must?.find(q => q.match || q.multi_match)?.match?.name || '';
-        
-        // Generate mock hits based on search text
-        const mockHits = generateMockHits(searchText);
-        
-        return {
-          took: 5,
-          timed_out: false,
-          _shards: {
-            total: 1,
-            successful: 1,
-            skipped: 0,
-            failed: 0
-          },
-          hits: {
-            total: {
-              value: mockHits.length,
-              relation: 'eq'
-            },
-            max_score: 1.0,
-            hits: mockHits
-          }
-        };
+        // Instead of mock data, throw the error to be handled by the calling component
+        throw new Error(`Elasticsearch search failed: ${error.message}`);
       }
     } catch (error) {
       console.error('Elasticsearch search error:', error);

@@ -180,7 +180,7 @@ const DataCatalog: React.FC = () => {
     fetchDataAssets();
   }, [debouncedSearchText, filters, page, limit, searchHistory]);
 
-  // Load search history and edited assets from localStorage on component mount
+  // Load search history from localStorage on component mount
   useEffect(() => {
     // Load search history
     const savedHistory = localStorage.getItem('searchHistory');
@@ -195,32 +195,12 @@ const DataCatalog: React.FC = () => {
       }
     }
     
-    // Load any edited assets from localStorage
-    const savedEdits = localStorage.getItem('editedAssets');
-    if (savedEdits) {
-      try {
-        const edits = JSON.parse(savedEdits);
-        // Only apply edits if we have assets loaded
-        if (Object.keys(edits).length > 0 && dataAssets.length > 0) {
-          console.log('Applying local edits to data assets:', edits);
-          
-          // Apply edits to current assets
-          setDataAssets(prevAssets => {
-            return prevAssets.map(asset => {
-              const savedEdit = edits[asset._id || ''];
-              if (savedEdit) {
-                console.log(`Applying local edit for ${asset.name}:`, savedEdit);
-                return {...asset, ...savedEdit};
-              }
-              return asset;
-            });
-          });
-        }
-      } catch (e) {
-        console.error('Error applying edited assets from localStorage:', e);
-      }
+    // Remove any existing editedAssets from localStorage to prevent using stale local data
+    if (localStorage.getItem('editedAssets')) {
+      console.log('Removing locally edited assets to ensure backend data consistency');
+      localStorage.removeItem('editedAssets');
     }
-  }, [dataAssets.length]);
+  }, []);
 
   // Handle search clear
   const handleClearSearch = useCallback(() => {
@@ -345,46 +325,35 @@ const DataCatalog: React.FC = () => {
         throw new Error('You need to be logged in as an admin or data steward to save changes to the backend');
       }
       
-      // Store updated data in localStorage as a fallback regardless of backend success
-      try {
-        const savedEdits = JSON.parse(localStorage.getItem('editedAssets') || '{}');
-        savedEdits[editedAsset._id] = editedAsset;
-        localStorage.setItem('editedAssets', JSON.stringify(savedEdits));
-        console.log('Saved edit to localStorage as fallback');
-      } catch (localStorageErr) {
-        console.error('Error saving to localStorage:', localStorageErr);
-      }
+      // No longer storing in localStorage to ensure backend is the only source of truth
+      console.log('Backend update successful - not using localStorage fallback');
     } catch (err) {
       console.error('Failed to update asset:', err);
       
-      // Even if backend save fails, update local state
-      // This ensures UI reflects changes even if backend fails
-      const optimisticAsset = { ...editedAsset };
-      setDataAssets(prevAssets => 
-        prevAssets.map(asset => 
-          asset._id === editedAsset._id ? optimisticAsset : asset
-        )
-      );
+      // No longer using optimistic updates to ensure UI matches backend state
+      console.log('Backend update failed - showing error to user');
       
-      // Store in localStorage for persistence between page reloads
-      try {
-        const savedEdits = JSON.parse(localStorage.getItem('editedAssets') || '{}');
-        savedEdits[editedAsset._id] = editedAsset;
-        localStorage.setItem('editedAssets', JSON.stringify(savedEdits));
-        console.log('Backend update failed, but saved to localStorage');
-      } catch (localStorageErr) {
-        console.error('Error saving to localStorage:', localStorageErr);
-      }
+      // Refresh data from server to ensure UI reflects actual backend state
+      const refreshData = async () => {
+        try {
+          const response = await dataAssetService.searchDataAssets(debouncedSearchText);
+          setDataAssets(response.assets || []);
+        } catch (refreshErr) {
+          console.error('Error refreshing data after failed update:', refreshErr);
+        }
+      };
+      
+      refreshData();
       
       setSaveSuccess(true); // Still show success to user
       
-      // Show appropriate error message based on authentication state
+      // Show accessible error messages with clear instructions
       if (!user) {
-        setSaveError('Changes saved locally. Please log in as admin or data steward to save to backend.');
+        setSaveError('Authentication required. Please log in as admin or data steward to update data assets.');
       } else if (user && (user.role !== 'admin' && user.role !== 'data-steward')) {
-        setSaveError('Changes saved locally. Your account does not have permission to update data assets.');
+        setSaveError('Permission denied. Your account does not have the required role to update data assets. Contact an administrator for assistance.');
       } else {
-        setSaveError('Changes saved locally but not to backend. Will retry automatically when connection is restored.');
+        setSaveError('Update failed. The server could not be reached or returned an error. Please try again or contact support if the issue persists.');
       }
       
       setEditDialogOpen(false);

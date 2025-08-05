@@ -1,0 +1,3 @@
+/* @license GPL-2.0-or-later https://www.drupal.org/licensing/faq */
+.usa-alert{margin-bottom:1rem;}
+.grid-container,.usa-banner__inner,.usa-footer__primary-section>.grid-container,.usa-footer__secondary-section>.grid-container,.usa-footer>.grid-container,.usa-header .usa-nav-container>.usa-navbar{max-width:80rem;}@media screen and (min-width:1280px){.usa-header .usa-nav-container>.usa-navbar{width:80rem;}}

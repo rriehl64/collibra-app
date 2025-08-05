@@ -15,7 +15,36 @@ import DataStewardLesson from './components/Learn/DataStewardLesson';
 import AssetTypes from './pages/AssetTypes';
 import PolicyManager from './pages/PolicyManager';
 import DataAssetDemo from './pages/DataAssetDemo';
+import BusinessProcesses from './pages/BusinessProcesses';
+import DataCategories from './pages/DataCategories';
+import DataConcepts from './pages/DataConcepts';
+import DataDomains from './pages/DataDomains';
+import SubjectCategories from './pages/SubjectCategories';
+import LineOfBusiness from './pages/LineOfBusiness';
+import BusinessTerms from './pages/BusinessTerms';
+import Acronyms from './pages/Acronyms';
+import KPIs from './pages/KPIs';
+import Reports from './pages/Reports';
+import BIReports from './pages/BIReports';
+import DomainTypes from './pages/admin/DomainTypes';
+import Statuses from './pages/admin/Statuses';
+import Characteristics from './pages/admin/Characteristics';
+import QualityRules from './pages/admin/QualityRules';
+import Scopes from './pages/admin/Scopes';
+import Workflows from './pages/admin/Workflows';
+import Users from './pages/access/Users';
+import Roles from './pages/access/Roles';
+import Permissions from './pages/access/Permissions';
+import Jurisdictions from './pages/access/Jurisdictions';
+import Documentation from './pages/Documentation';
+import Settings from './pages/Settings';
 import TestPage from './pages/TestPage';
+import ProcessingCategories from './pages/processing/ProcessingCategories';
+import ProcessingMeasures from './pages/processing/ProcessingMeasures';
+import ProcessingMigration from './pages/processing/ProcessingMigration';
+import GDPRPolicy from './pages/policy/GDPRPolicy';
+import PolicyIndex from './pages/policy/PolicyIndex';
+import Standards from './pages/policy/Standards';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 
@@ -185,9 +214,29 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/data-catalog" element={<DataCatalog />} />
                 <Route path="/data-assets" element={<DataAssetDemo />} />
+                <Route path="/assets/business-processes" element={<BusinessProcesses />} />
+                <Route path="/assets/data-categories" element={<DataCategories />} />
+                <Route path="/assets/data-concepts" element={<DataConcepts />} />
+                <Route path="/assets/data-domains" element={<DataDomains />} />
+                <Route path="/assets/subject-categories" element={<SubjectCategories />} />
+                <Route path="/assets/line-of-business" element={<LineOfBusiness />} />
+                <Route path="/context/business-terms" element={<BusinessTerms />} />
+                <Route path="/context/acronyms" element={<Acronyms />} />
+                <Route path="/context/kpis" element={<KPIs />} />
+                <Route path="/context/reports" element={<Reports />} />
+                <Route path="/context/bi-reports" element={<BIReports />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/integration" element={<Integration />} />
                 <Route path="/asset-types" element={<AssetTypes />} />
+                <Route path="/testpage" element={<TestPage />} />
+                <Route path="/docs" element={<Documentation />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/processing/categories" element={<ProcessingCategories />} />
+                <Route path="/processing/measures" element={<ProcessingMeasures />} />
+                <Route path="/processing/migration" element={<ProcessingMigration />} />
+                <Route path="/policy" element={<PolicyIndex />} />
+                <Route path="/policy/gdpr" element={<GDPRPolicy />} />
+                <Route path="/policy/standards" element={<Standards />} />
               </Route>
               
               {/* Data Steward Only Routes */}
@@ -197,9 +246,23 @@ function App() {
               
               {/* Admin Only Routes */}
               <Route element={<AdminRoute />}>
-                <Route path="/policy" element={<PolicyManager />}>
-                  <Route path="gdpr" element={<PolicyManager />} />
-                  <Route path="standards" element={<PolicyManager />} />
+                <Route path="/admin" element={<Outlet />}>
+                  <Route path="/admin/dashboard" element={<Dashboard />} />
+                  <Route path="/admin/policy-manager" element={<PolicyManager />} />
+                  <Route path="/admin/domain-types" element={<DomainTypes />} />
+                  <Route path="/admin/statuses" element={<Statuses />} />
+                  <Route path="/admin/characteristics" element={<Characteristics />} />
+                  <Route path="/admin/dataQuality" element={<Dashboard />} />
+                  <Route path="/admin/dataStewards" element={<Dashboard />} />
+                  <Route path="/admin/workflows" element={<Workflows />} />
+                </Route>
+                
+                {/* Access Management Routes */}
+                <Route path="/access" element={<Outlet />}>
+                  <Route path="/access/users" element={<Users />} />
+                  <Route path="/access/roles" element={<Roles />} />
+                  <Route path="/access/permissions" element={<Permissions />} />
+                  <Route path="/access/jurisdictions" element={<Jurisdictions />} />
                 </Route>
               </Route>
               

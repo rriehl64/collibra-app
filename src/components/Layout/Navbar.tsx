@@ -72,6 +72,19 @@ const Navbar = () => {
               alt="Collibra" 
               style={{ height: 32 }}
             />
+            <Typography 
+              variant="h5" 
+              component="span"
+              sx={{ 
+                fontWeight: 700,
+                color: '#003366',
+                letterSpacing: '0.5px',
+                ml: 1,
+                display: { xs: 'none', sm: 'block' }
+              }}
+            >
+              E-Unify
+            </Typography>
           </Typography>
           
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>

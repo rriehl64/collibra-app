@@ -158,8 +158,8 @@ const Dashboard: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom component="h1" sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}>
-        Dashboard
+      <Typography variant="h4" gutterBottom component="h1" sx={{ fontWeight: 'bold', color: '#003366' }}>
+        E-Unify Dashboard
       </Typography>
       
       <Box sx={{ mb: 3 }}>
