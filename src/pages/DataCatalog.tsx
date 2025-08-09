@@ -25,7 +25,8 @@ import {
   DialogActions,
   Snackbar,
   Divider,
-  FormHelperText
+  FormHelperText,
+  InputAdornment
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -129,8 +130,12 @@ const DataCatalog: React.FC = () => {
   // Search history
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   
-  // Edit dialog state
+  // State for controlling the edit dialog
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  
+  // State for filter dialog
+  const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [currentAsset, setCurrentAsset] = useState<DataAsset | null>(null);
   const [editedAsset, setEditedAsset] = useState<DataAsset | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -205,6 +210,18 @@ const DataCatalog: React.FC = () => {
   // Handle search clear
   const handleClearSearch = useCallback(() => {
     setSearchText('');
+  }, []);
+  
+  // Handle filter dialog
+  const handleOpenFilters = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+    setFilterDialogOpen(true);
+  }, []);
+  
+  // Handle closing filter dialog
+  const handleCloseFilters = useCallback(() => {
+    setAnchorEl(null);
+    setFilterDialogOpen(false);
   }, []);
 
   // Handle opening edit dialog
@@ -387,96 +404,102 @@ const DataCatalog: React.FC = () => {
   }, [dataAssets]);
 
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 4 }}>
-      {/* App Bar Section */}
-      <Box
-        sx={{
-          bgcolor: 'background.paper',
-          py: 1.5,
-          boxShadow: 1,
-          mt: 8
-        }}
-      >
-        <Container maxWidth="lg">
-          <Typography variant="h4" component="h1" gutterBottom>
-            Data Catalog
-          </Typography>
-        </Container>
-      </Box>
+    <Container sx={{ py: 4 }} className="data-catalog-page" role="main" aria-labelledby="page-title">
+      <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#003366', fontWeight: 700 }} tabIndex={-1} id="page-title">
+        E-Unify Data Catalog
+      </Typography>
+      <Typography variant="body1" paragraph>
+        Browse, search, and manage data assets across the enterprise.
+      </Typography>
 
       {/* Search Section */}
-      <Container maxWidth="lg" sx={{ mt: 3 }}>
-        <Paper sx={{ p: 2, mb: 3 }} elevation={2}>
-          <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} sm={6}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                <TextField
-                  fullWidth
-                  placeholder="Search data assets..."
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  variant="outlined"
-                  size="small"
-                  InputProps={{
-                    endAdornment: searchText ? (
-                      <IconButton 
-                        size="small" 
-                        onClick={handleClearSearch}
-                        aria-label="Clear search"
-                      >
-                        <ClearIcon />
-                      </IconButton>
-                    ) : null
-                  }}
-                  aria-label="Search data assets"
-                />
-              </Box>
-              {/* Search history suggestions */}
-              {searchHistory.length > 0 && !searchText && (
-                <Box sx={{ mt: 1 }}>
-                  <Typography variant="caption" color="text.secondary">
-                    Recent searches:
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
-                    {searchHistory.map((term, index) => (
-                      <Chip 
-                        key={`${term}-${index}`}
-                        label={term} 
-                        size="small"
-                        onClick={() => setSearchText(term)}
-                        clickable
-                      />
-                    ))}
-                  </Box>
-                </Box>
-              )}
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <IconButton aria-label="Filter">
-                  <FilterIcon />
-                </IconButton>
-              </Box>
-            </Grid>
+      <Box sx={{ mb: 4 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} sm>                
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Search assets..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+                endAdornment: searchText ? (
+                  <InputAdornment position="end">
+                    <IconButton 
+                      aria-label="Clear search" 
+                      onClick={handleClearSearch}
+                      edge="end"
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null
+              }}
+              aria-label="Search data assets"
+            />
           </Grid>
-        </Paper>
-
-        {/* Loading and Error States */}
-        {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }} aria-live="polite">
-            <CircularProgress aria-label="Loading data assets" />
+          
+          <Grid item>
+            <Button 
+              startIcon={<FilterIcon />}
+              variant="outlined"
+              color="primary"
+              aria-label="Filter data assets"
+              size="small"
+              onClick={handleOpenFilters}
+            >
+              Filter
+            </Button>
+          </Grid>
+        </Grid>
+        
+        {/* Search history */}
+        {searchHistory.length > 0 && !searchText && (
+          <Box sx={{ mt: 1 }}>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+              Recent searches:
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+              {searchHistory.map((term, index) => (
+                <Chip
+                  key={`${term}-${index}`}
+                  label={term}
+                  size="small"
+                  onClick={() => setSearchText(term)}
+                  onDelete={() => {
+                    const newHistory = searchHistory.filter(h => h !== term);
+                    setSearchHistory(newHistory);
+                    localStorage.setItem('dataCatalogSearchHistory', JSON.stringify(newHistory));
+                  }}
+                  sx={{ fontSize: '0.75rem', background: 'rgba(0,0,0,0.04)' }}
+                />
+              ))}
+            </Box>
           </Box>
         )}
+      </Box>
+      
+      {/* Loading state */}
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+          <CircularProgress aria-label="Loading data assets" />
+        </Box>
+      )}
+      
+      {/* Error state */}
+      {error && (
+        <Box sx={{ mt: 2, mb: 2 }} aria-live="assertive">
+          <Alert severity="error">{error}</Alert>
+        </Box>
+      )}
 
-        {error && (
-          <Box sx={{ mt: 2, mb: 2 }} aria-live="assertive">
-            <Alert severity="error">{error}</Alert>
-          </Box>
-        )}
-
-        {/* Results Section */}
-        {!loading && !error && (
+      {/* Results Section */}
+      {!loading && !error && (
           <>
             <Box sx={{ mb: 2 }} aria-live="polite">
               <Typography variant="subtitle1">
@@ -493,12 +516,23 @@ const DataCatalog: React.FC = () => {
                     sx={{ 
                       height: '100%',
                       cursor: 'pointer',
-                      bgcolor: getDomainColorScheme(asset.domain).background,
+                      bgcolor: 'background.paper',
                       borderLeft: `4px solid ${getDomainColorScheme(asset.domain).border}`,
-                      '&:hover': { boxShadow: 3 },
-                      '&:focus-within': { boxShadow: 3, outline: `2px solid ${getDomainColorScheme(asset.domain).border}` },
-                      position: 'relative', // For edit button positioning
-                      transition: 'box-shadow 0.3s, outline 0.3s'
+                      '&:hover': { 
+                        boxShadow: 3,
+                        '& .edit-indicator': {
+                          opacity: 1
+                        }
+                      },
+                      '&:focus-within': { 
+                        boxShadow: 3, 
+                        outline: `2px solid ${getDomainColorScheme(asset.domain).border}`,
+                        '& .edit-indicator': {
+                          opacity: 1
+                        }
+                      },
+                      position: 'relative',
+                      transition: 'box-shadow 0.2s ease-in-out, outline 0.2s ease-in-out'
                     }}
                     onClick={() => handleEditAsset(asset)}
                     tabIndex={0}
@@ -511,43 +545,102 @@ const DataCatalog: React.FC = () => {
                       }
                     }}
                   >
+                    {/* Edit indicator that appears on hover/focus */}
+                    <Box
+                      className="edit-indicator"
+                      sx={{
+                        position: 'absolute',
+                        top: 8,
+                        right: 8,
+                        bgcolor: 'rgba(255, 255, 255, 0.9)',
+                        borderRadius: '50%',
+                        width: 32,
+                        height: 32,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: 0,
+                        transition: 'opacity 0.2s ease-in-out',
+                        boxShadow: 1,
+                        zIndex: 1
+                      }}
+                      aria-hidden="true"
+                    >
+                      <EditIcon fontSize="small" color="primary" />
+                    </Box>
                     <CardContent>
                       <Typography 
                         variant="h6" 
                         component="h2" 
-                        noWrap
-                        sx={{ color: getDomainColorScheme(asset.domain).text }}
+                        sx={{ 
+                          fontWeight: 600,
+                          mb: 1,
+                          lineHeight: 1.2,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}
                       >
                         {asset.name}
                       </Typography>
+                      
+                      <Box sx={{ mb: 1 }}>
+                        <Chip 
+                          size="small"
+                          label={asset.domain}
+                          sx={{ 
+                            mr: 1, 
+                            mb: 1,
+                            fontSize: '0.75rem',
+                            borderRadius: '4px',
+                            height: '24px',
+                            color: 'white',
+                            backgroundColor: getDomainColorScheme(asset.domain).border
+                          }} 
+                        />
+                        <Chip 
+                          size="small"
+                          label={asset.status || 'Draft'}
+                          sx={{ 
+                            mb: 1,
+                            fontSize: '0.75rem',
+                            borderRadius: '4px',
+                            height: '24px',
+                            color: 'white',
+                            backgroundColor: asset.status === 'Active' ? '#007B3E' : 
+                                          asset.status === 'Pending' ? '#F1C21B' : '#8A8B8C'
+                          }} 
+                        />
+                      </Box>
+                      
                       <Typography 
                         variant="body2" 
+                        color="text.secondary"
                         sx={{ 
-                          mt: 1, 
                           mb: 2,
-                          color: getDomainColorScheme(asset.domain).text,
-                          opacity: 0.8 
+                          display: '-webkit-box',
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          height: '4.5em'
                         }}
                       >
                         {asset.description || 'No description available'}
                       </Typography>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                      
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 'auto' }}>
                         {asset.type && (
                           <Chip 
                             label={asset.type} 
-                            size="small" 
-                            color="primary" 
-                            variant="outlined" 
-                          />
-                        )}
-                        {asset.domain && (
-                          <Chip 
-                            label={asset.domain} 
-                            size="small" 
-                            sx={{
-                              backgroundColor: getDomainColorScheme(asset.domain).border,
-                              color: '#ffffff', // White text for maximum contrast
-                              fontWeight: 500
+                            size="small"
+                            sx={{ 
+                              fontSize: '0.75rem',
+                              height: '24px',
+                              color: 'white',
+                              backgroundColor: '#003366'
                             }}
                           />
                         )}
@@ -587,8 +680,7 @@ const DataCatalog: React.FC = () => {
             )}
           </>
         )}
-      </Container>
-
+      
       {/* Edit Dialog */}
       <Dialog 
         open={editDialogOpen} 
@@ -772,7 +864,7 @@ const DataCatalog: React.FC = () => {
         message="Changes saved successfully"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
-    </Box>
+    </Container>
   );
 };
 

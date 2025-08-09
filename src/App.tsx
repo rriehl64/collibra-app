@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import Layout from './components/Layout/Layout';
 import Navbar from './components/Layout/Navbar';
+import { SnackbarProvider } from './contexts/SnackbarContext';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import DataCatalog from './pages/DataCatalog';
@@ -47,6 +48,7 @@ import PolicyIndex from './pages/policy/PolicyIndex';
 import Standards from './pages/policy/Standards';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
+import DevLogin from './pages/DevLogin';
 
 // Import Auth Provider Context
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -192,12 +194,14 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
-        <BrowserRouter>
+        <SnackbarProvider>
+          <BrowserRouter>
           {/* DevTools component for development only */}
           <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/dev-login" element={<DevLogin />} />
             
             {/* Temporary Testing Route */}
             <Route path="/test/data-assets" element={<DataAssetDemo />} />
@@ -284,6 +288,7 @@ function App() {
           {/* Development tools */}
           <DevTools />
         </BrowserRouter>
+        </SnackbarProvider>
       </AuthProvider>
     </ThemeProvider>
   );

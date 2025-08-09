@@ -30,7 +30,7 @@ const DRAWER_WIDTH = 240;
 
 const menuItems = [
   { text: 'Dashboard', icon: DashboardIcon, path: '/' },
-  { text: 'Collibra 101', icon: SchoolIcon, path: '/learn101' },
+  { text: 'E-Unify 101', icon: SchoolIcon, path: '/learn101' },
   { text: 'Data Catalog', icon: StorageIcon, path: '/data-catalog' },
   { text: 'Data Assets', icon: StorageIcon, path: '/data-assets' },
   { text: 'Business Processes', icon: BusinessIcon, path: '/assets/business-processes' },

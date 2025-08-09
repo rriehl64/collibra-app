@@ -76,6 +76,7 @@
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@types/testing-library__react": "^10.0.1",
+    "@types/uuid": "^10.0.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "concurrently": "^9.1.2",
     "console-browserify": "^1.2.0",

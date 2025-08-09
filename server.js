@@ -18,6 +18,9 @@ const dataAssets = require('./server/routes/dataAssets');
 const auth = require('./server/routes/auth');
 const policies = require('./server/routes/policies');
 const dashboard = require('./server/routes/dashboard');
+const businessProcesses = require('./server/routes/businessProcesses');
+const dataCategories = require('./server/routes/dataCategories');
+const dataConcepts = require('./server/routes/dataConcepts');
 
 const app = express();
 
@@ -104,6 +107,9 @@ app.use('/api/v1/data-assets', dataAssets);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/policies', policies);
 app.use('/api/v1/dashboard', dashboard);
+app.use('/api/v1/business-processes', businessProcesses);
+app.use('/api/v1/data-categories', dataCategories);
+app.use('/api/v1/data-concepts', dataConcepts);
 
 // Only serve static files and handle React routing in production mode
 if (process.env.NODE_ENV === 'production') {

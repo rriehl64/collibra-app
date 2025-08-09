@@ -26,7 +26,7 @@ import DataGovernanceLesson from '../components/Learn/DataGovernanceLesson';
 import DataCatalogLesson from '../components/Learn/DataCatalogLesson';
 import BusinessGlossaryLesson from '../components/Learn/BusinessGlossaryLesson';
 import DataQualityLineageLesson from '../components/Learn/DataQualityLineageLesson';
-import CollibraRangerLesson from '../components/Learn/CollibraRangerLesson';
+import EUnifyRangerLesson from '../components/Learn/EUnifyRangerLesson';
 
 interface LessonType {
   id: number;
@@ -68,7 +68,7 @@ const lessons: LessonType[] = [
   },
   {
     id: 6,
-    title: "Collibra Ranger",
+    title: "E-Unify Ranger",
     duration: "20 mins",
     completed: false
   }
@@ -142,7 +142,7 @@ const Learn101 = () => {
           />
         )}
         {selectedLesson === 6 && (
-          <CollibraRangerLesson
+          <EUnifyRangerLesson
             onBack={handleBack}
             onComplete={handleLessonComplete}
             isCompleted={currentLesson?.completed || false}
@@ -156,7 +156,7 @@ const Learn101 = () => {
     <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
       <Box sx={{ mb: 6 }}>
         <Typography variant="h4" gutterBottom sx={{ mb: 2 }}>
-          Collibra 101: Your journey to data intelligence starts here
+          E-Unify 101: Your journey to data intelligence starts here
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
           Master the fundamentals of data intelligence and governance with our comprehensive introduction course.
@@ -303,7 +303,7 @@ const Learn101 = () => {
                   <ListItemIcon sx={{ minWidth: 36 }}>
                     <CheckCircleIcon color="primary" fontSize="small" />
                   </ListItemIcon>
-                  <ListItemText primary="Collibra Ranger" />
+                  <ListItemText primary="E-Unify Ranger" />
                 </ListItem>
               </List>
             </CardContent>

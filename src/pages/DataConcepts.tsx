@@ -3,9 +3,10 @@
  * 
  * Displays data concepts with full accessibility support
  * and consistent styling with other asset pages.
+ * Data is fetched from MongoDB via the API similar to BusinessProcesses page.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Container, 
   Typography, 
@@ -19,18 +20,32 @@ import {
   TextField,
   InputAdornment,
   IconButton,
-  Tooltip
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  FormControl,
+  FormHelperText,
+  MenuItem,
+  Select,
+  FormLabel,
+  Snackbar,
+  AlertProps
 } from '@mui/material';
 import { 
   Search as SearchIcon,
-  Clear as ClearIcon
+  Clear as ClearIcon,
+  Edit as EditIcon
 } from '@mui/icons-material';
 import useDebounce from '../hooks/useDebounce';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../services/api';
 
-// Sample data concept type for demonstration
+// Data concept type for API integration
 interface DataConcept {
-  id: string;
+  _id: string; // MongoDB ID format
   name: string;
   description: string;
   domain: string;
@@ -44,10 +59,31 @@ interface DataConcept {
 const DataConcepts: React.FC = () => {
   // State management
   const [concepts, setConcepts] = useState<DataConcept[]>([]);
+  const [allConcepts, setAllConcepts] = useState<DataConcept[]>([]); // Store all concepts for filtering
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState<string>('');
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
+  const [currentConcept, setCurrentConcept] = useState<DataConcept | null>(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    domain: '',
+    status: 'draft' as 'approved' | 'draft' | 'deprecated',
+    steward: '',
+    relatedConcepts: '',
+    tags: ''
+  });
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
+  const [snackbar, setSnackbar] = useState<{open: boolean; message: string; severity: AlertProps['severity']}>({ 
+    open: false, 
+    message: '', 
+    severity: 'success' 
+  });
+  
+  // Refs for accessibility focus management
+  const firstInputRef = useRef<HTMLInputElement>(null);
   
   // Auth context for user permissions
   const { user } = useAuth();
@@ -55,10 +91,10 @@ const DataConcepts: React.FC = () => {
   // Debounced search text to prevent excessive API calls
   const debouncedSearchText = useDebounce(searchText, 500);
 
-  // Sample data - in a real app this would come from an API
-  const sampleConcepts: DataConcept[] = [
+  // Sample data - memoize to avoid recreation on each render
+  const sampleConcepts = React.useMemo<DataConcept[]>(() => [
     {
-      id: 'con-001',
+      _id: 'con-001',
       name: 'Customer',
       description: 'An individual or entity that purchases goods or services from the organization',
       domain: 'Customer Management',
@@ -69,7 +105,7 @@ const DataConcepts: React.FC = () => {
       tags: ['core', 'business', 'customer']
     },
     {
-      id: 'con-002',
+      _id: 'con-002',
       name: 'Account',
       description: 'A formal business relationship between a customer and the company',
       domain: 'Customer Management',
@@ -80,7 +116,7 @@ const DataConcepts: React.FC = () => {
       tags: ['core', 'finance', 'customer']
     },
     {
-      id: 'con-003',
+      _id: 'con-003',
       name: 'Product',
       description: 'Any item or service that is offered for sale',
       domain: 'Product Management',
@@ -91,7 +127,7 @@ const DataConcepts: React.FC = () => {
       tags: ['core', 'product']
     },
     {
-      id: 'con-004',
+      _id: 'con-004',
       name: 'Order',
       description: 'A request from a customer to purchase one or more products',
       domain: 'Sales',
@@ -102,7 +138,7 @@ const DataConcepts: React.FC = () => {
       tags: ['core', 'sales', 'transaction']
     },
     {
-      id: 'con-005',
+      _id: 'con-005',
       name: 'Revenue',
       description: 'Income generated from business activities',
       domain: 'Finance',
@@ -113,7 +149,7 @@ const DataConcepts: React.FC = () => {
       tags: ['finance', 'metrics']
     },
     {
-      id: 'con-006',
+      _id: 'con-006',
       name: 'Employee',
       description: 'A person who works for the organization under an employment contract',
       domain: 'Human Resources',
@@ -124,7 +160,7 @@ const DataConcepts: React.FC = () => {
       tags: ['hr', 'personnel']
     },
     {
-      id: 'con-007',
+      _id: 'con-007',
       name: 'Lead',
       description: 'A potential customer who has shown interest in the company\'s products or services',
       domain: 'Sales',
@@ -135,7 +171,7 @@ const DataConcepts: React.FC = () => {
       tags: ['sales', 'marketing']
     },
     {
-      id: 'con-008',
+      _id: 'con-008',
       name: 'Asset',
       description: 'Any resource owned or controlled by the company with economic value',
       domain: 'Finance',
@@ -145,27 +181,159 @@ const DataConcepts: React.FC = () => {
       relatedConcepts: ['Property', 'Equipment', 'Investment'],
       tags: ['finance', 'accounting']
     }
-  ];
+  ], []); // Empty dependency array ensures it's only created once
 
-  // Function to fetch data concepts - would use API in production
+  // Handle opening edit dialog
+  const handleEditConcept = (concept: DataConcept) => {
+    setCurrentConcept(concept);
+    setFormData({
+      name: concept.name,
+      description: concept.description,
+      domain: concept.domain,
+      status: concept.status,
+      steward: concept.steward,
+      relatedConcepts: concept.relatedConcepts ? concept.relatedConcepts.join(', ') : '',
+      tags: concept.tags ? concept.tags.join(', ') : ''
+    });
+    setFormErrors({});
+    setEditDialogOpen(true);
+    
+    // Set focus on first field after dialog opens
+    setTimeout(() => {
+      if (firstInputRef.current) {
+        firstInputRef.current.focus();
+      }
+    }, 100);
+  };
+  
+  // Handle form field changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error for this field when user starts typing
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+  
+  // Handle status select change
+  const handleStatusChange = (e: any) => {
+    setFormData(prev => ({
+      ...prev,
+      status: e.target.value
+    }));
+  };
+  
+  // Validate form data
+  const validateForm = () => {
+    const errors: {[key: string]: string} = {};
+    
+    if (!formData.name.trim()) errors.name = 'Name is required';
+    if (!formData.description.trim()) errors.description = 'Description is required';
+    if (!formData.domain.trim()) errors.domain = 'Domain is required';
+    if (!formData.steward.trim()) errors.steward = 'Data steward is required';
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+  
+  // Save data concept changes using the API
+  const handleSaveConcept = async () => {
+    if (!validateForm() || !currentConcept) return;
+    
+    try {
+      // Parse input strings to arrays
+      const relatedConceptsArray = formData.relatedConcepts
+        ? formData.relatedConcepts.split(',').map(concept => concept.trim()).filter(concept => concept)
+        : [];
+      
+      const tagsArray = formData.tags
+        ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+        : [];
+      
+      // Prepare data for API
+      const conceptData = {
+        name: formData.name,
+        description: formData.description,
+        domain: formData.domain,
+        status: formData.status,
+        steward: formData.steward,
+        relatedConcepts: relatedConceptsArray,
+        tags: tagsArray
+      };
+      
+      console.log('Saving concept to API:', conceptData);
+      
+      // Make API call to save the concept
+      try {
+        const endpoint = `/data-concepts/${currentConcept._id}`;
+        const response = await api.put(endpoint, conceptData);
+        console.log('API save response:', response.data);
+        
+        // Refresh the list to get updated data from API
+        fetchDataConcepts();
+      } catch (apiError) {
+        console.error('API save error:', apiError);
+        
+        // If API fails, update local state as fallback
+        const updatedConcept = {
+          ...currentConcept,
+          ...conceptData,
+          lastUpdated: new Date().toISOString().split('T')[0]
+        };
+        
+        // Update local state
+        const updatedConcepts = concepts.map(concept => 
+          concept._id === currentConcept._id ? updatedConcept : concept
+        );
+        
+        const updatedAllConcepts = allConcepts.map(concept => 
+          concept._id === currentConcept._id ? updatedConcept : concept
+        );
+        
+        setConcepts(updatedConcepts);
+        setAllConcepts(updatedAllConcepts);
+        
+        throw apiError; // Re-throw to handle in catch block
+      }
+      
+      setEditDialogOpen(false);
+      
+      // Show success message
+      setSnackbar({
+        open: true,
+        message: 'Data concept updated successfully',
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('Error updating data concept:', error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to update data concept',
+        severity: 'error'
+      });
+    }
+  };
+
+  // Function to fetch data concepts from the API
   const fetchDataConcepts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 500));
+      let endpoint = '/data-concepts';
+      let params = {};
       
-      // Filter concepts based on search text if provided
-      let filteredConcepts = [...sampleConcepts];
+      // Add search query if provided
       if (debouncedSearchText) {
-        const searchLower = debouncedSearchText.toLowerCase();
-        filteredConcepts = sampleConcepts.filter(concept => 
-          concept.name.toLowerCase().includes(searchLower) ||
-          concept.description.toLowerCase().includes(searchLower) ||
-          concept.domain.toLowerCase().includes(searchLower) ||
-          (concept.tags && concept.tags.some(tag => tag.toLowerCase().includes(searchLower)))
-        );
+        params = { search: debouncedSearchText };
         
         // Add to search history if it's a new search
         if (!searchHistory.includes(debouncedSearchText)) {
@@ -175,11 +343,33 @@ const DataConcepts: React.FC = () => {
         }
       }
       
-      setConcepts(filteredConcepts);
+      // Make API request using the authenticated API service
+      try {
+        const response = await api.get(endpoint, { params });
+        console.log('API response:', response.data);
+        setConcepts(response.data.data);
+        setAllConcepts(response.data.data);
+      } catch (apiError) {
+        console.error('API error:', apiError);
+        // Fall back to sample data if API fails
+        if (allConcepts.length === 0) {
+          console.log('Using sample data as fallback');
+          setConcepts(sampleConcepts);
+          setAllConcepts(sampleConcepts);
+        }
+        throw apiError;
+      }
     } catch (err) {
       console.error('Failed to fetch data concepts:', err);
       setError('Failed to load data concepts. Please try again later.');
-      setConcepts([]);
+      
+      // If API fails, use fallback sample data for development
+      if (process.env.NODE_ENV === 'development') {
+        if (allConcepts.length === 0) {
+          setConcepts([...sampleConcepts]);
+          setAllConcepts([...sampleConcepts]);
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -221,6 +411,192 @@ const DataConcepts: React.FC = () => {
 
   return (
     <Container sx={{ py: 4 }} className="data-concepts-page">
+      {/* Edit Dialog with accessibility features */}
+      <Dialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        aria-labelledby="edit-dialog-title"
+        fullWidth
+        maxWidth="sm"
+        disableEscapeKeyDown={false}
+        aria-describedby="edit-dialog-description"
+      >
+        <DialogTitle id="edit-dialog-title">
+          Edit Data Concept
+        </DialogTitle>
+        
+        <DialogContent dividers>
+          <Box id="edit-dialog-description" sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              Edit the details of this data concept. All fields marked with * are required.
+            </Typography>
+          </Box>
+          
+          <form noValidate>
+            {/* Name field */}
+            <TextField
+              inputRef={firstInputRef}
+              margin="dense"
+              id="name"
+              name="name"
+              label="Concept Name"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={formData.name}
+              onChange={handleInputChange}
+              error={!!formErrors.name}
+              helperText={formErrors.name || ''}
+              required
+              inputProps={{
+                'aria-describedby': 'name-helper-text',
+                'aria-invalid': !!formErrors.name
+              }}
+            />
+            
+            {/* Description field */}
+            <TextField
+              margin="dense"
+              id="description"
+              name="description"
+              label="Description"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={formData.description}
+              onChange={handleInputChange}
+              error={!!formErrors.description}
+              helperText={formErrors.description || ''}
+              required
+              multiline
+              rows={3}
+              inputProps={{
+                'aria-describedby': 'description-helper-text',
+                'aria-invalid': !!formErrors.description
+              }}
+            />
+            
+            {/* Domain field */}
+            <TextField
+              margin="dense"
+              id="domain"
+              name="domain"
+              label="Domain"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={formData.domain}
+              onChange={handleInputChange}
+              error={!!formErrors.domain}
+              helperText={formErrors.domain || ''}
+              required
+              inputProps={{
+                'aria-describedby': 'domain-helper-text',
+                'aria-invalid': !!formErrors.domain
+              }}
+            />
+            
+            {/* Steward field */}
+            <TextField
+              margin="dense"
+              id="steward"
+              name="steward"
+              label="Data Steward"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={formData.steward}
+              onChange={handleInputChange}
+              error={!!formErrors.steward}
+              helperText={formErrors.steward || ''}
+              required
+              inputProps={{
+                'aria-describedby': 'steward-helper-text',
+                'aria-invalid': !!formErrors.steward
+              }}
+            />
+            
+            {/* Status select */}
+            <FormControl 
+              fullWidth 
+              margin="dense"
+              variant="outlined"
+              error={!!formErrors.status}
+            >
+              <FormLabel htmlFor="status">Status</FormLabel>
+              <Select
+                id="status"
+                name="status"
+                value={formData.status}
+                onChange={handleStatusChange}
+                aria-describedby="status-helper-text"
+              >
+                <MenuItem value="approved">Approved</MenuItem>
+                <MenuItem value="draft">Draft</MenuItem>
+                <MenuItem value="deprecated">Deprecated</MenuItem>
+              </Select>
+              {formErrors.status && (
+                <FormHelperText id="status-helper-text" error>
+                  {formErrors.status}
+                </FormHelperText>
+              )}
+            </FormControl>
+            
+            {/* Related Concepts field */}
+            <TextField
+              margin="dense"
+              id="relatedConcepts"
+              name="relatedConcepts"
+              label="Related Concepts (comma separated)"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={formData.relatedConcepts}
+              onChange={handleInputChange}
+              helperText="Enter related concepts separated by commas"
+              inputProps={{
+                'aria-describedby': 'related-concepts-helper-text'
+              }}
+            />
+            
+            {/* Tags field */}
+            <TextField
+              margin="dense"
+              id="tags"
+              name="tags"
+              label="Tags (comma separated)"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={formData.tags}
+              onChange={handleInputChange}
+              helperText="Enter tags separated by commas"
+              inputProps={{
+                'aria-describedby': 'tags-helper-text'
+              }}
+            />
+          </form>
+        </DialogContent>
+        
+        <DialogActions>
+          <Button 
+            onClick={() => setEditDialogOpen(false)}
+            color="primary"
+            aria-label="Cancel editing"
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSaveConcept}
+            color="primary"
+            variant="contained"
+            aria-label="Save changes"
+          >
+            Save Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
+      
       <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#003366', fontWeight: 700 }} tabIndex={-1}>
         E-Unify Data Concepts
       </Typography>
@@ -305,7 +681,7 @@ const DataConcepts: React.FC = () => {
 
           <Grid container spacing={3}>
             {concepts.map((concept) => (
-              <Grid item xs={12} sm={6} md={4} key={concept.id}>
+              <Grid item xs={12} sm={6} md={4} key={concept._id}>
                 <Card 
                   sx={{ 
                     height: '100%',
@@ -317,20 +693,19 @@ const DataConcepts: React.FC = () => {
                   }}
                   tabIndex={0}
                   role="button"
-                  aria-label={`View details for ${concept.name} concept`}
+                  aria-label={`Edit ${concept.name} concept`}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault();
-                      // In a real app, this would navigate to concept details
-                      console.log(`Viewing details for ${concept.name}`);
+                      handleEditConcept(concept);
                     }
                   }}
-                  onClick={() => {
-                    // In a real app, this would navigate to concept details
-                    console.log(`Viewing details for ${concept.name}`);
-                  }}
+                  onClick={() => handleEditConcept(concept)}
+                  aria-haspopup="dialog"
+                  aria-expanded={editDialogOpen && currentConcept?._id === concept._id}
                 >
                   <CardContent>
+                    {/* Edit icon removed as requested */}
                     <Box 
                       sx={{ 
                         display: 'flex',
@@ -416,6 +791,23 @@ const DataConcepts: React.FC = () => {
           </Grid>
         </>
       )}
+      
+      {/* Success/Error Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={5000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={() => setSnackbar(prev => ({ ...prev, open: false }))} 
+          severity={snackbar.severity} 
+          sx={{ width: '100%' }}
+          variant="filled"
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
