@@ -1,5 +1,7 @@
 # Data Literacy Support - Data Governance Platform
 
+*Last Updated: August 9, 2025*
+
 A modern React-based web application designed to improve data literacy and governance within organizations, helping teams discover, understand, and trust their data with intelligent data governance solutions.
 
 ## Development Cost Analysis (June 29 - August 4, 2025)
