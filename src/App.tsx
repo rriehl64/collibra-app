@@ -11,6 +11,8 @@ import DataGovernance from './pages/DataGovernance';
 import Analytics from './pages/Analytics';
 import Integration from './pages/Integration';
 import Learn101 from './pages/Learn101';
+import DataLiteracyModule from './pages/DataLiteracyModule';
+import NationalProductionDataset from './pages/NationalProductionDataset';
 import DGvsMDMLesson from './components/Learn/DGvsMDMLesson';
 import DataStewardLesson from './components/Learn/DataStewardLesson';
 import AssetTypes from './pages/AssetTypes';
@@ -36,9 +38,11 @@ import Workflows from './pages/admin/Workflows';
 import Users from './pages/access/Users';
 import Roles from './pages/access/Roles';
 import Permissions from './pages/access/Permissions';
+import Profile from './pages/Profile';
 import Jurisdictions from './pages/access/Jurisdictions';
 import Documentation from './pages/Documentation';
 import Settings from './pages/Settings';
+import About from './pages/About';
 import TestPage from './pages/TestPage';
 import ProcessingCategories from './pages/processing/ProcessingCategories';
 import ProcessingMeasures from './pages/processing/ProcessingMeasures';
@@ -210,12 +214,16 @@ function App() {
             <Route element={<Layout>{<Outlet />}</Layout>}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/learn101" element={<Learn101 />} />
+              <Route path="/data-literacy" element={<DataLiteracyModule />} />
+              <Route path="/national-production-dataset" element={<NationalProductionDataset />} />
               <Route path="/dgvsmdm" element={<DGvsMDMLesson />} />
               <Route path="/data-steward" element={<DataStewardLesson />} />
+              <Route path="/about" element={<About />} />
               
               {/* Protected Routes - Require Authentication */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/profile" element={<Profile />} />
                 <Route path="/data-catalog" element={<DataCatalog />} />
                 <Route path="/data-assets" element={<DataAssetDemo />} />
                 <Route path="/assets/business-processes" element={<BusinessProcesses />} />

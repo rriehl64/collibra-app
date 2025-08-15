@@ -71,7 +71,9 @@
     "@mui/types": "^7.2.21",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^29.5.14",
+    "@types/jest-axe": "^3.5.9",
     "@types/lodash": "^4.17.20",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
@@ -81,11 +83,14 @@
     "concurrently": "^9.1.2",
     "console-browserify": "^1.2.0",
     "events": "^3.3.0",
+    "jest-axe": "^10.0.0",
+    "jest-environment-jsdom": "^29.7.0",
     "null-loader": "^4.0.1",
     "querystring-es3": "^0.2.1",
     "react-app-rewired": "^2.2.1",
     "react-router-dom": "^6.11.2",
     "source-map-loader": "^4.0.1",
+    "ts-jest": "^29.4.1",
     "web-vitals": "^4.2.4"
   }
 }

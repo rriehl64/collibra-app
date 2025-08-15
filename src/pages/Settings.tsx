@@ -19,7 +19,11 @@ import {
   Tabs,
   Tab,
   Alert,
-  Snackbar
+  Snackbar,
+  Tooltip,
+  Link,
+  CircularProgress,
+  Breadcrumbs
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -29,7 +33,17 @@ import {
   Notifications as NotificationsIcon,
   Security as SecurityIcon,
   Language as LanguageIcon,
-  Accessibility as AccessibilityIcon
+  Accessibility as AccessibilityIcon,
+  Home as HomeIcon,
+  Settings as SettingsIcon,
+  Help as HelpIcon,
+  Info as InfoIcon,
+  Warning as WarningIcon,
+  Check as CheckIcon,
+  KeyboardArrowRight as KeyboardArrowRightIcon,
+  TextFields as TextFieldsIcon,
+  Contrast as ContrastIcon,
+  VolumeUp as VolumeUpIcon
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -85,6 +99,7 @@ const Settings: React.FC = () => {
     primaryColor: '#003366',
     fontSize: 'medium',
     highContrast: false,
+    fontFamily: 'sourceSansPro',
     
     // Notifications
     emailNotifications: true,
@@ -102,7 +117,9 @@ const Settings: React.FC = () => {
     screenReader: false,
     keyboardNavigation: true,
     reducedMotion: false,
-    largeText: false
+    largeText: false,
+    audioFeedback: false,
+    simplifiedInterface: false
   });
   
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -129,11 +146,50 @@ const Settings: React.FC = () => {
   
   return (
     <Container sx={{ py: 4 }} className="settings-page">
-      <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#003366', fontWeight: 700 }}>
+      {/* Breadcrumb navigation for improved wayfinding */}
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
+        <Link 
+          underline="hover" 
+          color="inherit" 
+          href="/dashboard" 
+          sx={{ display: 'flex', alignItems: 'center' }}
+          aria-label="Go to dashboard"
+        >
+          <HomeIcon sx={{ mr: 0.5 }} fontSize="small" />
+          Dashboard
+        </Link>
+        <Typography 
+          color="text.primary" 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            color: '#003366',
+            fontWeight: 600 
+          }}
+        >
+          <SettingsIcon sx={{ mr: 0.5 }} fontSize="small" />
+          Settings
+        </Typography>
+      </Breadcrumbs>
+
+      <Typography 
+        variant="h4" 
+        component="h1" 
+        gutterBottom 
+        sx={{ 
+          color: '#003366', 
+          fontWeight: 700,
+          borderBottom: '2px solid #003366',
+          pb: 1,
+          mb: 3 
+        }}
+        tabIndex={0}
+      >
         Settings
       </Typography>
-      <Typography variant="body1" paragraph>
-        Configure your application preferences and account settings.
+      
+      <Typography variant="body1" paragraph sx={{ mb: 4 }}>
+        Configure your application preferences and account settings. Changes will be saved automatically to your user profile.
       </Typography>
       
       <Paper sx={{ mb: 4 }}>
@@ -144,12 +200,59 @@ const Settings: React.FC = () => {
             aria-label="settings tabs"
             variant="scrollable"
             scrollButtons="auto"
+            sx={{
+              '& .MuiTab-root': {
+                color: '#555',
+                '&.Mui-selected': {
+                  color: '#003366',
+                  fontWeight: 600,
+                },
+                '&:focus': {
+                  outline: '2px solid #003366',
+                  outlineOffset: '2px',
+                },
+              },
+              '& .MuiTabs-indicator': {
+                backgroundColor: '#003366',
+                height: 3
+              }
+            }}
           >
-            <Tab icon={<PaletteIcon />} iconPosition="start" label="Display & Theme" {...a11yProps(0)} />
-            <Tab icon={<NotificationsIcon />} iconPosition="start" label="Notifications" {...a11yProps(1)} />
-            <Tab icon={<SecurityIcon />} iconPosition="start" label="Security" {...a11yProps(2)} />
-            <Tab icon={<AccessibilityIcon />} iconPosition="start" label="Accessibility" {...a11yProps(3)} />
-            <Tab icon={<LanguageIcon />} iconPosition="start" label="Language & Region" {...a11yProps(4)} />
+            <Tab 
+              icon={<PaletteIcon />} 
+              iconPosition="start" 
+              label="Display & Theme" 
+              {...a11yProps(0)} 
+              sx={{ borderRadius: '4px 4px 0 0' }}
+            />
+            <Tab 
+              icon={<NotificationsIcon />} 
+              iconPosition="start" 
+              label="Notifications" 
+              {...a11yProps(1)} 
+              sx={{ borderRadius: '4px 4px 0 0' }}
+            />
+            <Tab 
+              icon={<SecurityIcon />} 
+              iconPosition="start" 
+              label="Security" 
+              {...a11yProps(2)} 
+              sx={{ borderRadius: '4px 4px 0 0' }}
+            />
+            <Tab 
+              icon={<AccessibilityIcon />} 
+              iconPosition="start" 
+              label="Accessibility" 
+              {...a11yProps(3)} 
+              sx={{ borderRadius: '4px 4px 0 0' }}
+            />
+            <Tab 
+              icon={<LanguageIcon />} 
+              iconPosition="start" 
+              label="Language & Region" 
+              {...a11yProps(4)} 
+              sx={{ borderRadius: '4px 4px 0 0' }}
+            />
           </Tabs>
         </Box>
         
@@ -456,79 +559,273 @@ const Settings: React.FC = () => {
         
         {/* Accessibility Tab */}
         <TabPanel value={tabValue} index={3}>
-          <Paper sx={{ p: 3 }} elevation={0} variant="outlined">
-            <Typography variant="h6" component="h2" gutterBottom>
-              Accessibility Settings
+          <Alert severity="info" sx={{ mb: 3, backgroundColor: '#E6F0F9', color: '#003366' }}>
+            <Typography variant="subtitle1">
+              <InfoIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+              These settings help ensure compliance with Section 508 and WCAG 2.0 standards
             </Typography>
-            
-            <Alert severity="info" sx={{ mb: 3 }}>
-              These settings help make the application more accessible for users with disabilities.
-            </Alert>
-            
-            <Box sx={{ mb: 3 }}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={settings.screenReader}
-                    onChange={(e) => handleSettingChange('screenReader', e.target.checked)}
-                    name="screenReader"
+          </Alert>
+
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Paper sx={{ p: 3 }} elevation={0} variant="outlined">
+                <Typography 
+                  variant="h6" 
+                  component="h2" 
+                  gutterBottom 
+                  sx={{ color: '#003366', fontWeight: 600 }}
+                  id="accessibility-options-heading"
+                >
+                  <AccessibilityIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Accessibility Options
+                </Typography>
+                
+                <Box sx={{ mb: 3 }} role="group" aria-labelledby="accessibility-options-heading">
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={settings.screenReader}
+                        onChange={(e) => handleSettingChange('screenReader', e.target.checked)}
+                        name="screenReader"
+                        inputProps={{ 'aria-describedby': 'screenreader-description' }}
+                        color="primary"
+                      />
+                    }
+                    label="Screen Reader Compatibility Mode"
                   />
-                }
-                label="Optimize for Screen Readers"
-              />
-              <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
-                Enhances compatibility with screen reading software.
-              </Typography>
-            </Box>
-            
-            <Box sx={{ mb: 3 }}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={settings.keyboardNavigation}
-                    onChange={(e) => handleSettingChange('keyboardNavigation', e.target.checked)}
-                    name="keyboardNavigation"
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ ml: 4 }}
+                    id="screenreader-description"
+                  >
+                    Optimize interface for screen readers with enhanced ARIA descriptions and skip navigation links.
+                  </Typography>
+                </Box>
+                
+                <Box sx={{ mb: 3 }} role="group" aria-labelledby="keyboard-navigation-label">
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={settings.keyboardNavigation}
+                        onChange={(e) => handleSettingChange('keyboardNavigation', e.target.checked)}
+                        name="keyboardNavigation"
+                        inputProps={{ 'aria-describedby': 'keyboard-navigation-description' }}
+                        color="primary"
+                      />
+                    }
+                    label="Enhanced Keyboard Navigation"
+                    id="keyboard-navigation-label"
                   />
-                }
-                label="Enhanced Keyboard Navigation"
-              />
-              <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
-                Improves navigation using only keyboard shortcuts.
-              </Typography>
-            </Box>
-            
-            <Box sx={{ mb: 3 }}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={settings.reducedMotion}
-                    onChange={(e) => handleSettingChange('reducedMotion', e.target.checked)}
-                    name="reducedMotion"
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ ml: 4 }}
+                    id="keyboard-navigation-description"
+                  >
+                    Enable focus indicators and keyboard shortcuts for all interactive elements.
+                  </Typography>
+                </Box>
+                
+                <Box sx={{ mb: 3 }} role="group" aria-labelledby="reduced-motion-label">
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={settings.reducedMotion}
+                        onChange={(e) => handleSettingChange('reducedMotion', e.target.checked)}
+                        name="reducedMotion"
+                        inputProps={{ 'aria-describedby': 'reduced-motion-description' }}
+                        color="primary"
+                      />
+                    }
+                    label="Reduced Motion"
+                    id="reduced-motion-label"
                   />
-                }
-                label="Reduce Motion"
-              />
-              <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
-                Minimizes animations and transitions throughout the application.
-              </Typography>
-            </Box>
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ ml: 4 }}
+                    id="reduced-motion-description"
+                  >
+                    Minimize animations and transitions for users with vestibular disorders.
+                  </Typography>
+                </Box>
+              </Paper>
+            </Grid>
             
-            <Box sx={{ mb: 3 }}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={settings.largeText}
-                    onChange={(e) => handleSettingChange('largeText', e.target.checked)}
-                    name="largeText"
+            <Grid item xs={12} md={6}>
+              <Paper sx={{ p: 3 }} elevation={0} variant="outlined">
+                <Typography 
+                  variant="h6" 
+                  component="h2" 
+                  gutterBottom 
+                  sx={{ color: '#003366', fontWeight: 600 }}
+                  id="visual-options-heading"
+                >
+                  <TextFieldsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Visual Preferences
+                </Typography>
+                
+                <Box sx={{ mb: 3 }} role="group" aria-labelledby="text-size-label">
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={settings.largeText}
+                        onChange={(e) => handleSettingChange('largeText', e.target.checked)}
+                        name="largeText"
+                        inputProps={{ 'aria-describedby': 'large-text-description' }}
+                        color="primary"
+                      />
+                    }
+                    label="Large Text"
+                    id="text-size-label"
                   />
-                }
-                label="Large Text"
-              />
-              <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
-                Increases the font size across the application.
-              </Typography>
-            </Box>
-          </Paper>
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ ml: 4 }}
+                    id="large-text-description"
+                  >
+                    Increase font size throughout the application (minimum 16px).
+                  </Typography>
+                </Box>
+                
+                <Box sx={{ mb: 3 }} role="group" aria-labelledby="contrast-mode-label">
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={settings.highContrast}
+                        onChange={(e) => handleSettingChange('highContrast', e.target.checked)}
+                        name="highContrast"
+                        inputProps={{ 'aria-describedby': 'contrast-description' }}
+                        color="primary"
+                      />
+                    }
+                    label="High Contrast Mode"
+                    id="contrast-mode-label"
+                  />
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ ml: 4 }}
+                    id="contrast-description"
+                  >
+                    Enable high contrast colors for better readability (WCAG AAA compliance).
+                  </Typography>
+                </Box>
+                
+                <FormControl 
+                  fullWidth 
+                  margin="normal" 
+                  sx={{ mt: 3 }}
+                  aria-labelledby="font-family-label"
+                >
+                  <InputLabel id="font-family-label-id">Font Family</InputLabel>
+                  <Select
+                    labelId="font-family-label-id"
+                    id="font-family-select"
+                    value={settings.fontFamily || 'sourceSansPro'}
+                    label="Font Family"
+                    onChange={(e) => handleSettingChange('fontFamily', e.target.value)}
+                  >
+                    <MenuItem value="sourceSansPro">Source Sans Pro (Default)</MenuItem>
+                    <MenuItem value="merriweather">Merriweather</MenuItem>
+                    <MenuItem value="roboto">Roboto</MenuItem>
+                    <MenuItem value="openSans">Open Sans</MenuItem>
+                  </Select>
+                  <Typography id="font-family-label" variant="caption" sx={{ mt: 1 }}>
+                    Select a font that is easier for you to read
+                  </Typography>
+                </FormControl>
+              </Paper>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Paper sx={{ p: 3, mt: 2 }} elevation={0} variant="outlined">
+                <Typography 
+                  variant="h6" 
+                  component="h2" 
+                  gutterBottom 
+                  sx={{ color: '#003366', fontWeight: 600 }}
+                  id="cognitive-options-heading"
+                >
+                  <VolumeUpIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  Audio & Cognitive Assistance
+                </Typography>
+                
+                <Box sx={{ mb: 3 }} role="group" aria-labelledby="cognitive-options-heading">
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={settings.audioFeedback || false}
+                        onChange={(e) => handleSettingChange('audioFeedback', e.target.checked)}
+                        name="audioFeedback"
+                        inputProps={{ 'aria-describedby': 'audio-feedback-description' }}
+                        color="primary"
+                      />
+                    }
+                    label="Audio Feedback"
+                  />
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ ml: 4 }}
+                    id="audio-feedback-description"
+                  >
+                    Enable audio cues for important actions and notifications.
+                  </Typography>
+                </Box>
+                
+                <Box sx={{ mb: 3 }}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={settings.simplifiedInterface || false}
+                        onChange={(e) => handleSettingChange('simplifiedInterface', e.target.checked)}
+                        name="simplifiedInterface"
+                        inputProps={{ 'aria-describedby': 'simplified-interface-description' }}
+                        color="primary"
+                      />
+                    }
+                    label="Simplified Interface"
+                  />
+                  <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ ml: 4 }}
+                    id="simplified-interface-description"
+                  >
+                    Reduce visual complexity and provide clearer instructions.
+                  </Typography>
+                </Box>
+              </Paper>
+            </Grid>
+          </Grid>
+          
+          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
+            <Button
+              variant="outlined"
+              color="primary"
+              startIcon={<HelpIcon />}
+              href="https://www.section508.gov/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Learn more about Section 508 compliance"
+            >
+              Section 508 Information
+            </Button>
+            
+            <Button
+              variant="contained"
+              color="primary"
+              sx={{ backgroundColor: '#003366' }}
+              startIcon={<SaveIcon />}
+              onClick={handleSaveSettings}
+              aria-label="Save all accessibility settings"
+            >
+              Save Settings
+            </Button>
+          </Box>
         </TabPanel>
         
         {/* Language & Region Tab */}

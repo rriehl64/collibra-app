@@ -23,6 +23,7 @@ import {
   Book as BookIcon,
   Domain as DomainIcon,
   Class as SubjectIcon,
+  Info as InfoIcon,
 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -31,6 +32,8 @@ const DRAWER_WIDTH = 240;
 const menuItems = [
   { text: 'Dashboard', icon: DashboardIcon, path: '/' },
   { text: 'E-Unify 101', icon: SchoolIcon, path: '/learn101' },
+  { text: 'Data Literacy Module', icon: SchoolIcon, path: '/data-literacy' },
+  { text: 'National Production Dataset', icon: StorageIcon, path: '/national-production-dataset' },
   { text: 'Data Catalog', icon: StorageIcon, path: '/data-catalog' },
   { text: 'Data Assets', icon: StorageIcon, path: '/data-assets' },
   { text: 'Business Processes', icon: BusinessIcon, path: '/assets/business-processes' },
@@ -47,6 +50,7 @@ const menuItems = [
 ];
 
 const secondaryMenuItems = [
+  { text: 'About E-Unify', icon: InfoIcon, path: '/about' },
   { text: 'Documentation', icon: DescriptionIcon, path: '/docs' },
   { text: 'Settings', icon: SettingsIcon, path: '/settings' },
 ];
@@ -70,10 +74,11 @@ const Sidenav = () => {
           boxSizing: 'border-box',
           borderRight: '1px solid rgba(0, 0, 0, 0.12)',
           backgroundColor: 'background.paper',
+          position: 'static',
         },
       }}
     >
-      <Box sx={{ overflow: 'auto', mt: 8 }}>
+      <Box sx={{ overflow: 'auto' }}>
         <List>
           {menuItems.map((item) => (
             <ListItem key={item.text} disablePadding>

@@ -9,21 +9,22 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <Navbar />
-      <Sidenav />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          width: '100%',
-          minHeight: '100vh',
-          backgroundColor: 'background.default',
-          pt: { xs: 10, sm: 12 }, // Add padding top to account for the navbar
-          px: { xs: 2, sm: 3 },   // Add horizontal padding
-        }}
-      >
-        {children}
+      <Box sx={{ display: 'flex', pt: { xs: '118px', sm: '118px' } }}>
+        <Sidenav />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            width: '100%',
+            minHeight: 'calc(100vh - 118px)',
+            backgroundColor: 'background.default',
+            px: { xs: 2, sm: 3 },   // Add horizontal padding
+          }}
+        >
+          {children}
+        </Box>
       </Box>
     </Box>
   );
