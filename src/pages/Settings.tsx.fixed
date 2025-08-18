@@ -98,10 +98,10 @@ const Settings = () => {
     timeFormat: '12h',
     
     // Theme
-    theme: themeContext.themePreferences.mode,
-    primaryColor: themeContext.themePreferences.primaryColor,
-    fontSize: themeContext.themePreferences.fontSize,
-    highContrast: themeContext.themePreferences.highContrast,
+    theme: 'light',
+    primaryColor: '#003366',
+    fontSize: 'medium',
+    highContrast: false,
     fontFamily: 'sourceSansPro',
     
     // Notifications
@@ -209,35 +209,35 @@ const Settings = () => {
               iconPosition="start" 
               label="Display & Theme" 
               {...a11yProps(0)} 
-              sx={{ border: 'none', boxShadow: 'none' }}
+              sx={{ borderRadius: '4px 4px 0 0' }}
             />
             <Tab 
               icon={<NotificationsIcon />} 
               iconPosition="start" 
               label="Notifications" 
               {...a11yProps(1)} 
-              sx={{ border: 'none', boxShadow: 'none' }}
+              sx={{ borderRadius: '4px 4px 0 0' }}
             />
             <Tab 
               icon={<SecurityIcon />} 
               iconPosition="start" 
               label="Security" 
               {...a11yProps(2)} 
-              sx={{ border: 'none', boxShadow: 'none' }}
+              sx={{ borderRadius: '4px 4px 0 0' }}
             />
             <Tab 
               icon={<AccessibilityIcon />} 
               iconPosition="start" 
               label="Accessibility" 
               {...a11yProps(3)} 
-              sx={{ border: 'none', boxShadow: 'none' }}
+              sx={{ borderRadius: '4px 4px 0 0' }}
             />
             <Tab 
               icon={<LanguageIcon />} 
               iconPosition="start" 
               label="Language & Region" 
               {...a11yProps(4)} 
-              sx={{ border: 'none', boxShadow: 'none' }}
+              sx={{ borderRadius: '4px 4px 0 0' }}
             />
           </Tabs>
         
@@ -899,16 +899,14 @@ const Settings = () => {
         {/* Save button */}
         <div className="settings-button-container">
           <Button
-            onClick={handleSaveSettings}
             variant="contained"
             color="primary"
-            size="large"
             startIcon={<SaveIcon />}
-            aria-label="Save all settings"
+            onClick={handleSaveSettings}
             sx={{
-              bgcolor: '#003366',
+              backgroundColor: '#003366',
               '&:hover': {
-                bgcolor: '#002855',
+                backgroundColor: '#002147',
               },
               boxShadow: 'none',
               borderRadius: '4px',
@@ -926,9 +924,9 @@ const Settings = () => {
           message={snackbarMessage || ''}
           anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         />
-      </Box>
     </Container>
   );
+
 };
 
 export default Settings;

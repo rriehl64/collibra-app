@@ -1,6 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { CssBaseline } from '@mui/material';
+import ThemeProvider from './contexts/ThemeContext';
+import './styles/theme.css';
+import './styles/settings.css';
 import Layout from './components/Layout/Layout';
 import Navbar from './components/Layout/Navbar';
 import { SnackbarProvider } from './contexts/SnackbarContext';
@@ -58,69 +61,7 @@ import DevLogin from './pages/DevLogin';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import DevTools from './components/DevTools/DevTools';
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#7BC144', // Collibra green
-      dark: '#6CAD3D',
-    },
-    secondary: {
-      main: '#1785FB', // Collibra blue
-      dark: '#1476E0',
-    },
-    background: {
-      default: '#FFFFFF',
-      paper: '#F5F6F7',
-    },
-    text: {
-      primary: '#0C1F3F', // Collibra dark blue
-      secondary: '#2D3436',
-    },
-  },
-  typography: {
-    fontFamily: [
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
-    h1: {
-      fontWeight: 600,
-      fontSize: '2.5rem',
-    },
-    h2: {
-      fontWeight: 600,
-      fontSize: '2rem',
-    },
-    button: {
-      textTransform: 'none',
-      fontWeight: 500,
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: '4px',
-          padding: '12px 24px',
-          fontSize: '16px',
-        },
-      },
-    },
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          backgroundColor: '#FFFFFF',
-          color: '#0C1F3F',
-          boxShadow: '0 2px 4px rgba(12, 31, 63, 0.08)',
-        },
-      },
-    },
-  },
-});
+// Theme configuration has been moved to ThemeContext
 
 // Protected Route Component
 const ProtectedRoute: React.FC = () => {
@@ -178,7 +119,7 @@ const AdminRoute: React.FC = () => {
 // It's used just to test our accessible components in isolation
 const TestApp: React.FC = () => {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <CssBaseline />
       <TestPage />
     </ThemeProvider>
@@ -195,7 +136,7 @@ function App() {
   }
   
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <CssBaseline />
       <AuthProvider>
         <SnackbarProvider>

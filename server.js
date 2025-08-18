@@ -21,6 +21,7 @@ const dashboard = require('./server/routes/dashboard');
 const businessProcesses = require('./server/routes/businessProcesses');
 const dataCategories = require('./server/routes/dataCategories');
 const dataConcepts = require('./server/routes/dataConcepts');
+const subjectCategories = require('./server/routes/subjectCategories');
 
 const app = express();
 
@@ -32,7 +33,7 @@ const corsOptions = {
     
     const allowedOrigins = process.env.CORS_ORIGIN ? 
       process.env.CORS_ORIGIN.split(',') : 
-      ['http://localhost:3006', 'http://localhost:3002'];
+      ['http://localhost:3006', 'http://localhost:3002', 'http://localhost:3008'];
       
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
@@ -110,6 +111,7 @@ app.use('/api/v1/dashboard', dashboard);
 app.use('/api/v1/business-processes', businessProcesses);
 app.use('/api/v1/data-categories', dataCategories);
 app.use('/api/v1/data-concepts', dataConcepts);
+app.use('/api/v1/subject-categories', subjectCategories);
 
 // Only serve static files and handle React routing in production mode
 if (process.env.NODE_ENV === 'production') {

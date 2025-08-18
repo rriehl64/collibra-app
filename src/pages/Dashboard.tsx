@@ -313,6 +313,15 @@ const Dashboard: React.FC = () => {
                       ))}
                     </Pie>
                     <Tooltip />
+                    <Legend 
+                      formatter={(value, entry) => {
+                        // Use a custom formatter to avoid inactiveColor being passed to DOM
+                        return <span style={{ color: entry.color }}>{value}</span>;
+                      }}
+                      layout="vertical"
+                      align="right"
+                      verticalAlign="middle"
+                    />
                   </PieChart>
                 </ResponsiveContainer>
               </Paper>
@@ -346,7 +355,12 @@ const Dashboard: React.FC = () => {
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Legend />
+                    <Legend 
+                      formatter={(value, entry) => {
+                        // Use a custom formatter to avoid inactiveColor being passed to DOM
+                        return <span style={{ color: entry.color }}>{value}</span>;
+                      }}
+                    />
                     <Bar dataKey="count" name="Asset Count" fill={theme.palette.primary.main} />
                   </BarChart>
                 </ResponsiveContainer>

@@ -308,11 +308,11 @@ const NationalProductionDataset = () => {
         {/* Main Content */}
         <Grid item xs={12} md={9} lg={9.5}>
           <Paper sx={{ mb: 4 }}>
-            <Box sx={{ p: 3, backgroundColor: 'primary.main', color: 'primary.contrastText' }}>
-              <Typography variant="h4" gutterBottom>
+            <Box sx={{ p: 3, backgroundColor: 'primary.main', color: '#ffffff' }}>
+              <Typography variant="h4" gutterBottom sx={{ color: '#ffffff' }}>
                 National Production Dataset (NPD)
               </Typography>
-              <Typography variant="subtitle1">
+              <Typography variant="subtitle1" sx={{ color: '#ffffff' }}>
                 A central repository for integrated immigration case data across USCIS systems
               </Typography>
             </Box>

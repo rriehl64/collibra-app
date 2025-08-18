@@ -1,0 +1,1 @@
+mongosh mongodb://localhost:27017/data-literacy-support /Users/russellriehl/appdev/collibra-app/insert-users.js

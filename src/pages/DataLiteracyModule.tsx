@@ -877,11 +877,11 @@ const DataLiteracyModule = () => {
   return (
     <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
       <Paper sx={{ mb: 4 }}>
-        <Box sx={{ p: 3, backgroundColor: 'primary.main', color: 'primary.contrastText' }}>
-          <Typography variant="h4" gutterBottom>
+        <Box sx={{ p: 3, backgroundColor: 'primary.main', color: '#ffffff' }}>
+          <Typography variant="h4" gutterBottom sx={{ color: '#ffffff' }}>
             Data Literacy Module
           </Typography>
-          <Typography variant="subtitle1">
+          <Typography variant="subtitle1" sx={{ color: '#ffffff' }}>
             Empowering employees with the skills to effectively read, understand, analyze, and communicate with data.
           </Typography>
         </Box>
@@ -978,18 +978,21 @@ const DataLiteracyModule = () => {
               aria-controls="uscis-data-literacy-content"
               id="uscis-data-literacy-header"
               sx={{ 
-                backgroundColor: 'primary.light', 
-                color: 'primary.contrastText',
+                backgroundColor: 'primary.main', 
+                color: '#ffffff',
                 '& .MuiAccordionSummary-expandIconWrapper': {
-                  color: 'primary.contrastText',
+                  color: '#ffffff',
+                },
+                '& .MuiSvgIcon-root': {
+                  color: '#ffffff',
                 }
               }}
             >
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <InfoIcon sx={{ mr: 1 }} />
-            <Typography variant="h6">Understanding DHS USCIS Data Literacy: The 5 Ws</Typography>
-          </Box>
-        </AccordionSummary>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <InfoIcon sx={{ mr: 1 }} />
+                <Typography variant="h6" sx={{ color: '#ffffff' }}>Understanding DHS USCIS Data Literacy: The 5 Ws</Typography>
+              </Box>
+            </AccordionSummary>
         <AccordionDetails>
           <Typography variant="h6" gutterBottom>Understanding DHS USCIS Data Literacy: The 5 Ws</Typography>
           

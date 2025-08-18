@@ -1,0 +1,113 @@
+/* Settings page styling */
+
+.settings-button-container {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.settings-tab-panel {
+  padding: 24px 0;
+}
+
+.settings-section {
+  border-left: 3px solid var(--uscis-blue);
+  background-color: rgba(0, 51, 102, 0.03);
+  border-radius: 0 4px 4px 0;
+  padding: 24px;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+.settings-section:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.settings-section-alt {
+  border-left: 3px solid #1976d2;
+  background-color: rgba(25, 118, 210, 0.03);
+}
+
+.settings-section-warning {
+  border-left: 3px solid #ff9800;
+  background-color: rgba(255, 152, 0, 0.03);
+}
+
+.settings-section-danger {
+  border-left: 3px solid #f44336;
+  background-color: rgba(244, 67, 54, 0.03);
+}
+
+.settings-heading {
+  color: var(--uscis-blue);
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.settings-heading svg {
+  margin-right: 8px;
+}
+
+/* Tab styling */
+.settings-tabs {
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.MuiTabs-root .MuiTab-root {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+.settings-tab {
+  text-transform: none;
+  font-size: 1rem;
+  font-weight: 500;
+  min-height: 48px;
+  padding: 0 16px;
+  transition: all 0.2s ease;
+}
+
+.settings-tab.Mui-selected {
+  color: var(--uscis-blue);
+  font-weight: 600;
+  box-shadow: none;
+  border: none;
+  outline: none;
+}
+
+.settings-tab:hover {
+  background-color: rgba(0, 51, 102, 0.04);
+  color: var(--uscis-blue);
+}
+
+.settings-tab:focus {
+  outline: 2px solid var(--uscis-blue);
+  outline-offset: 2px;
+}
+
+.settings-tabs .MuiTabs-indicator {
+  background-color: var(--uscis-blue);
+  height: 3px;
+}
+
+/* High contrast mode adjustments */
+.high-contrast .settings-section {
+  border-left-width: 4px;
+}
+
+/* For screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}

@@ -1,0 +1,146 @@
+/* 
+ * Global Theme Styles
+ * USCIS Design System Compliant
+ * Section 508 Accessibility Requirements
+ */
+
+:root {
+  /* USCIS Color Standards */
+  --uscis-blue: #003366;
+  --uscis-red: #B31B1B;
+  --uscis-white: #FFFFFF;
+  --uscis-black: #000000;
+  
+  /* Font Size Variables (controlled by ThemeContext) */
+  --app-font-size-base: 16px; /* Default medium size */
+  --app-font-scale-factor: 1;
+
+  /* Focus styles for accessibility */
+  --focus-outline-color: #1976d2;
+  --focus-outline-width: 2px;
+}
+
+/* Focus visible styles for keyboard navigation - Section 508 compliant */
+*:focus-visible {
+  outline: var(--focus-outline-width) solid var(--focus-outline-color) !important;
+  outline-offset: 2px !important;
+}
+
+/* Base font size on the html element */
+html {
+  font-size: var(--app-font-size-base);
+}
+
+/* Theme-specific body styles */
+body.theme-light {
+  background-color: #F5F6F7;
+  color: #0C1F3F;
+}
+
+body.theme-dark {
+  background-color: #121212;
+  color: #E0E0E0;
+}
+
+/* Font size specific styles */
+body.font-small {
+  font-size: 0.875rem;
+}
+
+body.font-medium {
+  font-size: 1rem;
+}
+
+body.font-large {
+  font-size: 1.125rem;
+}
+
+/* High contrast mode - Section 508 compliance */
+body.high-contrast.theme-light {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+body.high-contrast.theme-dark {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+body.high-contrast a {
+  text-decoration: underline;
+}
+
+body.high-contrast button,
+body.high-contrast a.MuiButtonBase-root {
+  border: 1px solid currentColor !important;
+}
+
+/* Improved button accessibility */
+button, 
+a.MuiButtonBase-root {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Skip navigation link for keyboard users - Section 508 compliance */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--uscis-blue);
+  color: white;
+  padding: 8px;
+  z-index: 9999;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Accessible form input focus states */
+input:focus, 
+select:focus, 
+textarea:focus {
+  border-color: var(--focus-outline-color) !important;
+}
+
+/* Ensure proper contrast for all interactive elements in high contrast mode */
+.high-contrast .MuiButton-root {
+  border: 2px solid currentColor !important;
+}
+
+/* Adjust headings scale based on font size preference */
+h1 {
+  font-size: calc(2.5rem * var(--app-font-scale-factor));
+}
+
+h2 {
+  font-size: calc(2rem * var(--app-font-scale-factor));
+}
+
+h3 {
+  font-size: calc(1.75rem * var(--app-font-scale-factor));
+}
+
+h4 {
+  font-size: calc(1.5rem * var(--app-font-scale-factor));
+}
+
+h5 {
+  font-size: calc(1.25rem * var(--app-font-scale-factor));
+}
+
+h6 {
+  font-size: calc(1rem * var(--app-font-scale-factor));
+}
+
+/* Ensure proper spacing in different font sizes */
+.font-large .MuiContainer-root {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.font-small .MuiContainer-root {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}

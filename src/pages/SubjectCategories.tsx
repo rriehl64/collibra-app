@@ -43,15 +43,21 @@ import api from '../services/api';
 
 // Define the subject category type for TypeScript support
 interface SubjectCategory {
-  id: string;
+  _id: string;  // MongoDB ObjectId as string
+  id?: string;  // Optional legacy id for backward compatibility
   name: string;
   description: string;
   owner: string;
   departmentCode: string;
   status: 'active' | 'inactive' | 'draft' | 'archived';
-  lastUpdated: string;
+  lastUpdated: string | Date;
   relatedAssets?: string[];
   tags?: string[];
+  createdBy?: string | null;
+  updatedBy?: string | null;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  __v?: number;
 }
 
 // Form value type
@@ -184,7 +190,7 @@ const SubjectCategories: React.FC = () => {
       
       try {
         // Make API call to update the category
-        const endpoint = `/subject-categories/${currentCategory?.id}`;
+        const endpoint = `/subject-categories/${currentCategory?._id}`;
         const response = await api.put(endpoint, categoryData);
         console.log('API save response:', response.data);
         
@@ -207,13 +213,13 @@ const SubjectCategories: React.FC = () => {
           
           // Update local state for immediate feedback
           const updatedCategories = categories.map(category => 
-            category.id === currentCategory.id ? updatedCategory : category
+            category._id === currentCategory._id ? updatedCategory : category
           );
           setCategories(updatedCategories);
           
           // Also update in allCategories to keep the search functionality working correctly
           setAllCategories(prev => prev.map(category => 
-            category.id === currentCategory.id ? updatedCategory : category
+            category._id === currentCategory._id ? updatedCategory : category
           ));
         }
         
@@ -261,92 +267,27 @@ const SubjectCategories: React.FC = () => {
         }
       }
       
-      try {
-        // Make API request using the authenticated API service
-        const response = await api.get(endpoint, { params });
-        console.log('API response:', response.data);
-        
-        if (response.data && response.data.data) {
-          // Set both categories and allCategories for display and persistence
-          setCategories(response.data.data);
-          setAllCategories(response.data.data);
-        } else {
-          throw new Error('Invalid API response format');
-        }
-      } catch (apiError) {
-        console.error('API error:', apiError);
-        
-        // Fall back to sample data if API fails and we have no data
-        if (allCategories.length === 0) {
-          // Sample categories as fallback for development
-          const sampleCategories: SubjectCategory[] = [
-            {
-              id: 'sc1',
-              name: 'Immigration Applications',
-              description: 'Categories related to different types of immigration applications and forms',
-              owner: 'Robert Chen',
-              departmentCode: 'IMM-100',
-              status: 'active',
-              lastUpdated: '2023-07-20',
-              tags: ['immigration', 'applications', 'forms']
-            },
-            {
-              id: 'sc2',
-              name: 'Asylum and Refugee',
-              description: 'Categories related to asylum claims and refugee status',
-              owner: 'Maria Rodriguez',
-              departmentCode: 'ASY-200',
-              status: 'active',
-              lastUpdated: '2023-07-18',
-              tags: ['asylum', 'refugee', 'humanitarian']
-            },
-            {
-              id: 'sc3',
-              name: 'Employment Authorization',
-              description: 'Categories related to work permits and employment eligibility',
-              owner: 'John Smith',
-              departmentCode: 'EMP-300',
-              status: 'active',
-              lastUpdated: '2023-07-15',
-              tags: ['employment', 'work', 'authorization']
-            }
-          ];
-          
-          console.log('Using sample categories as fallback');
-          setCategories(sampleCategories);
-          setAllCategories(sampleCategories);
-        }
-        throw apiError;
+      // Make API request using the authenticated API service
+      const response = await api.get(endpoint, { params });
+      console.log('API response:', response.data);
+      
+      if (response.data && response.data.data) {
+        // Set both categories and allCategories for display and persistence
+        setCategories(response.data.data);
+        setAllCategories(response.data.data);
+        console.log(`Loaded ${response.data.data.length} categories from the API`);
+      } else {
+        throw new Error('Invalid API response format');
       }
     } catch (err) {
       console.error('Error fetching subject categories:', err);
       setError('Failed to load subject categories. Please try again later.');
-      
-      // If API fails, use fallback sample data for development
-      if (process.env.NODE_ENV === 'development') {
-        if (allCategories.length === 0) {
-          const fallbackData: SubjectCategory[] = [
-            {
-              id: 'sc1',
-              name: 'Immigration Applications',
-              description: 'Categories related to different types of immigration applications and forms',
-              owner: 'Robert Chen',
-              departmentCode: 'IMM-100',
-              status: 'active',
-              lastUpdated: '2023-07-20',
-              tags: ['immigration', 'applications', 'forms']
-            }
-          ];
-          
-          console.log('Using emergency fallback data');
-          setCategories(fallbackData);
-          setAllCategories(fallbackData);
-        }
-      }
+      setCategories([]);
+      setAllCategories([]);
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearchText, searchHistory, allCategories.length]);
+  }, [debouncedSearchText, searchHistory]);
 
   // Initial fetch and search history retrieval
   useEffect(() => {
@@ -369,22 +310,40 @@ const SubjectCategories: React.FC = () => {
     fetchSubjectCategories();
   }, [fetchSubjectCategories]);
 
-  // Get status color based on status value
+  // Get status color based on status string
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
-        return 'success';
-      case 'inactive':
-        return 'error';
-      case 'draft':
-        return 'warning';
-      case 'archived':
-        return 'default';
-      default:
-        return 'default';
+      case 'active': return 'success';
+      case 'inactive': return 'error';
+      case 'draft': return 'warning';
+      case 'archived': return 'default';
+      default: return 'default';
     }
   };
 
+  // Format date for display
+  const formatDate = (date: string | Date): string => {
+    if (!date) return 'N/A';
+    
+    try {
+      // Convert to Date object if it's a string
+      const dateObj = typeof date === 'string' ? new Date(date) : date;
+      
+      // Check if valid date
+      if (isNaN(dateObj.getTime())) return 'Invalid Date';
+      
+      // Format as MM/DD/YYYY
+      return dateObj.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (e) {
+      console.error('Error formatting date:', e);
+      return String(date);
+    }
+  };
+  
   return (
     <Container sx={{ py: 4 }} className="subject-categories-page">
       <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#003366', fontWeight: 700 }} tabIndex={-1}>
@@ -513,7 +472,7 @@ const SubjectCategories: React.FC = () => {
                   <strong>Owner:</strong> {category.owner}
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 1 }}>
-                  <strong>Last Updated:</strong> {category.lastUpdated}
+                  <strong>Last Updated:</strong> {formatDate(category.lastUpdated)}
                 </Typography>
                 {category.tags && category.tags.length > 0 && (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 2 }}>
