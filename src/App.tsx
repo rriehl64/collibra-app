@@ -1,7 +1,9 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import ScrollToTop from './components/common/ScrollToTop';
 import { CssBaseline } from '@mui/material';
 import ThemeProvider from './contexts/ThemeContext';
+import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import './styles/theme.css';
 import './styles/settings.css';
 import Layout from './components/Layout/Layout';
@@ -32,6 +34,7 @@ import Acronyms from './pages/Acronyms';
 import KPIs from './pages/KPIs';
 import Reports from './pages/Reports';
 import BIReports from './pages/BIReports';
+import Help from './pages/Help';
 import DomainTypes from './pages/admin/DomainTypes';
 import Statuses from './pages/admin/Statuses';
 import Characteristics from './pages/admin/Characteristics';
@@ -138,11 +141,14 @@ function App() {
   return (
     <ThemeProvider>
       <CssBaseline />
-      <AuthProvider>
-        <SnackbarProvider>
+      <AccessibilityProvider>
+        <AuthProvider>
+          <SnackbarProvider>
           <BrowserRouter>
-          {/* DevTools component for development only */}
-          <Routes>
+            {/* ScrollToTop component ensures the page starts at the top when navigating */}
+            <ScrollToTop />
+            {/* DevTools component for development only */}
+            <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -160,6 +166,7 @@ function App() {
               <Route path="/dgvsmdm" element={<DGvsMDMLesson />} />
               <Route path="/data-steward" element={<DataStewardLesson />} />
               <Route path="/about" element={<About />} />
+              <Route path="/help" element={<Help />} />
               
               {/* Protected Routes - Require Authentication */}
               <Route element={<ProtectedRoute />}>
@@ -237,8 +244,9 @@ function App() {
           {/* Development tools */}
           <DevTools />
         </BrowserRouter>
-        </SnackbarProvider>
-      </AuthProvider>
+          </SnackbarProvider>
+        </AuthProvider>
+      </AccessibilityProvider>
     </ThemeProvider>
   );
 }

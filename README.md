@@ -1,6 +1,6 @@
 # Data Literacy Support - Data Governance Platform
 
-*Last Updated: August 18, 2025*
+*Last Updated: August 20, 2025*
 
 A modern React-based web application designed to improve data literacy and governance within organizations, helping teams discover, understand, and trust their data with intelligent data governance solutions.
 
@@ -66,6 +66,14 @@ A modern React-based web application designed to improve data literacy and gover
 - Knowledge Sharing: System captures decisions and approaches for future reference
 
 ## Recent Updates
+
+- August 20, 2025: Enhanced Help Center and Authentication System
+  - Implemented comprehensive Help page with Section 508 compliant navigation
+  - Fixed TypeScript errors in ListItem components by removing deprecated 'button' prop
+  - Added proper ARIA attributes and keyboard accessibility to navigation elements
+  - Ensured complete authentication flow with logout and admin login functionality
+  - Added route for Help page in the application router
+  - Enhanced visual feedback for interactive elements with USCIS design standards
 
 - August 10, 2025: Fixed TypeScript errors in HandbookTab and HandbookViewer components
   - Resolved component prop typing issues with Material-UI components
@@ -266,6 +274,18 @@ The application comes with pre-seeded user accounts:
 - Admin: `admin@example.com` / `admin123!`
 - Data Steward: `steward@example.com` / `password123`
 - Regular User: `user@example.com` / `password123`
+
+### Authentication Flow
+
+The application supports a complete authentication flow with the following features:
+
+- **Logout Process**: Access the logout option through the user profile menu in the top-right corner
+- **Admin Login**: After logging out, use the admin credentials to access the full administrative interface
+- **Role-Based Access Control**: Different user types have access to different parts of the application
+- **Persistent Sessions**: Authentication state is preserved across page refreshes
+- **Protected Routes**: Certain routes are only accessible to authenticated users with the appropriate role
+
+All authentication features follow Section 508 compliance guidelines with proper focus management, ARIA attributes, and keyboard accessibility.
 
 1. Start the development server:
    ```bash
