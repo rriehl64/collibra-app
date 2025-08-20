@@ -1,0 +1,10 @@
+// This is a fixed closing structure for About.tsx
+// Replace lines 2445-2451 with this content:
+
+        </Accordion>
+      </Box>
+    </Container>
+  );
+}
+
+export default About;

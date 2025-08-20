@@ -105,7 +105,7 @@ const Learn101 = () => {
     const currentLesson = lessonState.find(lesson => lesson.id === selectedLesson);
     
     return (
-      <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         {selectedLesson === 1 && (
           <LessonContent
             onBack={handleBack}
@@ -153,9 +153,9 @@ const Learn101 = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Box sx={{ mb: 6 }}>
-        <Typography variant="h4" gutterBottom sx={{ mb: 2 }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#003366', fontWeight: 700, mb: 2 }} tabIndex={-1} id="page-title">
           E-Unify 101: Your journey to data intelligence starts here
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>

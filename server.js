@@ -22,6 +22,7 @@ const businessProcesses = require('./server/routes/businessProcesses');
 const dataCategories = require('./server/routes/dataCategories');
 const dataConcepts = require('./server/routes/dataConcepts');
 const subjectCategories = require('./server/routes/subjectCategories');
+const users = require('./server/routes/users');
 
 const app = express();
 
@@ -112,6 +113,7 @@ app.use('/api/v1/business-processes', businessProcesses);
 app.use('/api/v1/data-categories', dataCategories);
 app.use('/api/v1/data-concepts', dataConcepts);
 app.use('/api/v1/subject-categories', subjectCategories);
+app.use('/api/v1/users', users);
 
 // Only serve static files and handle React routing in production mode
 if (process.env.NODE_ENV === 'production') {

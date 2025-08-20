@@ -140,7 +140,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ pt: 3 }}>
+        <Box sx={{ p: 3 }}>
           {label && <Typography sx={{ position: 'absolute', width: '1px', height: '1px', padding: '0', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: '0' }} id={`tabpanel-heading-${index}`}>{label}</Typography>}
           {children}
         </Box>
@@ -210,7 +210,7 @@ const NationalProductionDataset = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
+    <Box sx={{ width: '100%', maxWidth: '1200px', mx: 'auto', mt: 4, mb: 4, px: { xs: 2, sm: 3, md: 4 } }}>
       {/* Mobile Sidenav Toggle */}
       <Box sx={{ display: { xs: 'flex', md: 'none' }, mb: 2, alignItems: 'center' }}>
         <Button 
@@ -306,10 +306,10 @@ const NationalProductionDataset = () => {
         </Grid>
         
         {/* Main Content */}
-        <Grid item xs={12} md={9} lg={9.5}>
-          <Paper sx={{ mb: 4 }}>
+        <Grid item xs={12}>
+          <Paper sx={{ mb: 4, px: 3 }}>
             <Box sx={{ p: 3, backgroundColor: 'primary.main', color: '#ffffff' }}>
-              <Typography variant="h4" gutterBottom sx={{ color: '#ffffff' }}>
+              <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#ffffff', fontWeight: 700 }} tabIndex={-1} id="page-title">
                 National Production Dataset (NPD)
               </Typography>
               <Typography variant="subtitle1" sx={{ color: '#ffffff' }}>
@@ -317,7 +317,7 @@ const NationalProductionDataset = () => {
               </Typography>
             </Box>
             
-            <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
+            <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3 }}>
               <Tabs 
                 value={activeTab} 
                 onChange={handleTabChange} 
@@ -350,8 +350,7 @@ const NationalProductionDataset = () => {
             </Box>
             
             {/* Tab Panels */}
-            <Paper sx={{ p: 3 }}>
-              <TabPanel value={activeTab} index={0} label={tabItems[0].label}>
+            <TabPanel value={activeTab} index={0} label={tabItems[0].label}>
                 <Typography variant="h5" gutterBottom>
                   National Production Dataset (NPD) Overview
                 </Typography>
@@ -3936,11 +3935,10 @@ const NationalProductionDataset = () => {
                   Training materials, documentation, and support resources for NPD users.
                 </Typography>
               </TabPanel>
-            </Paper>
           </Paper>
         </Grid>
       </Grid>
-    </Container>
+    </Box>
   );
 };
 

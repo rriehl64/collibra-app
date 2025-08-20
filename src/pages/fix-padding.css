@@ -1,0 +1,10 @@
+/* Fix for NPD padding */
+.MuiContainer-root .MuiPaper-root {
+  padding: 0 !important;
+}
+
+.npd-tab-content {
+  padding: 24px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}

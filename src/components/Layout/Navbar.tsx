@@ -24,7 +24,8 @@ import {
   Settings, 
   Search as SearchIcon,
   Language,
-  Help
+  Help,
+  Info
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { styled, alpha } from '@mui/material/styles';
@@ -130,7 +131,7 @@ const Navbar = () => {
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <img src="/images/us_flag_small.png" alt="U.S. flag" style={{ height: 16 }} />
+          <img src="/images/USFlag-Icon-2x.png" alt="U.S. flag" style={{ height: 16, width: 'auto' }} />
           <Typography variant="body2" sx={{ color: '#333' }}>
             An official website of the United States government
           </Typography>
@@ -213,6 +214,56 @@ const Navbar = () => {
                   <SearchIcon />
                 </IconButton>
               </Paper>
+            </Box>
+            
+            {/* Utility Navigation - Section 508 compliant */}
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                gap: 1, 
+                alignItems: 'center', 
+                mr: 2, 
+                borderRight: '1px solid #e0e0e0',
+                pr: 2 
+              }}
+              aria-label="Utility navigation"
+            >
+              <Tooltip title="About E-Unify">
+                <Button
+                  component={Link}
+                  to="/about"
+                  size="small"
+                  startIcon={<Info />}
+                  sx={{
+                    color: '#003366',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
+                    '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
+                  }}
+                  aria-label="About E-Unify"
+                >
+                  About
+                </Button>
+              </Tooltip>
+              <Tooltip title="Help Center">
+                <Button
+                  component={Link}
+                  to="/help"
+                  size="small"
+                  startIcon={<Help />}
+                  sx={{
+                    color: '#003366',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
+                    '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
+                  }}
+                  aria-label="Help Center"
+                >
+                  Help
+                </Button>
+              </Tooltip>
             </Box>
             
             {/* Right side: Sign In/Admin User */}

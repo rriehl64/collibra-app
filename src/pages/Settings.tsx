@@ -47,6 +47,7 @@ import {
   VolumeUp as VolumeUpIcon
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import AccessibilitySettings from '../components/Settings/AccessibilitySettings';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -89,6 +90,11 @@ const Settings = () => {
   const [tabValue, setTabValue] = useState(0);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  
+  // Scroll to top on component mount for accessibility
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   
   // Settings state
   const [settings, setSettings] = useState({
@@ -567,273 +573,42 @@ const Settings = () => {
         
         {/* Accessibility Tab */}
         <TabPanel value={tabValue} index={3}>
-          <Alert severity="info" sx={{ mb: 3, backgroundColor: '#E6F0F9', color: '#003366' }}>
-            <Typography variant="subtitle1">
-              <InfoIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-              These settings help ensure compliance with Section 508 and WCAG 2.0 standards
-            </Typography>
-          </Alert>
-
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <div className="settings-section settings-section-alt">
-                <Typography 
-                  variant="h6" 
-                  component="h2" 
-                  gutterBottom 
-                  sx={{ color: '#00695c', fontWeight: 600 }}
-                  id="accessibility-options-heading"
-                >
-                  <AccessibilityIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  Accessibility Options
-                </Typography>
-                
-                <Box sx={{ mb: 3 }} role="group" aria-labelledby="accessibility-options-heading">
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={settings.screenReader}
-                        onChange={(e) => handleSettingChange('screenReader', e.target.checked)}
-                        name="screenReader"
-                        inputProps={{ 'aria-describedby': 'screenreader-description' }}
-                        color="primary"
-                      />
-                    }
-                    label="Screen Reader Compatibility Mode"
-                  />
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ ml: 4 }}
-                    id="screenreader-description"
-                  >
-                    Optimize interface for screen readers with enhanced ARIA descriptions and skip navigation links.
-                  </Typography>
-                </Box>
-                
-                <Box sx={{ mb: 3 }} role="group" aria-labelledby="keyboard-navigation-label">
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={settings.keyboardNavigation}
-                        onChange={(e) => handleSettingChange('keyboardNavigation', e.target.checked)}
-                        name="keyboardNavigation"
-                        inputProps={{ 'aria-describedby': 'keyboard-navigation-description' }}
-                        color="primary"
-                      />
-                    }
-                    label="Enhanced Keyboard Navigation"
-                    id="keyboard-navigation-label"
-                  />
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ ml: 4 }}
-                    id="keyboard-navigation-description"
-                  >
-                    Enable focus indicators and keyboard shortcuts for all interactive elements.
-                  </Typography>
-                </Box>
-                
-                <Box sx={{ mb: 3 }} role="group" aria-labelledby="reduced-motion-label">
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={settings.reducedMotion}
-                        onChange={(e) => handleSettingChange('reducedMotion', e.target.checked)}
-                        name="reducedMotion"
-                        inputProps={{ 'aria-describedby': 'reduced-motion-description' }}
-                        color="primary"
-                      />
-                    }
-                    label="Reduced Motion"
-                    id="reduced-motion-label"
-                  />
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ ml: 4 }}
-                    id="reduced-motion-description"
-                  >
-                    Minimize animations and transitions for users with vestibular disorders.
-                  </Typography>
-                </Box>
-              </div>
-            </Grid>
+          <Box sx={{ maxWidth: '100%', overflow: 'auto' }}>
+            <Alert severity="info" sx={{ mb: 3, backgroundColor: '#E6F0F9', color: '#003366' }}>
+              <Typography variant="subtitle1">
+                <InfoIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                These settings help ensure compliance with Section 508 and WCAG 2.1 standards
+              </Typography>
+            </Alert>
             
-            <Grid item xs={12} md={6}>
-              <div className="settings-section settings-section-alt">
-                <Typography 
-                  variant="h6" 
-                  component="h2" 
-                  gutterBottom 
-                  sx={{ color: '#4527a0', fontWeight: 600 }}
-                  id="visual-options-heading"
-                >
-                  <TextFieldsIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  Visual Preferences
-                </Typography>
-                
-                <Box sx={{ mb: 3 }} role="group" aria-labelledby="text-size-label">
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={settings.largeText}
-                        onChange={(e) => handleSettingChange('largeText', e.target.checked)}
-                        name="largeText"
-                        inputProps={{ 'aria-describedby': 'large-text-description' }}
-                        color="primary"
-                      />
-                    }
-                    label="Large Text"
-                    id="text-size-label"
-                  />
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ ml: 4 }}
-                    id="large-text-description"
-                  >
-                    Increase font size throughout the application (minimum 16px).
-                  </Typography>
-                </Box>
-                
-                <Box sx={{ mb: 3 }} role="group" aria-labelledby="contrast-mode-label">
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={settings.highContrast}
-                        onChange={(e) => handleSettingChange('highContrast', e.target.checked)}
-                        name="highContrast"
-                        inputProps={{ 'aria-describedby': 'contrast-description' }}
-                        color="primary"
-                      />
-                    }
-                    label="High Contrast Mode"
-                    id="contrast-mode-label"
-                  />
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ ml: 4 }}
-                    id="contrast-description"
-                  >
-                    Enable high contrast colors for better readability (WCAG AAA compliance).
-                  </Typography>
-                </Box>
-                
-                <FormControl 
-                  fullWidth 
-                  margin="normal" 
-                  sx={{ mt: 3 }}
-                  aria-labelledby="font-family-label"
-                >
-                  <InputLabel id="font-family-label-id">Font Family</InputLabel>
-                  <Select
-                    labelId="font-family-label-id"
-                    id="font-family-select"
-                    value={settings.fontFamily || 'sourceSansPro'}
-                    label="Font Family"
-                    onChange={(e) => handleSettingChange('fontFamily', e.target.value)}
-                  >
-                    <MenuItem value="sourceSansPro">Source Sans Pro (Default)</MenuItem>
-                    <MenuItem value="merriweather">Merriweather</MenuItem>
-                    <MenuItem value="roboto">Roboto</MenuItem>
-                    <MenuItem value="openSans">Open Sans</MenuItem>
-                  </Select>
-                  <Typography id="font-family-label" variant="caption" sx={{ mt: 1 }}>
-                    Select a font that is easier for you to read
-                  </Typography>
-                </FormControl>
-              </div>
-            </Grid>
-
-            <Grid item xs={12}>
-              <div className="settings-section settings-section-alt">
-                <Typography 
-                  variant="h6" 
-                  component="h2" 
-                  gutterBottom 
-                  sx={{ color: '#00796b', fontWeight: 600 }}
-                  id="cognitive-options-heading"
-                >
-                  <VolumeUpIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                  Audio & Cognitive Assistance
-                </Typography>
-                
-                <Box sx={{ mb: 3 }} role="group" aria-labelledby="cognitive-options-heading">
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={settings.audioFeedback || false}
-                        onChange={(e) => handleSettingChange('audioFeedback', e.target.checked)}
-                        name="audioFeedback"
-                        inputProps={{ 'aria-describedby': 'audio-feedback-description' }}
-                        color="primary"
-                      />
-                    }
-                    label="Audio Feedback"
-                  />
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ ml: 4 }}
-                    id="audio-feedback-description"
-                  >
-                    Enable audio cues for important actions and notifications.
-                  </Typography>
-                </Box>
-                
-                <Box sx={{ mb: 3 }}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={settings.simplifiedInterface || false}
-                        onChange={(e) => handleSettingChange('simplifiedInterface', e.target.checked)}
-                        name="simplifiedInterface"
-                        inputProps={{ 'aria-describedby': 'simplified-interface-description' }}
-                        color="primary"
-                      />
-                    }
-                    label="Simplified Interface"
-                  />
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ ml: 4 }}
-                    id="simplified-interface-description"
-                  >
-                    Reduce visual complexity and provide clearer instructions.
-                  </Typography>
-                </Box>
-              </div>
-            </Grid>
-          </Grid>
-          
-          <div className="settings-button-container">
-            <Button
-              variant="outlined"
-              color="primary"
-              startIcon={<HelpIcon />}
-              href="https://www.section508.gov/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Learn more about Section 508 compliance"
-            >
-              Section 508 Information
-            </Button>
+            <AccessibilitySettings />
             
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{ backgroundColor: '#003366' }}
-              startIcon={<SaveIcon />}
-              onClick={handleSaveSettings}
-              aria-label="Save all accessibility settings"
-            >
-              Save Settings
-            </Button>
-          </div>
+            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<HelpIcon />}
+                href="https://www.section508.gov/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Learn more about Section 508 compliance"
+                sx={{ mr: 2 }}
+              >
+                Section 508 Information
+              </Button>
+              
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ backgroundColor: '#003366' }}
+                startIcon={<SaveIcon />}
+                onClick={handleSaveSettings}
+                aria-label="Save all accessibility settings"
+              >
+                Save Settings
+              </Button>
+            </Box>
+          </Box>
         </TabPanel>
         
         {/* Language & Region Tab */}

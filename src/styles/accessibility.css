@@ -1,0 +1,157 @@
+/**
+ * Global Accessibility Styles
+ * 
+ * This stylesheet provides global accessibility styles that are applied
+ * based on user preferences from the Accessibility Settings.
+ * Complies with Section 508 and WCAG 2.1 guidelines.
+ */
+
+/* Font Size Adjustments */
+.font-large {
+  font-size: 120% !important;
+}
+
+.font-large h1, .font-large h2, .font-large h3, .font-large h4, .font-large h5, .font-large h6 {
+  font-size: 120% !important;
+}
+
+.font-x-large {
+  font-size: 150% !important;
+}
+
+.font-x-large h1, .font-x-large h2, .font-x-large h3, .font-x-large h4, .font-x-large h5, .font-x-large h6 {
+  font-size: 150% !important;
+}
+
+/* High Contrast Mode */
+.high-contrast {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+.high-contrast h1, .high-contrast h2, .high-contrast h3, .high-contrast h4, .high-contrast h5, .high-contrast h6 {
+  color: #fff !important;
+}
+
+.high-contrast a {
+  color: #ffff00 !important;
+}
+
+.high-contrast button, .high-contrast .MuiButton-root {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+  border: 2px solid #fff !important;
+}
+
+.high-contrast .MuiPaper-root {
+  background-color: #121212 !important;
+  color: #fff !important;
+  border: 1px solid #fff !important;
+}
+
+.high-contrast .MuiCard-root {
+  background-color: #121212 !important;
+  border: 1px solid #fff !important;
+}
+
+.high-contrast .MuiCardHeader-root {
+  background-color: #000 !important;
+}
+
+.high-contrast .MuiIconButton-root {
+  color: #fff !important;
+}
+
+.high-contrast .MuiDivider-root {
+  background-color: #fff !important;
+}
+
+.high-contrast .MuiListItem-root {
+  border-bottom: 1px solid #333 !important;
+}
+
+/* Enhanced Focus Indicators */
+.enhanced-focus button:focus,
+.enhanced-focus a:focus,
+.enhanced-focus input:focus,
+.enhanced-focus select:focus,
+.enhanced-focus textarea:focus,
+.enhanced-focus .MuiButton-root:focus,
+.enhanced-focus .MuiIconButton-root:focus,
+.enhanced-focus .MuiInputBase-root:focus,
+.enhanced-focus .MuiFab-root:focus,
+.enhanced-focus [role="button"]:focus,
+.enhanced-focus [tabindex]:focus {
+  outline: 3px solid #003366 !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.4) !important;
+}
+
+.enhanced-focus.high-contrast button:focus,
+.enhanced-focus.high-contrast a:focus,
+.enhanced-focus.high-contrast input:focus,
+.enhanced-focus.high-contrast select:focus,
+.enhanced-focus.high-contrast textarea:focus,
+.enhanced-focus.high-contrast .MuiButton-root:focus,
+.enhanced-focus.high-contrast .MuiIconButton-root:focus,
+.enhanced-focus.high-contrast .MuiInputBase-root:focus,
+.enhanced-focus.high-contrast .MuiFab-root:focus,
+.enhanced-focus.high-contrast [role="button"]:focus,
+.enhanced-focus.high-contrast [tabindex]:focus {
+  outline: 3px solid #ffff00 !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 0, 0.4) !important;
+}
+
+/* Reduced Motion */
+.reduced-motion * {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* Text Spacing for Dyslexia and Reading Difficulties */
+.text-spacing {
+  letter-spacing: 0.12em !important;
+  word-spacing: 0.16em !important;
+  line-height: 1.5 !important;
+}
+
+.text-spacing p, 
+.text-spacing li,
+.text-spacing h1, 
+.text-spacing h2, 
+.text-spacing h3, 
+.text-spacing h4, 
+.text-spacing h5, 
+.text-spacing h6 {
+  line-height: 1.5 !important;
+}
+
+.text-spacing p, 
+.text-spacing li {
+  margin-bottom: 1.5em !important;
+}
+
+/* Keyboard Navigation Mode */
+body:not(.keyboard-mode) :focus {
+  outline: none !important;
+}
+
+.keyboard-mode button:focus,
+.keyboard-mode a:focus,
+.keyboard-mode input:focus,
+.keyboard-mode select:focus,
+.keyboard-mode textarea:focus,
+.keyboard-mode [role="button"]:focus,
+.keyboard-mode [tabindex]:focus {
+  outline: 2px solid #003366 !important;
+  outline-offset: 2px !important;
+}
+
+/* Transitions between settings should be smooth except when reduced motion is enabled */
+body:not(.reduced-motion) {
+  transition: font-size 0.3s ease, color 0.3s ease, background-color 0.3s ease;
+}
+
+body:not(.reduced-motion) * {
+  transition: font-size 0.3s ease, color 0.3s ease, background-color 0.3s ease;
+}

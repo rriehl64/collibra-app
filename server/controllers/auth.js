@@ -11,7 +11,9 @@ const User = require('../models/User');
  */
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role, department, jobTitle } = req.body;
+    const { name, email, password, role, department, jobTitle, assignedDomains } = req.body;
+    
+    console.log('Register user request:', { name, email, role, department, jobTitle, assignedDomains });
     
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -23,14 +25,19 @@ exports.register = async (req, res) => {
       });
     }
     
-    // Create user
+    // Create user with all fields
     const user = await User.create({
       name,
       email,
       password,
-      role,
+      role: role || 'user', // Default to 'user' if not specified
       department,
-      jobTitle
+      jobTitle,
+      assignedDomains,
+      preferences: { 
+        theme: 'system',
+        notifications: { email: true, inApp: true }
+      }
     });
     
     sendTokenResponse(user, 201, res);
@@ -84,9 +91,10 @@ exports.login = async (req, res) => {
       });
     }
     
-    // Check if password matches
+    // Check if password matches using bcrypt directly to avoid any potential issues
     console.log('[AUTH] Checking password match...');
-    const isMatch = await user.matchPassword(password);
+    const bcrypt = require('bcryptjs');
+    const isMatch = await bcrypt.compare(password, user.password);
     console.log('[AUTH] Password match result:', isMatch);
     
     if (!isMatch) {
@@ -105,7 +113,7 @@ exports.login = async (req, res) => {
     
     sendTokenResponse(user, 200, res);
   } catch (err) {
-    console.error(err);
+    console.error('[AUTH] Server error during login:', err);
     res.status(500).json({
       success: false,
       error: 'Server Error'

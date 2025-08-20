@@ -826,7 +826,7 @@ const DataLiteracyModule = () => {
     
     // Placeholder for lesson content components
     return (
-      <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Paper sx={{ p: 4, mb: 4 }}>
           <Button 
             variant="outlined"
@@ -875,10 +875,10 @@ const DataLiteracyModule = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
-      <Paper sx={{ mb: 4 }}>
+    <Box sx={{ width: '100%', maxWidth: '1200px', mx: 'auto', mt: 4, mb: 4, px: { xs: 2, sm: 3, md: 4 } }}>
+      <Paper sx={{ mb: 4, px: 3 }}>
         <Box sx={{ p: 3, backgroundColor: 'primary.main', color: '#ffffff' }}>
-          <Typography variant="h4" gutterBottom sx={{ color: '#ffffff' }}>
+          <Typography variant="h4" component="h1" gutterBottom sx={{ color: '#ffffff', fontWeight: 700 }} tabIndex={-1} id="page-title">
             Data Literacy Module
           </Typography>
           <Typography variant="subtitle1" sx={{ color: '#ffffff' }}>
@@ -886,17 +886,16 @@ const DataLiteracyModule = () => {
           </Typography>
         </Box>
         
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
-          aria-label="Data literacy module sections"
-          sx={{ 
-            borderBottom: 1, 
-            borderColor: 'divider',
-            backgroundColor: 'background.paper'
-          }}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3 }}>
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            variant="scrollable"
+            scrollButtons="auto"
+            aria-label="Data literacy module sections"
+            sx={{ 
+              backgroundColor: 'background.paper'
+            }}
         >
           <Tab 
             icon={<InfoIcon />} 
@@ -969,6 +968,7 @@ const DataLiteracyModule = () => {
             aria-label="Contact tab"
           />
         </Tabs>
+        </Box>
 
         {/* Overview Tab */}
         <TabPanel value={activeTab} index={0}>
@@ -5635,7 +5635,7 @@ const DataLiteracyModule = () => {
           </Box>
         </TabPanel>
       </Paper>
-    </Container>
+    </Box>
   );
 };
 

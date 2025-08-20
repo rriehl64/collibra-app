@@ -1,0 +1,11 @@
+            <Typography paragraph sx={{ mt: 2 }}>
+              Despite these challenges, the development team implemented strategies to mitigate risks, including phased deployment, comprehensive testing, user training programs, and regular security reviews. The application continues to evolve to address emerging requirements and technological advances.
+            </Typography>
+          </AccordionDetails>
+        </Accordion>
+      </Box>
+    </Container>
+  );
+}
+
+export default About;

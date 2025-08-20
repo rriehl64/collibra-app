@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import api from '../../services/api';
 import { 
   Container, 
   Typography, 
@@ -27,7 +28,16 @@ import {
   DialogContentText,
   DialogActions,
   Tooltip,
-  Avatar
+  Avatar,
+  Snackbar,
+  Card,
+  CardContent,
+  FormControl,
+  InputLabel,
+  Select,
+  SelectChangeEvent,
+  ListItemText,
+  FormHelperText
 } from '@mui/material';
 import { 
   Search as SearchIcon, 
@@ -42,21 +52,35 @@ import {
   History as HistoryIcon,
   SupervisorAccount as SupervisorAccountIcon,
   Person as PersonIcon,
-  Security as SecurityIcon
+  Security as SecurityIcon,
+  Save as SaveIcon,
+  Cancel as CancelIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
+import { AlertColor } from '@mui/material';
+import AddUserDialog from './AddUserDialog';
 
 // User type definition
 interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
+  _id: string;
+  name: string;
   email: string;
-  role: 'admin' | 'data_steward' | 'user';
-  department: string;
-  status: 'active' | 'inactive' | 'pending';
-  lastLogin?: string;
+  role: string;
+  department?: string;
+  jobTitle?: string;
   createdAt: string;
+  lastActive?: string;
+  assignedDomains?: string[];
+  preferences?: {
+    theme?: string;
+    notifications?: {
+      email?: boolean;
+      inApp?: boolean;
+    };
+  };
+  // UI-specific properties
+  status?: 'active' | 'inactive' | 'pending';
+  isEditing?: boolean;
 }
 
 // Simple debounce hook
@@ -76,6 +100,155 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
+// User Edit Dialog Component
+interface UserEditDialogProps {
+  user: User;
+  onSave: (user: User, updatedData: Partial<User>) => void;
+  onCancel: (user: User) => void;
+}
+
+// Add User Dialog Component is imported from ./AddUserDialog
+
+const UserEditDialog: React.FC<UserEditDialogProps> = ({ user, onSave, onCancel }) => {
+  const [formData, setFormData] = useState<Partial<User>>({});
+  
+  // Initialize form data when dialog opens
+  useEffect(() => {
+    setFormData({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      department: user.department || '',
+      jobTitle: user.jobTitle || ''
+    });
+  }, [user]);
+  
+  // Handle form field changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  // Handle role selection change
+  const handleRoleChange = (e: SelectChangeEvent<string>) => {
+    setFormData(prev => ({
+      ...prev,
+      role: e.target.value
+    }));
+  };
+  
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(user, formData);
+  };
+  
+  return (
+    <Dialog 
+      open={true} 
+      onClose={() => onCancel(user)}
+      aria-labelledby="edit-user-dialog-title"
+      fullWidth
+      maxWidth="sm"
+    >
+      <DialogTitle id="edit-user-dialog-title">
+        Edit User: {user.name}
+      </DialogTitle>
+      <form onSubmit={handleSubmit}>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            id="name"
+            name="name"
+            label="Full Name"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={formData.name || ''}
+            onChange={handleChange}
+            required
+            inputProps={{ 'aria-label': 'User full name' }}
+          />
+          <TextField
+            margin="dense"
+            id="email"
+            name="email"
+            label="Email Address"
+            type="email"
+            fullWidth
+            variant="outlined"
+            value={formData.email || ''}
+            onChange={handleChange}
+            required
+            inputProps={{ 'aria-label': 'User email address' }}
+          />
+          <FormControl fullWidth margin="dense" variant="outlined" required>
+            <InputLabel id="role-select-label">Role</InputLabel>
+            <Select
+              labelId="role-select-label"
+              id="role"
+              name="role"
+              value={formData.role || 'user'}
+              label="Role"
+              onChange={handleRoleChange}
+              inputProps={{ 'aria-label': 'User role' }}
+            >
+              <MenuItem value="user">User</MenuItem>
+              <MenuItem value="data-steward">Data Steward</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            margin="dense"
+            id="department"
+            name="department"
+            label="Department"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={formData.department || ''}
+            onChange={handleChange}
+            inputProps={{ 'aria-label': 'User department' }}
+          />
+          <TextField
+            margin="dense"
+            id="jobTitle"
+            name="jobTitle"
+            label="Job Title"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={formData.jobTitle || ''}
+            onChange={handleChange}
+            inputProps={{ 'aria-label': 'User job title' }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => onCancel(user)} 
+            startIcon={<CancelIcon />}
+            aria-label="Cancel editing"
+          >
+            Cancel
+          </Button>
+          <Button 
+            type="submit" 
+            variant="contained" 
+            color="primary"
+            startIcon={<SaveIcon />}
+            aria-label="Save changes"
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </form>
+    </Dialog>
+  );
+};
+
 const Users: React.FC = () => {
   // Auth context
   const { user } = useAuth();
@@ -83,7 +256,7 @@ const Users: React.FC = () => {
   // State
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchText, setSearchText] = useState('');
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
@@ -95,100 +268,66 @@ const Users: React.FC = () => {
   const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>('success');
+  const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   
   // Debounced search
   const debouncedSearchText = useDebounce(searchText, 500);
   
-  // Sample data - would come from API
-  const sampleUsers: User[] = [
-    {
-      id: 'user-001',
-      firstName: 'Admin',
-      lastName: 'User',
-      email: 'admin@example.com',
-      role: 'admin',
-      department: 'IT',
-      status: 'active',
-      lastLogin: '2025-08-03T10:15:30Z',
-      createdAt: '2024-01-15T08:00:00Z'
-    },
-    {
-      id: 'user-002',
-      firstName: 'Data',
-      lastName: 'Steward',
-      email: 'steward@example.com',
-      role: 'data_steward',
-      department: 'Data Governance',
-      status: 'active',
-      lastLogin: '2025-08-01T14:22:10Z',
-      createdAt: '2024-02-20T09:30:00Z'
-    },
-    {
-      id: 'user-003',
-      firstName: 'Regular',
-      lastName: 'User',
-      email: 'user@example.com',
-      role: 'user',
-      department: 'Marketing',
-      status: 'active',
-      lastLogin: '2025-07-28T09:45:22Z',
-      createdAt: '2024-03-10T11:15:00Z'
-    },
-    {
-      id: 'user-004',
-      firstName: 'Sarah',
-      lastName: 'Johnson',
-      email: 'sjohnson@example.com',
-      role: 'data_steward',
-      department: 'Finance',
-      status: 'active',
-      lastLogin: '2025-08-02T16:30:45Z',
-      createdAt: '2024-02-05T10:20:00Z'
-    },
-    {
-      id: 'user-005',
-      firstName: 'Michael',
-      lastName: 'Roberts',
-      email: 'mroberts@example.com',
-      role: 'user',
-      department: 'Sales',
-      status: 'inactive',
-      lastLogin: '2025-06-15T11:10:05Z',
-      createdAt: '2024-04-18T13:45:00Z'
-    },
-    {
-      id: 'user-006',
-      firstName: 'Emily',
-      lastName: 'Chen',
-      email: 'echen@example.com',
-      role: 'user',
-      department: 'Research',
-      status: 'active',
-      lastLogin: '2025-08-03T09:20:15Z',
-      createdAt: '2024-05-22T09:00:00Z'
-    },
-    {
-      id: 'user-007',
-      firstName: 'David',
-      lastName: 'Wilson',
-      email: 'dwilson@example.com',
-      role: 'admin',
-      department: 'IT',
-      status: 'active',
-      lastLogin: '2025-08-04T08:05:30Z',
-      createdAt: '2024-01-30T14:15:00Z'
-    },
-    {
-      id: 'user-008',
-      firstName: 'Jessica',
-      lastName: 'Martinez',
-      email: 'jmartinez@example.com',
-      role: 'data_steward',
-      department: 'Customer Support',
-      status: 'pending',
-      createdAt: '2025-07-30T15:30:00Z'
+  // Function to fetch users from API
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Build query parameters for filtering
+      let queryParams = new URLSearchParams();
+      
+      if (debouncedSearchText) {
+        queryParams.append('search', debouncedSearchText);
+      }
+      
+      if (roleFilter !== 'all') {
+        queryParams.append('role', roleFilter);
+      }
+      
+      // Use the api service which automatically includes auth tokens
+      const response = await api.get(`/users?${queryParams.toString()}`);
+      
+      // Axios responses have data directly in the response object
+      const data = response.data;
+      
+      if (!data.success) {
+        throw new Error(data.message || 'Error fetching users');
+      }
+      
+      // Process users data to match our interface
+      const processedUsers: User[] = data.data.map((user: any) => ({
+        ...user,
+        // Set UI status based on lastActive timestamp (within 30 days = active)
+        status: user.lastActive && new Date(user.lastActive) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) ? 'active' : 'inactive',
+        isEditing: false
+      }));
+      
+      setUsers(processedUsers);
+      setFilteredUsers(processedUsers);
+      
+      // Add search term to history if it's a new search
+      if (debouncedSearchText.trim() && !searchHistory.includes(debouncedSearchText)) {
+        const newHistory = [...searchHistory.slice(-4), debouncedSearchText];
+        setSearchHistory(newHistory);
+        localStorage.setItem('usersSearchHistory', JSON.stringify(newHistory));
+      }
+      
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred while fetching users');
+    } finally {
+      setLoading(false);
     }
-  ];
+  }, [debouncedSearchText, roleFilter, searchHistory]);
   
   // Load search history from localStorage on mount
   useEffect(() => {
@@ -198,54 +337,167 @@ const Users: React.FC = () => {
     }
   }, []);
   
-  // Filter users based on search and filters
-  const filterUsers = useCallback(() => {
-    setLoading(true);
+  // Function to apply local filters (status filter only, other filters handled by API)
+  const applyLocalFilters = useCallback(() => {
+    if (!users.length) return;
     
-    try {
-      let filtered = [...sampleUsers];
-      
-      // Apply text search
-      if (debouncedSearchText) {
-        const searchLower = debouncedSearchText.toLowerCase();
-        filtered = filtered.filter(user => 
-          user.firstName.toLowerCase().includes(searchLower) ||
-          user.lastName.toLowerCase().includes(searchLower) ||
-          user.email.toLowerCase().includes(searchLower) ||
-          user.department.toLowerCase().includes(searchLower)
-        );
-        
-        // Add to search history if it's a new search
-        if (debouncedSearchText.trim() && !searchHistory.includes(debouncedSearchText)) {
-          const newHistory = [...searchHistory.slice(-4), debouncedSearchText];
-          setSearchHistory(newHistory);
-          localStorage.setItem('usersSearchHistory', JSON.stringify(newHistory));
-        }
-      }
-      
-      // Apply role filter
-      if (roleFilter !== 'all') {
-        filtered = filtered.filter(user => user.role === roleFilter);
-      }
-      
-      // Apply status filter
-      if (statusFilter !== 'all') {
-        filtered = filtered.filter(user => user.status === statusFilter);
-      }
-      
-      setFilteredUsers(filtered);
-    } catch (err) {
-      console.error('Error filtering users:', err);
-      setError('An error occurred while filtering users.');
-    } finally {
-      setLoading(false);
+    let filtered = [...users];
+    
+    // Apply status filter locally
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(user => user.status === statusFilter);
     }
-  }, [debouncedSearchText, roleFilter, statusFilter, searchHistory]);
+    
+    setFilteredUsers(filtered);
+  }, [users, statusFilter]);
+  
+  // Apply local filters when status filter changes
+  useEffect(() => {
+    applyLocalFilters();
+  }, [applyLocalFilters]);
   
   // Fetch users on mount and when filters change
   useEffect(() => {
-    filterUsers();
-  }, [filterUsers]);
+    fetchUsers();
+  }, [fetchUsers]);
+  
+  // Function to save user data
+  const saveUser = async (user: User, updatedData: Partial<User>) => {
+    try {
+      setLoading(true);
+      
+      // Use the api service which automatically includes auth tokens
+      const response = await api.put(`/users/${user._id}`, updatedData);
+      
+      // Axios responses have data directly in the response object
+      const data = response.data;
+      
+      if (!data.success) {
+        throw new Error(data.message || 'Error updating user');
+      }
+      
+      // Update local state
+      setUsers(prevUsers => 
+        prevUsers.map(u => 
+          u._id === user._id ? { ...data.data, isEditing: false } : u
+        )
+      );
+      
+      setFilteredUsers(prevUsers => 
+        prevUsers.map(u => 
+          u._id === user._id ? { ...data.data, isEditing: false } : u
+        )
+      );
+      
+      // Show success message
+      setSnackbarMessage('User updated successfully');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
+    } catch (err) {
+      console.error('Error updating user:', err);
+      setSnackbarMessage(err instanceof Error ? err.message : 'An error occurred while updating user');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to delete a user
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
+    
+    try {
+      setLoading(true);
+      
+      // Call the delete user API endpoint
+      const response = await api.delete(`/api/v1/users/${selectedUser._id}`);
+      
+      if (response.data.success) {
+        // Remove the user from the UI lists
+        setUsers(prevUsers => prevUsers.filter(user => user._id !== selectedUser._id));
+        setFilteredUsers(prevUsers => prevUsers.filter(user => user._id !== selectedUser._id));
+        
+        // Close the dialog
+        setDeleteDialogOpen(false);
+        
+        // Reset selected user
+        setSelectedUser(null);
+        
+        // Show success message
+        setSnackbarMessage(`User '${selectedUser.name}' has been deleted`);
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+      } else {
+        throw new Error(response.data.message || 'Failed to delete user');
+      }
+    } catch (err: any) {
+      console.error('Error deleting user:', err);
+      
+      let errorMessage = 'An error occurred while deleting the user';
+      
+      if (err?.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      
+      setSnackbarMessage(errorMessage);
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to add a new user
+  const handleAddUser = async (userData: Omit<User, '_id' | 'createdAt' | 'lastActive' | 'isEditing' | 'status'>) => {
+    try {
+      setLoading(true);
+      
+      // Use the auth service register endpoint to create a new user
+      const response = await api.post('/auth/register', userData);
+      
+      if (response.data.success) {
+        // Refresh the users list to include the new user
+        fetchUsers();
+        
+        // Close the dialog
+        setAddUserDialogOpen(false);
+
+        // Show success message
+        setSnackbarMessage(`User '${userData.name}' created successfully`);
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+      } else {
+        throw new Error(response.data.message || 'Failed to create user');
+      }
+    } catch (err: any) {
+      console.error('Error creating user:', err);
+      let errorMessage = 'An error occurred while creating user';
+      
+      if (err?.response?.data?.error) {
+        errorMessage = err.response.data.error;
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      
+      setSnackbarMessage(errorMessage);
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to toggle edit mode for a user
+  const toggleEditMode = (user: User) => {
+    setFilteredUsers(prevUsers => 
+      prevUsers.map(u => 
+        u._id === user._id ? { ...u, isEditing: !u.isEditing } : u
+      )
+    );
+  };
   
   // Format date
   const formatDate = (dateString?: string) => {
@@ -340,12 +592,16 @@ const Users: React.FC = () => {
   };
   
   // Get user initials for avatar
-  const getUserInitials = (firstName: string, lastName: string) => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  const getUserInitials = (name: string) => {
+    const nameParts = name.split(' ');
+    if (nameParts.length >= 2) {
+      return `${nameParts[0].charAt(0)}${nameParts[1].charAt(0)}`.toUpperCase();
+    }
+    return nameParts[0].charAt(0).toUpperCase();
   };
   
   // Generate avatar color based on user id
-  const getAvatarColor = (id: string) => {
+  const getAvatarColor = (_id: string) => {
     const colors = [
       '#1976D2', // Blue
       '#388E3C', // Green
@@ -357,13 +613,45 @@ const Users: React.FC = () => {
       '#5D4037', // Brown
     ];
     
-    // Simple hash function for consistent color selection
-    const hash = id.split('').reduce((acc, char) => {
-      return acc + char.charCodeAt(0);
-    }, 0);
+    // Generate a simple hash code from a string
+    const hashCode = (str: string) => {
+      return str.split('').reduce((acc: number, char: string) => {
+        return ((acc << 5) - acc) + char.charCodeAt(0) | 0;
+      }, 0);
+    };  
     
-    return colors[hash % colors.length];
+    return colors[hashCode(_id) % colors.length];
   };
+  
+  // Handle menu actions
+  const handleMenuAction = (action: string) => {
+    if (!selectedUser) return;
+    
+    handleUserMenuClose();
+    
+    switch (action) {
+      case 'edit':
+        // Open edit dialog
+        toggleEditMode(selectedUser);
+        break;
+      case 'reset_password':
+        // Reset password functionality
+        setSnackbarMessage(`Password reset functionality not implemented in this version`);
+        setSnackbarSeverity('info');
+        setSnackbarOpen(true);
+        break;
+      case 'deactivate':
+        // Deactivate user
+        setSnackbarMessage(`User deactivation functionality not implemented in this version`);
+        setSnackbarSeverity('info');
+        setSnackbarOpen(true);
+        break;
+      case 'delete':
+        // Open delete confirmation
+        setDeleteDialogOpen(true);
+        break;
+    }
+  }; 
   
   return (
     <Container sx={{ py: 4 }} className="users-management-page">
@@ -449,7 +737,10 @@ const Users: React.FC = () => {
                   horizontal: 'left',
                 }}
                 PaperProps={{
-                  style: { width: searchAnchorEl?.clientWidth },
+                  style: { 
+                    width: Math.max(searchAnchorEl?.clientWidth || 0, 220), // Ensure minimum width for menu items
+                    maxHeight: '300px'
+                  },
                 }}
               >
                 <MenuItem disabled dense>
@@ -469,15 +760,24 @@ const Users: React.FC = () => {
                 ))}
                 {searchHistory.length > 0 && (
                   <MenuItem 
-                    dense
                     onClick={() => {
                       localStorage.removeItem('usersSearchHistory');
                       setSearchHistory([]);
                       setShowSearchHistory(false);
                       setSearchAnchorEl(null);
                     }}
+                    sx={{ 
+                      borderTop: '1px solid rgba(0, 0, 0, 0.12)', 
+                      mt: 1, 
+                      pt: 1,
+                      '&:hover': { bgcolor: 'rgba(179, 27, 27, 0.08)' } 
+                    }}
+                    aria-label="Clear all search history"
                   >
-                    <Typography variant="caption" color="error">Clear search history</Typography>
+                    <ListItemIcon sx={{ minWidth: 36, color: '#B31B1B' }}>
+                      <DeleteIcon fontSize="small" />
+                    </ListItemIcon>
+                    <Typography color="#B31B1B" fontWeight="medium">Clear search history</Typography>
                   </MenuItem>
                 )}
               </Menu>
@@ -501,6 +801,7 @@ const Users: React.FC = () => {
               color="primary"
               startIcon={<AddIcon />}
               aria-label="Add new user"
+              onClick={() => setAddUserDialogOpen(true)}
             >
               Add User
             </Button>
@@ -582,6 +883,7 @@ const Users: React.FC = () => {
       
       {/* Users table */}
       {!loading && !error && filteredUsers.length > 0 && (
+        <>
         <TableContainer component={Paper} sx={{ mb: 4 }}>
           <Table aria-label="Users management table">
             <TableHead sx={{ backgroundColor: '#F5F6F7' }}>
@@ -590,19 +892,42 @@ const Users: React.FC = () => {
                 <TableCell sx={{ fontWeight: 'bold', color: '#0C1F3F' }}>Email</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', color: '#0C1F3F' }}>Role</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', color: '#0C1F3F' }}>Department</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: '#0C1F3F' }}>Job Title</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', color: '#0C1F3F' }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: '#0C1F3F' }}>Last Login</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: '#0C1F3F' }}>Last Active</TableCell>
                 <TableCell sx={{ fontWeight: 'bold', color: '#0C1F3F' }} align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filteredUsers.map((user) => {
                 const roleInfo = getRoleInfo(user.role);
-                const statusColors = getStatusColor(user.status);
-                const avatarColor = getAvatarColor(user.id);
+                const statusColors = getStatusColor(user.status || 'inactive');
+                const avatarColor = getAvatarColor(user._id);
                 
+                // Table row that works as a clickable card for editing
                 return (
-                  <TableRow key={user.id} hover>
+                  <TableRow 
+                    key={user._id} 
+                    hover
+                    onClick={() => toggleEditMode(user)}
+                    sx={{ 
+                      cursor: 'pointer',
+                      '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.04)' },
+                      '&:focus-visible': {
+                        outline: '2px solid #003366',
+                        backgroundColor: 'rgba(0, 51, 102, 0.08)'
+                      }
+                    }}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`Edit user ${user.name}`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleEditMode(user);
+                      }
+                    }}
+                  >
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Avatar 
@@ -615,11 +940,11 @@ const Users: React.FC = () => {
                           }}
                           aria-hidden="true"
                         >
-                          {getUserInitials(user.firstName, user.lastName)}
+                          {getUserInitials(user.name)}
                         </Avatar>
                         <Box>
                           <Typography variant="body2" fontWeight={500}>
-                            {user.firstName} {user.lastName}
+                            {user.name}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
                             Created {formatDate(user.createdAt)}
@@ -640,27 +965,31 @@ const Users: React.FC = () => {
                         }}
                       />
                     </TableCell>
-                    <TableCell>{user.department}</TableCell>
+                    <TableCell>{user.department || 'Not specified'}</TableCell>
+                    <TableCell>{user.jobTitle || 'Not specified'}</TableCell>
                     <TableCell>
                       <Chip 
-                        label={user.status.charAt(0).toUpperCase() + user.status.slice(1)} 
+                        label={user.status ? user.status.charAt(0).toUpperCase() + user.status.slice(1) : 'Unknown'} 
                         size="small" 
                         sx={{ backgroundColor: statusColors.bg, color: statusColors.color }}
                       />
                     </TableCell>
                     <TableCell>
-                      <Tooltip title={user.lastLogin ? formatDate(user.lastLogin) : 'Never logged in'}>
+                      <Tooltip title={user.lastActive ? formatDate(user.lastActive) : 'Never logged in'}>
                         <Typography variant="body2">
-                          {user.lastLogin ? getRelativeTime(user.lastLogin) : 'Never'}
+                          {user.lastActive ? getRelativeTime(user.lastActive) : 'Never'}
                         </Typography>
                       </Tooltip>
                     </TableCell>
                     <TableCell align="right">
                       <IconButton 
                         size="small"
-                        aria-label={`Actions for ${user.firstName} ${user.lastName}`}
+                        aria-label={`Actions for ${user.name}`}
                         aria-haspopup="true"
-                        onClick={(e) => handleUserMenuOpen(e, user)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent row click
+                          handleUserMenuOpen(e, user);
+                        }}
                       >
                         <MoreVertIcon />
                       </IconButton>
@@ -671,6 +1000,39 @@ const Users: React.FC = () => {
             </TableBody>
           </Table>
         </TableContainer>
+        
+        {/* User Edit Dialog */}
+        {filteredUsers.find(u => u.isEditing) && (
+          <UserEditDialog 
+            user={filteredUsers.find(u => u.isEditing)!}
+            onSave={saveUser}
+            onCancel={toggleEditMode}
+          />
+        )}
+        
+        {/* Snackbar for notifications */}
+        <Snackbar 
+          open={snackbarOpen} 
+          autoHideDuration={6000} 
+          onClose={() => setSnackbarOpen(false)}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert 
+            onClose={() => setSnackbarOpen(false)} 
+            severity={snackbarSeverity} 
+            sx={{ width: '100%' }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+
+        {/* Add User Dialog */}
+        <AddUserDialog 
+          open={addUserDialogOpen}
+          onClose={() => setAddUserDialogOpen(false)}
+          onSave={handleAddUser}
+        />
+      </>
       )}
       
       {/* User action menu */}
@@ -688,29 +1050,26 @@ const Users: React.FC = () => {
           horizontal: 'right',
         }}
       >
-        <MenuItem onClick={handleUserMenuClose}>
+        <MenuItem onClick={() => handleMenuAction('edit')}>
           <ListItemIcon>
             <EditIcon fontSize="small" />
           </ListItemIcon>
           <Typography variant="body2">Edit User</Typography>
         </MenuItem>
-        <MenuItem onClick={handleUserMenuClose}>
+        <MenuItem onClick={() => handleMenuAction('reset_password')}>
           <ListItemIcon>
             <SecurityIcon fontSize="small" />
           </ListItemIcon>
           <Typography variant="body2">Change Password</Typography>
         </MenuItem>
-        <MenuItem onClick={handleUserMenuClose}>
+        <MenuItem onClick={() => handleMenuAction('deactivate')}>
           <ListItemIcon>
             <AccountCircleIcon fontSize="small" />
           </ListItemIcon>
-          <Typography variant="body2">View Activity</Typography>
+          <Typography variant="body2">Deactivate User</Typography>
         </MenuItem>
         <MenuItem 
-          onClick={() => {
-            handleUserMenuClose();
-            setDeleteDialogOpen(true);
-          }}
+          onClick={() => handleMenuAction('delete')}
           sx={{ color: 'error.main' }}
         >
           <ListItemIcon sx={{ color: 'error.main' }}>
@@ -727,23 +1086,30 @@ const Users: React.FC = () => {
         aria-labelledby="delete-dialog-title"
         aria-describedby="delete-dialog-description"
       >
-        <DialogTitle id="delete-dialog-title">
+        <DialogTitle id="delete-dialog-title" sx={{ bgcolor: '#003366', color: 'white' }}>
           Confirm User Deletion
         </DialogTitle>
-        <DialogContent>
+        <DialogContent sx={{ pt: 2 }}>
           <DialogContentText id="delete-dialog-description">
-            Are you sure you want to delete {selectedUser?.firstName} {selectedUser?.lastName}? 
+            Are you sure you want to delete <strong>{selectedUser?.name}</strong>? 
             This action cannot be undone and will remove all associated data for this user.
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button 
+            onClick={() => setDeleteDialogOpen(false)} 
+            variant="outlined"
+            startIcon={<CancelIcon />}
+            aria-label="Cancel user deletion"
+          >
             Cancel
           </Button>
           <Button 
             color="error" 
-            onClick={() => setDeleteDialogOpen(false)}
             variant="contained"
+            startIcon={<DeleteIcon />}
+            aria-label={`Confirm deletion of user ${selectedUser?.name}`}
+            onClick={() => handleDeleteUser()}
             autoFocus
           >
             Delete
