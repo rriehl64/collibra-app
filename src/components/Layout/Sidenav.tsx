@@ -24,6 +24,7 @@ import {
   Domain as DomainIcon,
   Class as SubjectIcon,
   Info as InfoIcon,
+  AssignmentInd as AssignmentIndIcon,
 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -34,6 +35,7 @@ const menuItems = [
   { text: 'E-Unify 101', icon: SchoolIcon, path: '/learn101' },
   { text: 'Data Literacy Module', icon: SchoolIcon, path: '/data-literacy' },
   { text: 'National Production Dataset', icon: StorageIcon, path: '/national-production-dataset' },
+  { text: 'E-Unify E22 Classification', icon: AssignmentIndIcon, path: '/e22-classification' },
   { text: 'Data Catalog', icon: StorageIcon, path: '/data-catalog' },
   { text: 'Data Assets', icon: StorageIcon, path: '/data-assets' },
   { text: 'Business Processes', icon: BusinessIcon, path: '/assets/business-processes' },
@@ -46,6 +48,7 @@ const menuItems = [
   { text: 'DG vs MDM', icon: SecurityIcon, path: '/dgvsmdm' },
   { text: 'Data Steward', icon: SecurityIcon, path: '/data-steward' },
   { text: 'Analytics', icon: AnalyticsIcon, path: '/analytics' },
+  { text: 'Study Aids: Business Analytics', icon: AnalyticsIcon, path: '/study-aids/business-analytics' },
   { text: 'Integration', icon: IntegrationIcon, path: '/integration' },
 ];
 

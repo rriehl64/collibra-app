@@ -22,7 +22,8 @@ import {
   TrendingUp as TrendingUpIcon,
   AssignmentTurnedIn as AssignmentIcon,
   Notifications as NotificationsIcon,
-  LibraryBooks as LibraryBooksIcon
+  LibraryBooks as LibraryBooksIcon,
+  MenuBook as MenuBookIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -181,6 +182,70 @@ const Dashboard: React.FC = () => {
         </Box>
       ) : (
         <>
+          {/* Quick Access Links */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} md={6} lg={4}>
+              <Card
+                role="button"
+                tabIndex={0}
+                aria-label="Open Data Strategy Support Services"
+                onClick={() => navigate('/data-strategy-support')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate('/data-strategy-support');
+                  }
+                }}
+                sx={{
+                  cursor: 'pointer',
+                  outline: 'none',
+                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 },
+                }}
+              >
+                <CardHeader
+                  avatar={<MenuBookIcon color="primary" />}
+                  title={<Typography component="h2" variant="h6">Data Strategy Support</Typography>}
+                  subheader={<Typography variant="body2" color="text.secondary">Plan, govern, and execute your data strategy</Typography>}
+                />
+                <CardContent>
+                  <Typography variant="body2" color="text.secondary">
+                    Access the Data Strategy Plan, Capstone Project, and curated resources to drive agency-wide data outcomes.
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+            <Grid item xs={12} md={6} lg={4}>
+              <Card
+                role="button"
+                tabIndex={0}
+                aria-label="Open Project Charter form"
+                onClick={() => navigate('/project-charter')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate('/project-charter');
+                  }
+                }}
+                sx={{
+                  cursor: 'pointer',
+                  outline: 'none',
+                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 },
+                }}
+              >
+                <CardHeader
+                  avatar={<AssignmentIcon color="primary" />}
+                  title={<Typography component="h2" variant="h6">Project Charter</Typography>}
+                  subheader={<Typography variant="body2" color="text.secondary">Create and manage your USCIS-styled charters</Typography>}
+                />
+                <CardContent>
+                  <Typography variant="body2" color="text.secondary">
+                    Click to open the editable module form capturing problem statement, KPIs, scope, RACI, risks, and more.
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
           {/* Stats Overview */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
             <Grid item xs={12} sm={6} md={3}>

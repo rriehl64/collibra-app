@@ -18,6 +18,7 @@ import Integration from './pages/Integration';
 import Learn101 from './pages/Learn101';
 import DataLiteracyModule from './pages/DataLiteracyModule';
 import NationalProductionDataset from './pages/NationalProductionDataset';
+import E22Classification from './pages/E22Classification';
 import DGvsMDMLesson from './components/Learn/DGvsMDMLesson';
 import DataStewardLesson from './components/Learn/DataStewardLesson';
 import AssetTypes from './pages/AssetTypes';
@@ -50,6 +51,10 @@ import Documentation from './pages/Documentation';
 import Settings from './pages/Settings';
 import About from './pages/About';
 import TestPage from './pages/TestPage';
+import DataStrategySupport from './pages/DataStrategySupport';
+import ProjectCharter from './pages/ProjectCharter';
+import KpiDictionary from './pages/KpiDictionary';
+import KpisBrowser from './pages/KpisBrowser';
 import ProcessingCategories from './pages/processing/ProcessingCategories';
 import ProcessingMeasures from './pages/processing/ProcessingMeasures';
 import ProcessingMigration from './pages/processing/ProcessingMigration';
@@ -59,6 +64,7 @@ import Standards from './pages/policy/Standards';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import DevLogin from './pages/DevLogin';
+import StudyAidsBusinessAnalytics from './pages/StudyAidsBusinessAnalytics';
 
 // Import Auth Provider Context
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -163,9 +169,11 @@ function App() {
               <Route path="/learn101" element={<Learn101 />} />
               <Route path="/data-literacy" element={<DataLiteracyModule />} />
               <Route path="/national-production-dataset" element={<NationalProductionDataset />} />
+              <Route path="/e22-classification" element={<E22Classification isAdmin={true} />} />
               <Route path="/dgvsmdm" element={<DGvsMDMLesson />} />
               <Route path="/data-steward" element={<DataStewardLesson />} />
               <Route path="/about" element={<About />} />
+              <Route path="/data-strategy-support" element={<DataStrategySupport />} />
               <Route path="/help" element={<Help />} />
               
               {/* Protected Routes - Require Authentication */}
@@ -174,6 +182,10 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/data-catalog" element={<DataCatalog />} />
                 <Route path="/data-assets" element={<DataAssetDemo />} />
+                <Route path="/project-charter" element={<ProjectCharter />} />
+                <Route path="/templates/kpi-dictionary" element={<KpiDictionary />} />
+                <Route path="/templates/kpi-dictionary/:id" element={<KpiDictionary />} />
+                <Route path="/templates/kpis" element={<KpisBrowser />} />
                 <Route path="/assets/business-processes" element={<BusinessProcesses />} />
                 <Route path="/assets/data-categories" element={<DataCategories />} />
                 <Route path="/assets/data-concepts" element={<DataConcepts />} />
@@ -182,11 +194,12 @@ function App() {
                 <Route path="/assets/line-of-business" element={<LineOfBusiness />} />
                 <Route path="/context/business-terms" element={<BusinessTerms />} />
                 <Route path="/context/acronyms" element={<Acronyms />} />
-                <Route path="/context/kpis" element={<KPIs />} />
+                <Route path="/context/kpis" element={<Navigate to="/templates/kpis" replace />} />
                 <Route path="/context/reports" element={<Reports />} />
                 <Route path="/context/bi-reports" element={<BIReports />} />
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/integration" element={<Integration />} />
+                <Route path="/study-aids/business-analytics" element={<StudyAidsBusinessAnalytics />} />
                 <Route path="/asset-types" element={<AssetTypes />} />
                 <Route path="/testpage" element={<TestPage />} />
                 <Route path="/docs" element={<Documentation />} />

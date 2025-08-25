@@ -1,0 +1,3 @@
+SourceSystem,SourceField,TargetSystem,TargetField,Transform/Rule,Quality Check,Steward
+ELIS,app_id,CISMart,application_id,ToUppercase; trim,Non-null; unique,DataOps
+CLAIMS3,status,CISMart,case_status,Normalize Status via lookup,Allowed values,Policy
