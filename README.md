@@ -1,6 +1,6 @@
 # Data Literacy Support - Data Governance Platform
 
-*Last Updated: August 20, 2025*
+*Last Updated: August 25, 2025*
 
 A modern React-based web application designed to improve data literacy and governance within organizations, helping teams discover, understand, and trust their data with intelligent data governance solutions.
 
@@ -66,6 +66,13 @@ A modern React-based web application designed to improve data literacy and gover
 - Knowledge Sharing: System captures decisions and approaches for future reference
 
 ## Recent Updates
+
+- August 25, 2025: Capstone – Mission-Critical Use Case (Option A) Artifacts
+   - Added Step 1 example in `DataStrategySupport` Capstone expectations showing the selected use case: EAD Cycle-Time Reduction
+   - Published Project Charter draft (Markdown) at `public/templates/project-charter-ead-cycle-time.md`
+   - Generated accessible PDF at `public/templates/project-charter-ead-cycle-time.pdf` with Section 508 considerations
+   - Added PWS crosswalk table mapping Charter sections to PWS clauses and AQLs for traceability
+   - Linked KPI Browser (`/templates/kpis`) for selecting metrics (median/P90 cycle time, queue wait-time, rework, RFE rate, throughput per FTE, OT hours)
 
 - August 20, 2025: Enhanced Help Center and Authentication System
   - Implemented comprehensive Help page with Section 508 compliant navigation

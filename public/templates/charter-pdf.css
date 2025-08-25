@@ -1,0 +1,82 @@
+@page {
+  size: A4;
+  margin: 20mm;
+}
+
+:root {
+  --uscis-blue: #003366;
+  --uscis-red: #B31B1B;
+  --text-color: #0F172A;
+}
+
+body {
+  font-family: "Source Sans Pro", Arial, Helvetica, sans-serif;
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--uscis-blue);
+  font-weight: 700;
+}
+
+h1 { font-size: 22pt; margin-bottom: 8pt; }
+h2 { font-size: 16pt; margin-top: 16pt; margin-bottom: 6pt; }
+h3 { font-size: 13pt; margin-top: 14pt; margin-bottom: 4pt; }
+
+strong, b { color: var(--uscis-red); }
+
+hr {
+  border: none;
+  border-top: 2px solid var(--uscis-blue);
+  margin: 12pt 0;
+}
+
+/* Table styling for PWS crosswalk and lists */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8pt 0 12pt;
+}
+
+table th, table td {
+  border: 1px solid #d0d7de;
+  padding: 6pt 8pt;
+  font-size: 10pt;
+}
+
+table th {
+  background: #f2f6fb;
+  color: var(--uscis-blue);
+  font-weight: 700;
+}
+
+ul, ol { margin: 6pt 0 6pt 18pt; }
+
+blockquote {
+  border-left: 4px solid var(--uscis-blue);
+  padding-left: 8pt;
+  color: #334155;
+}
+
+.code, code, pre { font-family: "SFMono-Regular", Consolas, monospace; }
+
+/* Header block for branding */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12pt;
+  margin-bottom: 10pt;
+}
+
+.header__title {
+  font-size: 18pt;
+  color: var(--uscis-blue);
+  font-weight: 800;
+}
+
+.footer {
+  margin-top: 12pt;
+  font-size: 9pt;
+  color: #475569;
+}
