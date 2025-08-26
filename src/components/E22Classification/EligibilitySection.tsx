@@ -23,6 +23,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
 import AccessTimeFilledIcon from '@mui/icons-material/AccessTimeFilled';
 import EditIcon from '@mui/icons-material/Edit';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
@@ -30,6 +31,7 @@ import { useEdit } from '../../contexts/EditContext';
 import EditableField from '../shared/EditableField';
 import EditableListItem from '../shared/EditableListItem';
 import EligibilityForm from './EligibilityForm';
+import PrimaryButton from '../shared/PrimaryButton';
 
 interface EligibilityCriterion {
   _id?: string;
@@ -282,27 +284,32 @@ const EligibilitySection: React.FC = () => {
       {isUserAdmin && (
         <Box display="flex" justifyContent="flex-end" mb={2}>
           {!editMode ? (
-            <Button
-              startIcon={<EditIcon />}
-              variant="outlined"
-              onClick={() => setEditMode(true)}
-              aria-label="Enable editing mode"
-            >
-              Edit Content
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <PrimaryButton
+                startIcon={<EditIcon />}
+                onClick={() => setEditMode(true)}
+                aria-label="Enable editing mode"
+              >
+                Field Editor
+              </PrimaryButton>
+              <PrimaryButton
+                startIcon={<ListAltIcon />}
+                onClick={() => setFormOpen(true)}
+                aria-label="Open form editor for Eligibility"
+              >
+                Form Editor
+              </PrimaryButton>
+            </Box>
           ) : (
-            <Box>
-              <Button
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <PrimaryButton
                 startIcon={<SaveIcon />}
-                variant="contained"
-                color="primary"
                 onClick={handleSaveChanges}
-                sx={{ mr: 1 }}
                 disabled={loading}
                 aria-label="Save all changes"
               >
                 {loading ? 'Saving...' : 'Save All'}
-              </Button>
+              </PrimaryButton>
               <Button
                 startIcon={<CancelIcon />}
                 variant="outlined"
@@ -313,18 +320,6 @@ const EligibilitySection: React.FC = () => {
                 Cancel
               </Button>
             </Box>
-          )}
-          {!editMode && (
-            <Button
-              startIcon={<EditIcon />}
-              variant="contained"
-              color="primary"
-              sx={{ ml: 1 }}
-              onClick={() => setFormOpen(true)}
-              aria-label="Open form editor for eligibility content"
-            >
-              Edit in Form
-            </Button>
           )}
         </Box>
       )}

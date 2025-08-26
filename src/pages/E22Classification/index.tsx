@@ -87,7 +87,7 @@ interface E22ClassificationProps {
   isAdmin?: boolean;
 }
 
-const E22Classification: React.FC<E22ClassificationProps> = ({ isAdmin = false }) => {
+const E22Classification: React.FC<E22ClassificationProps> = ({ isAdmin = true }) => {
   const [value, setValue] = useState(0);
   const [sidenavOpen, setSidenavOpen] = useState(true);
   const theme = useTheme();

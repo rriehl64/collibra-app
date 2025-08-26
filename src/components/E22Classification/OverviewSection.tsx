@@ -23,6 +23,7 @@ import EditableField from '../shared/EditableField';
 import EditableCard from '../shared/EditableCard';
 import OverviewForm from './OverviewForm';
 import { E22OverviewData } from './types';
+import PrimaryButton from '../shared/PrimaryButton';
 
 interface KeyFeature {
   _id?: string;
@@ -227,8 +228,8 @@ const OverviewSection: React.FC = () => {
       {isUserAdmin && (
         <Box display="flex" justifyContent="flex-end" mb={2}>
           {!editMode ? (
-            <ButtonGroup variant="outlined">
-              <Button
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <PrimaryButton
                 startIcon={<EditIcon />}
                 onClick={() => {
                   setEditMode(true);
@@ -236,33 +237,31 @@ const OverviewSection: React.FC = () => {
                 }}
                 aria-label="Enable individual editing mode"
               >
-                Edit Content
-              </Button>
-              <Tooltip title="Edit all content in form view">
-                <Button
+                Field Editor
+              </PrimaryButton>
+              <Tooltip title="Open form editor">
+                <PrimaryButton
                   startIcon={<ListAltIcon />}
                   onClick={() => {
                     setIsFormOpen(true);
                   }}
-                  aria-label="Open form editing mode"
+                  aria-label="Open form editor for Overview"
                 >
-                  Form Mode
-                </Button>
+                  Form Editor
+                </PrimaryButton>
               </Tooltip>
-            </ButtonGroup>
+            </Box>
           ) : (
             <Box>
-              <Button
+              <PrimaryButton
                 startIcon={<SaveIcon />}
-                variant="contained"
-                color="primary"
                 onClick={handleSaveChanges}
                 sx={{ mr: 1 }}
                 disabled={loading}
                 aria-label="Save all changes"
               >
                 {loading ? 'Saving...' : 'Save All'}
-              </Button>
+              </PrimaryButton>
               <Button
                 startIcon={<CancelIcon />}
                 variant="outlined"

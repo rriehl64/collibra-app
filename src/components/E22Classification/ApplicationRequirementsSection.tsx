@@ -32,12 +32,14 @@ import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
 import { useEdit } from '../../contexts/EditContext';
 import EditableField from '../shared/EditableField';
 import EditableListItem from '../shared/EditableListItem';
 import EditableFormItem from '../shared/EditableFormItem';
 import ApplicationRequirementsForm from './ApplicationRequirementsForm';
+import PrimaryButton from '../shared/PrimaryButton';
 
 // Interfaces
 interface RequirementItem {
@@ -330,46 +332,43 @@ const ApplicationRequirementsSection: React.FC = () => {
       {/* Save/Cancel buttons for admin users */}
       {isUserAdmin && editMode && (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+          <PrimaryButton
+            startIcon={<SaveIcon />}
+            onClick={handleSaveChanges}
+            aria-label="Save all changes"
+          >
+            Save All
+          </PrimaryButton>
           <Button
-            variant="outlined"
-            color="error"
-            onClick={handleCancelChanges}
             startIcon={<CancelIcon />}
-            sx={{ mr: 1 }}
-            aria-label="Cancel changes"
+            variant="outlined"
+            onClick={handleCancelChanges}
+            aria-label="Cancel all changes"
           >
             Cancel
           </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleSaveChanges}
-            startIcon={<SaveIcon />}
-            aria-label="Save changes"
-          >
-            Save Changes
-          </Button>
+          </Box>
         </Box>
       )}
 
       {/* Edit controls for admin when not in inline edit mode */}
       {isUserAdmin && !editMode && (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mb: 2 }}>
-          <Button
-            variant="outlined"
+          <PrimaryButton
             startIcon={<EditIcon />}
             onClick={() => setEditMode(true)}
             aria-label="Enable editing mode for Application Requirements"
           >
-            Edit Content
-          </Button>
-          <Button
-            variant="contained"
+            Field Editor
+          </PrimaryButton>
+          <PrimaryButton
+            startIcon={<ListAltIcon />}
             onClick={() => setFormOpen(true)}
-            aria-label="Edit Application Requirements in form mode"
+            aria-label="Open form editor for Application Requirements"
           >
-            Edit in Form
-          </Button>
+            Form Editor
+          </PrimaryButton>
         </Box>
       )}
       

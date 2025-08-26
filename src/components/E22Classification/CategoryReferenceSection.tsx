@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Box, 
   Typography, 
@@ -12,13 +12,25 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
+  Button,
+  Snackbar,
+  Alert
 } from '@mui/material';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 import CategoryIcon from '@mui/icons-material/Category';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
+import { useEdit } from '../../contexts/EditContext';
+import EditableField from '../shared/EditableField';
+import CategoryReferenceForm, { CategoryReferenceData } from './CategoryReferenceForm';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
+import PrimaryButton from '../shared/PrimaryButton';
 
 const CategoryReferenceSection: React.FC = () => {
   const { settings } = useAccessibility();
+  const { isUserAdmin, editMode, setEditMode, setCurrentEditingSection } = useEdit();
   const highContrast = settings.highContrast;
   const largeText = settings.fontSize === 'large' || settings.fontSize === 'x-large';
 
@@ -26,6 +38,50 @@ const CategoryReferenceSection: React.FC = () => {
   const headingProps = largeText ? { fontSize: '1.6rem' } : {};
   const contrastProps = highContrast ? { bgcolor: '#ffffff', color: '#000000' } : {};
   const tableHeaderBg = highContrast ? '#000000' : '#003366';
+
+  // Local editable fields
+  const [mainTitle, setMainTitle] = useState<string>('Category Reference');
+  const [introText, setIntroText] = useState<string>('This section provides reference information about E22 classification in relation to other immigration categories, subcategories, and associated forms and documents.');
+  const [codesTitle, setCodesTitle] = useState<string>('Related Classification Codes');
+  const [subcategoriesTitle, setSubcategoriesTitle] = useState<string>('EB-2 Subcategories');
+  const [formsTitle, setFormsTitle] = useState<string>('Related Forms');
+  const [hierarchyTitle, setHierarchyTitle] = useState<string>('USCIS Classification Hierarchy');
+
+  const [originalSnapshot, setOriginalSnapshot] = useState({
+    mainTitle, introText, codesTitle, subcategoriesTitle, formsTitle, hierarchyTitle
+  });
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+
+  const beginEdit = () => {
+    setOriginalSnapshot({ mainTitle, introText, codesTitle, subcategoriesTitle, formsTitle, hierarchyTitle });
+    setEditMode(true);
+  };
+  const cancelEdit = () => {
+    setMainTitle(originalSnapshot.mainTitle);
+    setIntroText(originalSnapshot.introText);
+    setCodesTitle(originalSnapshot.codesTitle);
+    setSubcategoriesTitle(originalSnapshot.subcategoriesTitle);
+    setFormsTitle(originalSnapshot.formsTitle);
+    setHierarchyTitle(originalSnapshot.hierarchyTitle);
+    setEditMode(false);
+  };
+  const saveEdit = () => {
+    setSaveSuccess(true);
+    setEditMode(false);
+  };
+  const openForm = () => { setCurrentEditingSection('category-reference'); setFormOpen(true); };
+  const closeForm = () => setFormOpen(false);
+  const handleFormSave = async (updated: CategoryReferenceData) => {
+    setMainTitle(updated.mainTitle);
+    setIntroText(updated.introText);
+    setCodesTitle(updated.codesTitle);
+    setSubcategoriesTitle(updated.subcategoriesTitle);
+    setFormsTitle(updated.formsTitle);
+    setHierarchyTitle(updated.hierarchyTitle);
+    setSaveSuccess(true);
+    setFormOpen(false);
+  };
 
   // Sample classification codes data
   const classificationCodes = [
@@ -54,18 +110,45 @@ const CategoryReferenceSection: React.FC = () => {
 
   return (
     <Box>
-      <Typography 
+      {isUserAdmin && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2, gap: 1 }}>
+          {!editMode ? (
+            <PrimaryButton startIcon={<EditIcon />} onClick={beginEdit} aria-label="Enable editing mode for Category Reference">Field Editor</PrimaryButton>
+          ) : (
+            <>
+              <Button variant="outlined" color="error" startIcon={<CancelIcon />} onClick={cancelEdit} aria-label="Cancel changes">Cancel</Button>
+              <PrimaryButton startIcon={<SaveIcon />} onClick={saveEdit} aria-label="Save all changes">Save All</PrimaryButton>
+            </>
+          )}
+          <PrimaryButton startIcon={<ListAltIcon />} onClick={openForm} aria-label="Open form editor for Category Reference">Form Editor</PrimaryButton>
+        </Box>
+      )}
+
+      <Snackbar open={saveSuccess} autoHideDuration={2500} onClose={() => setSaveSuccess(false)}>
+        <Alert severity="success" sx={{ width: '100%' }}>Changes saved (local only)</Alert>
+      </Snackbar>
+      <CategoryReferenceForm
+        open={formOpen}
+        onClose={closeForm}
+        onSave={handleFormSave}
+        data={{ mainTitle, introText, codesTitle, subcategoriesTitle, formsTitle, hierarchyTitle }}
+        highContrast={highContrast}
+        largeText={largeText}
+      />
+
+      <EditableField 
+        content={mainTitle}
+        onSave={(v) => setMainTitle(v)}
         variant="h5" 
         component="h2" 
-        gutterBottom 
+        fieldId="category-reference-title"
+        ariaLabel="Category reference title"
         sx={{ 
           color: highContrast ? '#000000' : '#003366',
           fontWeight: 'bold',
           ...headingProps
         }}
-      >
-        Category Reference
-      </Typography>
+      />
 
       <Paper 
         elevation={2} 
@@ -75,26 +158,29 @@ const CategoryReferenceSection: React.FC = () => {
           ...contrastProps
         }}
       >
-        <Typography 
+        <EditableField 
+          content={introText}
+          onSave={(v) => setIntroText(v)}
           variant="body1" 
-          paragraph
+          fieldId="category-reference-intro"
+          ariaLabel="Category reference introduction"
+          multiline
           sx={{ ...textSizeProps }}
-        >
-          This section provides reference information about E22 classification in relation to other immigration categories, subcategories, and associated forms and documents.
-        </Typography>
+        />
 
-        <Typography 
+        <EditableField 
+          content={codesTitle}
+          onSave={(v) => setCodesTitle(v)}
           variant="h6" 
-          gutterBottom
+          fieldId="category-reference-codes-title"
+          ariaLabel="Related classification codes heading"
           sx={{ 
             color: highContrast ? '#000000' : '#003366',
             fontWeight: 'bold',
             mt: 3,
             ...textSizeProps
           }}
-        >
-          Related Classification Codes
-        </Typography>
+        />
 
         <TableContainer component={Paper} sx={{ mb: 4, border: highContrast ? '1px solid #000000' : 'none' }}>
           <Table aria-label="classification codes table">
@@ -156,17 +242,18 @@ const CategoryReferenceSection: React.FC = () => {
 
         <Divider sx={{ my: 4 }} />
         
-        <Typography 
+        <EditableField 
+          content={subcategoriesTitle}
+          onSave={(v) => setSubcategoriesTitle(v)}
           variant="h6" 
-          gutterBottom
+          fieldId="category-reference-subcategories-title"
+          ariaLabel="EB-2 subcategories heading"
           sx={{ 
             color: highContrast ? '#000000' : '#003366',
             fontWeight: 'bold',
             ...textSizeProps
           }}
-        >
-          EB-2 Subcategories
-        </Typography>
+        />
 
         <Grid container spacing={3} sx={{ mt: 1 }}>
           {eb2Subcategories.map((category, index) => (
@@ -212,17 +299,18 @@ const CategoryReferenceSection: React.FC = () => {
 
         <Divider sx={{ my: 4 }} />
         
-        <Typography 
+        <EditableField 
+          content={formsTitle}
+          onSave={(v) => setFormsTitle(v)}
           variant="h6" 
-          gutterBottom
+          fieldId="category-reference-forms-title"
+          ariaLabel="Related forms heading"
           sx={{ 
             color: highContrast ? '#000000' : '#003366',
             fontWeight: 'bold',
             ...textSizeProps
           }}
-        >
-          Related Forms
-        </Typography>
+        />
 
         <TableContainer component={Paper} sx={{ border: highContrast ? '1px solid #000000' : 'none' }}>
           <Table aria-label="related forms table">
@@ -343,19 +431,20 @@ const CategoryReferenceSection: React.FC = () => {
         </TableContainer>
       </Paper>
 
-      <Typography 
+      <EditableField 
+        content={hierarchyTitle}
+        onSave={(v) => setHierarchyTitle(v)}
         variant="h5" 
         component="h2" 
-        gutterBottom 
+        fieldId="category-reference-hierarchy-title"
+        ariaLabel="USCIS classification hierarchy title"
         sx={{ 
           color: highContrast ? '#000000' : '#003366',
           fontWeight: 'bold',
           mt: 4,
           ...headingProps
         }}
-      >
-        USCIS Classification Hierarchy
-      </Typography>
+      />
 
       <Paper 
         elevation={2} 

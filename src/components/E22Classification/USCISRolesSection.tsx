@@ -33,6 +33,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import PrimaryButton from '../shared/PrimaryButton';
 
 const USCISRolesSection: React.FC = () => {
   const { settings } = useAccessibility();
@@ -156,37 +157,35 @@ const USCISRolesSection: React.FC = () => {
       {isUserAdmin && (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
           {!editMode ? (
-            <ButtonGroup variant="outlined">
-              <Button
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <PrimaryButton
                 startIcon={<EditIcon />}
                 onClick={() => setEditMode(true)}
                 aria-label="Enable individual editing mode"
               >
-                Edit Content
-              </Button>
-              <Tooltip title="Edit all content in form view">
-                <Button
+                Field Editor
+              </PrimaryButton>
+              <Tooltip title="Open form editor">
+                <PrimaryButton
                   startIcon={<ListAltIcon />}
                   onClick={() => setFormOpen(true)}
-                  aria-label="Open form editing mode"
+                  aria-label="Open form editor for USCIS Roles"
                 >
-                  Form Mode
-                </Button>
+                  Form Editor
+                </PrimaryButton>
               </Tooltip>
-            </ButtonGroup>
+            </Box>
           ) : (
             <Box>
-              <Button
+              <PrimaryButton
                 startIcon={<SaveIcon />}
-                variant="contained"
-                color="primary"
                 onClick={handleSaveAll}
                 sx={{ mr: 1 }}
                 disabled={loading}
                 aria-label="Save all changes"
               >
                 {loading ? 'Saving...' : 'Save All'}
-              </Button>
+              </PrimaryButton>
               <Button
                 startIcon={<CancelIcon />}
                 variant="outlined"
@@ -468,9 +467,9 @@ const USCISRolesSection: React.FC = () => {
 
       {isUserAdmin && !editMode && (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-          <Button variant="contained" onClick={() => setFormOpen(true)} aria-label="Edit USCIS Roles in form mode">
-            Edit in Form
-          </Button>
+          <PrimaryButton startIcon={<ListAltIcon />} onClick={() => setFormOpen(true)} aria-label="Open form editor for USCIS Roles">
+            Form Editor
+          </PrimaryButton>
         </Box>
       )}
 

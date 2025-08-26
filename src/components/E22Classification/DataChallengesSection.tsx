@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Box, 
   Typography, 
@@ -11,7 +11,10 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  Chip
+  Chip,
+  Button,
+  Alert,
+  Snackbar
 } from '@mui/material';
 import StorageIcon from '@mui/icons-material/Storage';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -20,10 +23,19 @@ import SecurityIcon from '@mui/icons-material/Security';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import BugReportIcon from '@mui/icons-material/BugReport';
 import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import CancelIcon from '@mui/icons-material/Cancel';
+import ListAltIcon from '@mui/icons-material/ListAlt';
 import { useAccessibility } from '../../contexts/AccessibilityContext';
+import { useEdit } from '../../contexts/EditContext';
+import EditableField from '../shared/EditableField';
+import DataChallengesForm, { DataChallengesData } from './DataChallengesForm';
+import PrimaryButton from '../shared/PrimaryButton';
 
 const DataChallengesSection: React.FC = () => {
   const { settings } = useAccessibility();
+  const { isUserAdmin, editMode, setEditMode, setCurrentEditingSection } = useEdit();
   const highContrast = settings.highContrast;
   const largeText = settings.fontSize === 'large' || settings.fontSize === 'x-large';
 
@@ -31,49 +43,195 @@ const DataChallengesSection: React.FC = () => {
   const headingProps = largeText ? { fontSize: '1.6rem' } : {};
   const contrastProps = highContrast ? { bgcolor: '#ffffff', color: '#000000' } : {};
 
+  // Local editable state for key blocks (no backend persistence for now)
+  const [mainTitle, setMainTitle] = useState<string>('Data Management and Challenges');
+  const [introText, setIntroText] = useState<string>(
+    'E22 classification data management involves tracking and processing information related to spouses of EB-2 principal immigrants. This data is crucial for case management, reporting, and policy analysis, but it also presents unique challenges.'
+  );
+  const [systemsTitle, setSystemsTitle] = useState<string>('Data Systems and Integration');
+  const [challengesTitle, setChallengesTitle] = useState<string>('Data Challenges');
+  const [improvementTitle, setImprovementTitle] = useState<string>('Improvement Initiatives');
+
+  // Snapshot for Cancel
+  const [originalSnapshot, setOriginalSnapshot] = useState({
+    mainTitle,
+    introText,
+    systemsTitle,
+    challengesTitle,
+    improvementTitle,
+  });
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
+
+  const beginEdit = () => {
+    setOriginalSnapshot({ mainTitle, introText, systemsTitle, challengesTitle, improvementTitle });
+    setEditMode(true);
+  };
+  const cancelEdit = () => {
+    setMainTitle(originalSnapshot.mainTitle);
+    setIntroText(originalSnapshot.introText);
+    setSystemsTitle(originalSnapshot.systemsTitle);
+    setChallengesTitle(originalSnapshot.challengesTitle);
+    setImprovementTitle(originalSnapshot.improvementTitle);
+    setEditMode(false);
+  };
+  const saveEdit = () => {
+    // In-memory only
+    setSaveSuccess(true);
+    setEditMode(false);
+  };
+
+  const openForm = () => {
+    setCurrentEditingSection('data-challenges');
+    setFormOpen(true);
+  };
+  const closeForm = () => setFormOpen(false);
+  const handleFormSave = async (updated: DataChallengesData) => {
+    setMainTitle(updated.mainTitle);
+    setIntroText(updated.introText);
+    setSystemsTitle(updated.systemsTitle);
+    setChallengesTitle(updated.challengesTitle);
+    setImprovementTitle(updated.improvementTitle);
+    setSaveSuccess(true);
+    setFormOpen(false);
+  };
+
+  // Click-anywhere to edit: focus first logical target and enable edit mode for admins
+  const focusFirstEditable = () => {
+    const el = document.getElementById('data-challenges-title');
+    if (el && 'focus' in el) {
+      (el as HTMLElement).focus();
+    }
+  };
+
+  const handleActivateEdit = () => {
+    if (isUserAdmin) {
+      setCurrentEditingSection('data-challenges');
+      if (!editMode) setEditMode(true);
+      focusFirstEditable();
+    }
+  };
+
   return (
     <Box>
-      <Typography 
-        variant="h5" 
-        component="h2" 
-        gutterBottom 
+      {/* Admin controls */}
+      {isUserAdmin && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2, gap: 1 }}>
+          {!editMode ? (
+            <PrimaryButton
+              startIcon={<EditIcon />}
+              onClick={beginEdit}
+              aria-label="Enable editing mode for Data Management and Challenges"
+            >
+              Field Editor
+            </PrimaryButton>
+          ) : (
+            <>
+              <Button
+                variant="outlined"
+                color="error"
+                startIcon={<CancelIcon />}
+                onClick={cancelEdit}
+                aria-label="Cancel changes"
+              >
+                Cancel
+              </Button>
+              <PrimaryButton
+                startIcon={<SaveIcon />}
+                onClick={saveEdit}
+                aria-label="Save all changes"
+              >
+                Save All
+              </PrimaryButton>
+            </>
+          )}
+          <PrimaryButton
+            startIcon={<ListAltIcon />}
+            onClick={openForm}
+            aria-label="Open form editor for Data Management and Challenges"
+          >
+            Form Editor
+          </PrimaryButton>
+        </Box>
+      )}
+
+      {/* Save success snackbar (local) */}
+      <Snackbar open={saveSuccess} autoHideDuration={2500} onClose={() => setSaveSuccess(false)}>
+        <Alert severity="success" sx={{ width: '100%' }}>
+          Changes saved (local only)
+        </Alert>
+      </Snackbar>
+      <DataChallengesForm
+        open={formOpen}
+        onClose={closeForm}
+        onSave={handleFormSave}
+        data={{
+          mainTitle,
+          introText,
+          systemsTitle,
+          challengesTitle,
+          improvementTitle,
+        }}
+        highContrast={highContrast}
+        largeText={largeText}
+      />
+      <EditableField
+        content={mainTitle}
+        onSave={(val) => setMainTitle(val)}
+        variant="h5"
+        component="h2"
+        fieldId="data-challenges-title"
+        ariaLabel="Data Management and Challenges title"
         sx={{ 
           color: highContrast ? '#000000' : '#003366',
           fontWeight: 'bold',
           ...headingProps
         }}
-      >
-        Data Management and Challenges
-      </Typography>
+      />
 
       <Paper 
         elevation={2} 
         sx={{ 
           p: 3, 
           mb: 3,
+          outline: 'none',
+          '&:focus': { boxShadow: '0 0 0 3px rgba(0,51,102,0.4)' },
           ...contrastProps
         }}
+        role="button"
+        tabIndex={isUserAdmin ? 0 : -1}
+        aria-label="Data Management and Challenges section. Activate to start editing."
+        onClick={handleActivateEdit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleActivateEdit();
+          }
+        }}
       >
-        <Typography 
+        <EditableField 
+          content={introText}
+          onSave={(val) => setIntroText(val)}
           variant="body1" 
-          paragraph
+          fieldId="data-challenges-intro"
+          ariaLabel="Data challenges introduction"
+          multiline
           sx={{ ...textSizeProps }}
-        >
-          E22 classification data management involves tracking and processing information related to spouses of EB-2 principal immigrants. This data is crucial for case management, reporting, and policy analysis, but it also presents unique challenges.
-        </Typography>
+        />
 
-        <Typography 
+        <EditableField 
+          content={systemsTitle}
+          onSave={(val) => setSystemsTitle(val)}
           variant="h6" 
-          gutterBottom
+          fieldId="data-systems-title"
+          ariaLabel="Data systems and integration title"
           sx={{ 
             color: highContrast ? '#000000' : '#003366',
             fontWeight: 'bold',
             mt: 3,
             ...textSizeProps
           }}
-        >
-          Data Systems and Integration
-        </Typography>
+        />
 
         <Grid container spacing={3} sx={{ mt: 1 }}>
           <Grid item xs={12} md={6}>
@@ -265,17 +423,18 @@ const DataChallengesSection: React.FC = () => {
 
         <Divider sx={{ my: 4 }} />
         
-        <Typography 
+        <EditableField 
+          content={challengesTitle}
+          onSave={(val) => setChallengesTitle(val)}
           variant="h6" 
-          gutterBottom
+          fieldId="data-challenges-subtitle"
+          ariaLabel="Data challenges heading"
           sx={{ 
             color: highContrast ? '#000000' : '#003366',
             fontWeight: 'bold',
             ...textSizeProps
           }}
-        >
-          Data Challenges
-        </Typography>
+        />
 
         <Grid container spacing={3} sx={{ mt: 1 }}>
           <Grid item xs={12} md={6} lg={4}>
@@ -570,25 +729,38 @@ const DataChallengesSection: React.FC = () => {
         </Grid>
       </Paper>
 
-      <Typography 
-        variant="h5" 
-        component="h2" 
-        gutterBottom 
+      <EditableField
+        content={improvementTitle}
+        onSave={(val) => setImprovementTitle(val)}
+        variant="h5"
+        component="h2"
+        fieldId="improvement-initiatives-title"
+        ariaLabel="Improvement initiatives title"
         sx={{ 
           color: highContrast ? '#000000' : '#003366',
           fontWeight: 'bold',
           mt: 4,
           ...headingProps
         }}
-      >
-        Improvement Initiatives
-      </Typography>
+      />
 
       <Paper 
         elevation={2} 
         sx={{ 
           p: 3,
+          outline: 'none',
+          '&:focus': { boxShadow: '0 0 0 3px rgba(0,51,102,0.4)' },
           ...contrastProps
+        }}
+        role="button"
+        tabIndex={isUserAdmin ? 0 : -1}
+        aria-label="Improvement Initiatives section. Activate to start editing."
+        onClick={handleActivateEdit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleActivateEdit();
+          }
         }}
       >
         <Typography 

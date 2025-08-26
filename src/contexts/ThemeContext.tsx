@@ -50,7 +50,9 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // Initialize state with stored or default preferences
   const [themePreferences, setThemePreferences] = useState<ThemePreferences>({
     ...defaultPreferences,
-    ...storedPreferences
+    ...storedPreferences,
+    // Force light mode regardless of stored preference
+    mode: 'light',
   });
 
   // Effect to detect system preference changes
@@ -66,8 +68,9 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   
   // Update theme preferences
   const updateThemePreferences = (preferences: Partial<ThemePreferences>) => {
-    setThemePreferences(prev => {
-      const newPreferences = { ...prev, ...preferences };
+    setThemePreferences((prev: ThemePreferences) => {
+      // Force light mode globally, regardless of incoming preference
+      const newPreferences: ThemePreferences = { ...prev, ...preferences, mode: 'light' as const };
       localStorage.setItem('themePreferences', JSON.stringify(newPreferences));
       
       // Force a re-render of components using this theme
@@ -80,10 +83,8 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Determine actual mode based on preferences
   const determineActualMode = (): 'light' | 'dark' => {
-    if (themePreferences.mode === 'system') {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-    return themePreferences.mode;
+    // Force light mode globally
+    return 'light';
   };
 
   // Create the appropriate theme based on preferences
