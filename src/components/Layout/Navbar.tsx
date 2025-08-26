@@ -25,7 +25,8 @@ import {
   Search as SearchIcon,
   Language,
   Help,
-  Info
+  Info,
+  MenuBook
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { styled, alpha } from '@mui/material/styles';
@@ -246,6 +247,24 @@ const Navbar = () => {
                   About
                 </Button>
               </Tooltip>
+              <Tooltip title="Data Strategy Support Services">
+                <Button
+                  component={Link}
+                  to="/data-strategy-support"
+                  size="small"
+                  startIcon={<MenuBook />}
+                  sx={{
+                    color: '#003366',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
+                    '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
+                  }}
+                  aria-label="Data Strategy Support Services"
+                >
+                  Data Strategy
+                </Button>
+              </Tooltip>
               <Tooltip title="Help Center">
                 <Button
                   component={Link}
@@ -271,7 +290,7 @@ const Navbar = () => {
             {user ? (
               <>
                 <Chip
-                  avatar={<Avatar alt={user.name} src="/user-avatar.png" />}
+                  avatar={<Avatar alt={user.name} src="/images/user-avatar.png" />}
                   label={user.name}
                   onClick={handleMenuOpen}
                   sx={{ 

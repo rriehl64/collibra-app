@@ -1,0 +1,3 @@
+RuleID,Data Set,Dimension (Completeness/Accuracy/Timeliness/etc),Rule Expression,Threshold,Owner,Alerting
+DQ-001,Applications,Completeness,NOT NULL(application_id),99.5%,DQ Team,Email+Dashboard
+DQ-002,Applications,Validity,IN(list_status),99.0%,DQ Team,Dashboard

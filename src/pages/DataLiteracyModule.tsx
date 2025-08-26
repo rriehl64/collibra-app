@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, createContext } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import LearningInsights from '../components/LearningInsights';
 import AdaptiveRecommendations from '../components/AdaptiveRecommendations';
 import HandbookTab from '../components/handbook/HandbookTab';
@@ -972,6 +973,34 @@ const DataLiteracyModule = () => {
 
         {/* Overview Tab */}
         <TabPanel value={activeTab} index={0}>
+          <Paper
+            elevation={2}
+            sx={{ p: 3, mb: 3, backgroundColor: '#e6f2ff', borderLeft: '4px solid #003366', borderRadius: '4px' }}
+            role="region"
+            aria-label="Data Strategy Support Services callout"
+          >
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} md={8}>
+                <Typography variant="h6" sx={{ color: '#003366', fontWeight: 600 }} gutterBottom>
+                  Data Strategy Support Services
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Visit the Data Strategy module for the Operating Model, Capstone Project, and resources to advance agency data strategy.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={4} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+                <Button
+                  component={RouterLink}
+                  to="/data-strategy-support"
+                  variant="contained"
+                  color="primary"
+                  aria-label="Open Data Strategy Support Services"
+                >
+                  Open Data Strategy
+                </Button>
+              </Grid>
+            </Grid>
+          </Paper>
           <Accordion sx={{ mb: 3 }} defaultExpanded={false}>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}

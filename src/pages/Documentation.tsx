@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Container,
   Typography,
@@ -36,9 +36,14 @@ import {
   Code as CodeIcon,
   School as SchoolIcon,
   Download as DownloadIcon,
-  Assignment as AssignmentIcon
+  Print as PrintIcon,
+  Assignment as AssignmentIcon,
+  TrendingUp as TrendingUpIcon
 } from '@mui/icons-material';
+import { Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { API_BASE_URL } from '../services/api';
+import ReactMarkdown from 'react-markdown';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -84,6 +89,97 @@ const Documentation: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [tabValue, setTabValue] = useState(0);
   const [expandedFAQ, setExpandedFAQ] = useState<string | false>('panel1');
+  const [featuresMd, setFeaturesMd] = useState<string>('');
+  const [featuresLoading, setFeaturesLoading] = useState<boolean>(true);
+  const [featuresError, setFeaturesError] = useState<string | null>(null);
+  const featuresPrintRef = useRef<HTMLDivElement>(null);
+  
+  // Derive backend origin from API base (e.g., http://localhost:3002)
+  let backendOrigin = API_BASE_URL.replace(/\/api\/v1$/, '');
+  // If pointing to frontend or wrong port (e.g., 3000/3001), normalize to 3002
+  backendOrigin = backendOrigin.replace(/:(3000|3001)(?=\/|$)/, ':3002');
+
+  // Normalize common mojibake and Unicode punctuation to ASCII equivalents
+  const normalizeMarkdown = (input: string): string => {
+    return input
+      // true Unicode characters
+      .replace(/\u00A0/g, ' ')   // NBSP -> space
+      .replace(/\u2011/g, '-')   // non-breaking hyphen -> hyphen
+      .replace(/\u2013/g, '-')   // en dash -> hyphen
+      .replace(/\u2014/g, '-')   // em dash -> hyphen
+      // common UTF-8 -> Win-1252 mojibake sequences seen in browsers
+      .replace(/â€‘/g, '-')
+      .replace(/â€“/g, '-')
+      .replace(/â€”/g, '-')
+      .replace(/Â /g, ' ');
+  };
+
+  // Load Features markdown once
+  useEffect(() => {
+    const controller = new AbortController();
+    const load = async () => {
+      try {
+        setFeaturesLoading(true);
+        setFeaturesError(null);
+        const res = await fetch(`${backendOrigin}/docs/features.md`, { signal: controller.signal, credentials: 'include' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        setFeaturesMd(normalizeMarkdown(text));
+      } catch (e: any) {
+        if (e.name !== 'AbortError') setFeaturesError(e.message || 'Failed to load features doc');
+      } finally {
+        setFeaturesLoading(false);
+      }
+    };
+    load();
+    return () => controller.abort();
+  }, [backendOrigin]);
+
+  const handlePrintFeatures = () => {
+    const node = featuresPrintRef.current;
+    if (!node) return;
+    const printWindow = window.open('', 'printWindow', 'width=1024,height=768');
+    if (!printWindow) return;
+    const title = 'E-Unify: Features & Capabilities';
+    const now = new Date().toLocaleString();
+    const styles = `
+      <style>
+        @page { margin: 16mm; }
+        body { font-family: "Source Sans Pro", Arial, sans-serif; color: #000; }
+        h1,h2,h3 { color: #003366; }
+        a { color: #003366; text-decoration: underline; }
+        .markdown-content { max-width: 100%; }
+        ul, ol { padding-left: 20px; }
+        .print-header { border-bottom: 2px solid #003366; margin-bottom: 12px; padding-bottom: 8px; }
+        .print-footer { border-top: 1px solid #ccc; margin-top: 16px; padding-top: 8px; font-size: 12px; color: #555; }
+      </style>
+    `;
+    printWindow.document.write(`
+      <html>
+        <head>
+          <meta charSet="utf-8" />
+          <title>${title}</title>
+          ${styles}
+        </head>
+        <body>
+          <div class="print-header">
+            <h1>${title}</h1>
+            <div>Printed: ${now}</div>
+          </div>
+          <div class="markdown-content">${node.innerHTML}</div>
+          <div class="print-footer">Source: Features & Capabilities (Inline View)</div>
+          <script>
+            window.onload = function(){
+              window.focus();
+              window.print();
+              setTimeout(function(){ window.close(); }, 200);
+            };
+          <\/script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
   
   // Mock documentation items
   const documentationItems: DocItem[] = [
@@ -274,6 +370,169 @@ const Documentation: React.FC = () => {
       <Typography variant="body1" paragraph>
         Comprehensive guides, tutorials, and reference materials for the Data Literacy Support platform.
       </Typography>
+      
+      {/* Quick Links */}
+      <Paper elevation={1} sx={{ p: 2, mb: 3 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={8}>
+            <Box>
+              <Typography variant="h6" component="h2" sx={{ mb: 0.5 }}>
+                Features & Capabilities
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Explore a curated inventory of app features across frontend and backend.
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={4} sx={{ textAlign: { xs: 'left', md: 'right' } }}>
+            <Button
+              variant="contained"
+              color="primary"
+              component="a"
+              href={`${backendOrigin}/docs/features.md`}
+              target="_blank"
+              rel="noopener noreferrer"
+              startIcon={<DescriptionIcon />}
+              aria-label="Open Features and Capabilities documentation in a new tab"
+            >
+              Open Features Doc
+            </Button>
+          </Grid>
+        </Grid>
+      </Paper>
+
+      {/* Templates & Forms */}
+      <Paper elevation={1} sx={{ p: 2, mb: 3 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={12} md={8}>
+            <Box>
+              <Typography variant="h6" component="h2" sx={{ mb: 0.5 }}>
+                Templates & Forms
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Quickly access the Project Charter and KPI Dictionary modules.
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={12} md={4} sx={{ textAlign: { xs: 'left', md: 'right' } }}>
+            <Box sx={{ display: 'inline-flex', gap: 1, flexWrap: 'wrap' }}>
+              <Button
+                variant="contained"
+                color="primary"
+                component={RouterLink}
+                to="/project-charter"
+                startIcon={<AssignmentIcon />}
+                aria-label="Open Project Charter form"
+                sx={{
+                  backgroundColor: '#003366',
+                  '&:hover': { backgroundColor: '#00264d' },
+                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 }
+                }}
+              >
+                Project Charter
+              </Button>
+              <Button
+                variant="outlined"
+                color="primary"
+                component={RouterLink}
+                to="/templates/kpi-dictionary"
+                startIcon={<TrendingUpIcon />}
+                aria-label="Open KPI Dictionary page"
+                sx={{
+                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 }
+                }}
+              >
+                KPI Dictionary
+              </Button>
+              <Button
+                variant="outlined"
+                color="primary"
+                component={RouterLink}
+                to="/templates/kpis"
+                startIcon={<TrendingUpIcon />}
+                aria-label="Open KPI Catalog browser"
+                sx={{
+                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 }
+                }}
+              >
+                Open KPI Catalog
+              </Button>
+            </Box>
+          </Grid>
+        </Grid>
+      </Paper>
+
+      {/* Features & Capabilities (Inline, Collapsible) */}
+      <Accordion sx={{ mb: 3 }} disableGutters>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="features-content"
+          id="features-header"
+        >
+          <Typography variant="h6" component="h2" sx={{ color: '#003366', fontWeight: 700 }}>
+            Features & Capabilities (Inline View)
+          </Typography>
+          <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<PrintIcon />}
+              aria-label="Print Features section to PDF"
+              onClick={(e) => { e.stopPropagation(); handlePrintFeatures(); }}
+              onFocus={(e) => e.stopPropagation()}
+              onKeyDown={(e) => { e.stopPropagation(); }}
+            >
+              Print PDF
+            </Button>
+          </Box>
+        </AccordionSummary>
+        <AccordionDetails aria-live="polite" aria-busy={featuresLoading ? 'true' : 'false'}>
+          {featuresLoading && (
+            <Typography variant="body1">Loading features...</Typography>
+          )}
+          {featuresError && (
+            <Typography role="alert" color="error.main">{featuresError}</Typography>
+          )}
+          {!featuresLoading && !featuresError && (
+            <Box className="markdown-content" ref={featuresPrintRef}>
+              <ReactMarkdown
+                components={{
+                  h1: ({ children }) => (
+                    <Typography variant="h4" component="h3" sx={{ mt: 2, color: '#003366', fontWeight: 700 }}>
+                      {children}
+                    </Typography>
+                  ),
+                  h2: ({ children }) => (
+                    <Typography variant="h5" component="h4" sx={{ mt: 2, color: '#003366', fontWeight: 700 }}>
+                      {children}
+                    </Typography>
+                  ),
+                  h3: ({ children }) => (
+                    <Typography variant="h6" component="h5" sx={{ mt: 2, color: '#003366', fontWeight: 700 }}>
+                      {children}
+                    </Typography>
+                  ),
+                  p: ({ children }) => (
+                    <Typography variant="body1" paragraph>
+                      {children}
+                    </Typography>
+                  ),
+                  li: ({ children }) => (
+                    <li>
+                      <Typography component="span" variant="body1">{children}</Typography>
+                    </li>
+                  ),
+                  a: ({ href, title, children }) => (
+                    <a href={href} title={title as string | undefined} target="_blank" rel="noopener noreferrer">{children}</a>
+                  )
+                }}
+              >
+                {featuresMd}
+              </ReactMarkdown>
+            </Box>
+          )}
+        </AccordionDetails>
+      </Accordion>
       
       {/* Search bar */}
       <Paper elevation={1} sx={{ p: 2, mb: 4 }}>

@@ -19,10 +19,15 @@ const auth = require('./server/routes/auth');
 const policies = require('./server/routes/policies');
 const dashboard = require('./server/routes/dashboard');
 const businessProcesses = require('./server/routes/businessProcesses');
+const projectCharters = require('./server/routes/projectCharters');
+const kpis = require('./server/routes/kpis');
 const dataCategories = require('./server/routes/dataCategories');
 const dataConcepts = require('./server/routes/dataConcepts');
 const subjectCategories = require('./server/routes/subjectCategories');
 const users = require('./server/routes/users');
+const e22 = require('./server/routes/e22');
+const studyAids = require('./server/routes/studyAids');
+const tts = require('./server/routes/tts');
 
 const app = express();
 
@@ -34,7 +39,13 @@ const corsOptions = {
     
     const allowedOrigins = process.env.CORS_ORIGIN ? 
       process.env.CORS_ORIGIN.split(',') : 
-      ['http://localhost:3006', 'http://localhost:3002', 'http://localhost:3008'];
+      [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:3002',
+        'http://localhost:3006',
+        'http://localhost:3008'
+      ];
       
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
@@ -96,7 +107,7 @@ app.get('/docs/:file', (req, res) => {
   
   if (fs.existsSync(filePath)) {
     console.log('File exists, sending...');
-    res.setHeader('Content-Type', 'text/markdown');
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
     res.sendFile(filePath);
   } else {
     console.log('File not found');
@@ -114,6 +125,14 @@ app.use('/api/v1/data-categories', dataCategories);
 app.use('/api/v1/data-concepts', dataConcepts);
 app.use('/api/v1/subject-categories', subjectCategories);
 app.use('/api/v1/users', users);
+app.use('/api/v1/e22', e22);
+app.use('/api/v1/project-charters', projectCharters);
+app.use('/api/v1/kpis', kpis);
+app.use('/api/v1/study-aids', studyAids);
+app.use('/api/v1/tts', tts);
+
+// Serve generated TTS audio cache
+app.use('/tts-cache', express.static(path.join(__dirname, 'public', 'tts-cache')));
 
 // Only serve static files and handle React routing in production mode
 if (process.env.NODE_ENV === 'production') {

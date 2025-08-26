@@ -418,7 +418,140 @@ function About() {
               <Typography paragraph>
                 By implementing E-Unify, USCIS has established a foundation for improved data management practices, enabling better decision-making, reducing redundancy, and fostering collaboration between technical and business teams. The platform supports metadata-driven automation, semantic search, and integration with other enterprise systems.
               </Typography>
+
+              <Typography variant="h6" gutterBottom sx={{ mt: 3, color: '#003366', fontWeight: 600 }} id="branding-section-heading">
+                About the E-Unify Name and Tagline
+              </Typography>
               
+              <Paper
+                elevation={2}
+                sx={{
+                  p: 3,
+                  mb: 4,
+                  borderLeft: '4px solid #003366',
+                  backgroundColor: '#f8f9fa'
+                }}
+                aria-labelledby="branding-section-heading"
+              >
+                <Grid container spacing={3} alignItems="center">
+                  <Grid item xs={12} md={8}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#003366', mb: 1 }} id="branding-tagline">
+                      "E-Unify: Your Pathway to Benefit"
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      The name "E-Unify" embodies our core mission of unifying enterprise data across USCIS. The "E" represents both "Enterprise" and "Electronic," reflecting our digital approach to data integration. "Unify" speaks to our commitment to bringing together disparate data sources into a cohesive, accessible framework.
+                    </Typography>
+                    
+                    <Typography paragraph>
+                      Our tagline, "Your Pathway to Benefit," emphasizes the platform's ultimate purpose: creating clear pathways for users to derive tangible benefits from organizational data. It highlights that E-Unify is not just a technical tool, but a means to unlock value and enable better outcomes for USCIS stakeholders.
+                    </Typography>
+                    
+                    <Box 
+                      sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}
+                      role="figure"
+                      aria-labelledby="branding-formation-label"
+                    >
+                      <Typography id="branding-formation-label" sx={{ width: '1px', height: '1px', overflow: 'hidden', position: 'absolute' }}>
+                        Visual representation of how E-Unify name is formed
+                      </Typography>
+                      <Chip 
+                        label="Enterprise" 
+                        color="primary" 
+                        sx={{ mr: 1, mb: { xs: 1, sm: 0 }, bgcolor: '#003366', fontSize: '0.875rem' }} 
+                        aria-label="Enterprise"
+                        tabIndex={0}
+                      />
+                      <Typography variant="body2" sx={{ mx: 1 }} aria-hidden="true">+</Typography>
+                      <Chip 
+                        label="Unify" 
+                        sx={{ mr: 1, mb: { xs: 1, sm: 0 }, bgcolor: '#0056b3', color: 'white', fontSize: '0.875rem' }} 
+                        aria-label="Unify"
+                        tabIndex={0}
+                      />
+                      <Typography variant="body2" sx={{ mx: 1 }} aria-hidden="true">=</Typography>
+                      <Chip 
+                        label="E-Unify" 
+                        sx={{ fontWeight: 'bold', bgcolor: '#003366', color: 'white', fontSize: '0.875rem' }} 
+                        aria-label="E-Unify"
+                        tabIndex={0}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} md={4} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <Box 
+                      sx={{ 
+                        p: 3, 
+                        borderRadius: '50%', 
+                        bgcolor: '#f0f4f8',
+                        border: '2px solid #003366',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 180,
+                        height: 180
+                      }}
+                      role="img"
+                      aria-labelledby="branding-logo-label"
+                    >
+                      <Typography id="branding-logo-label" sx={{ width: '1px', height: '1px', overflow: 'hidden', position: 'absolute' }}>
+                        E-Unify logo with tagline Your Pathway to Benefit
+                      </Typography>
+                      <Typography variant="h4" sx={{ fontWeight: 700, color: '#003366', mb: 1 }}>
+                        E-Unify
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#003366', fontStyle: 'italic', textAlign: 'center' }}>
+                        Your Pathway to Benefit
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+                
+                {/* Accessibility features for screen readers */}
+                <Box className="sr-only" sx={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', borderWidth: 0 }}>
+                  <Typography variant="body2">
+                    The E-Unify branding combines Enterprise and Unify concepts, with the official tagline "Your Pathway to Benefit" to emphasize how the platform creates pathways for users to benefit from organizational data.
+                  </Typography>
+                </Box>
+              </Paper>
+              
+              {/* Contextual callout to Data Strategy Support Services */}
+              <Paper
+                elevation={2}
+                sx={{
+                  p: 3,
+                  mb: 4,
+                  backgroundColor: '#e6f2ff',
+                  borderLeft: '4px solid #003366',
+                  borderRadius: '4px'
+                }}
+                role="region"
+                aria-label="Data Strategy Support Services callout"
+              >
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={12} md={8}>
+                    <Typography variant="h6" sx={{ color: '#003366', fontWeight: 600 }} gutterBottom>
+                      Data Strategy Support Services
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Explore our 508-compliant Data Strategy Support module featuring the Operating Model, Capstone Project, and curated resources to help you plan and execute your agency data strategy.
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} md={4} sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' } }}>
+                    <Button
+                      component={Link}
+                      to="/data-strategy-support"
+                      variant="contained"
+                      color="primary"
+                      aria-label="Open Data Strategy Support Services"
+                    >
+                      Open Data Strategy
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Paper>
+
               <Typography variant="h6" gutterBottom sx={{ mt: 3, color: '#003366', fontWeight: 600 }}>
                 Core Features
               </Typography>
