@@ -30,6 +30,10 @@ export interface DataAsset {
   createdAt?: string;
   updatedAt?: string;
   relatedAssets?: string[];
+  relationships?: Array<{
+    assetId: string;
+    relationshipType: string;
+  }>;
   _score?: number; // Added for Elasticsearch scoring
 }
 
@@ -41,9 +45,16 @@ export interface DataAssetFilters {
   domains: string[];
   statuses: string[];
   certifications: string[];
+  owners: string[];
+  complianceStatuses: string[];
+  tags: string[];
   dateRange?: {
     start: string;
     end: string;
+  };
+  qualityScore?: {
+    min: number;
+    max: number;
   };
 }
 

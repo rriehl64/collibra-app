@@ -64,7 +64,8 @@ const DashboardService = {
    */
   getDashboardMetrics: async (): Promise<DashboardMetrics> => {
     try {
-      const response = await axios.get(`${DASHBOARD_API_URL}/dashboard/metrics`, {
+      // Try the test endpoint first (unprotected) for debugging
+      const response = await axios.get(`${DASHBOARD_API_URL}/dashboard/test-metrics`, {
         withCredentials: true
       });
       

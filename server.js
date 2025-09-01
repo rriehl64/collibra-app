@@ -28,6 +28,9 @@ const users = require('./server/routes/users');
 const e22 = require('./server/routes/e22');
 const studyAids = require('./server/routes/studyAids');
 const tts = require('./server/routes/tts');
+const weeklyStatus = require('./server/routes/weeklyStatus');
+const monthlyStatus = require('./server/routes/monthlyStatus');
+const projectTimeline = require('./server/routes/projectTimeline');
 
 const app = express();
 
@@ -130,6 +133,9 @@ app.use('/api/v1/project-charters', projectCharters);
 app.use('/api/v1/kpis', kpis);
 app.use('/api/v1/study-aids', studyAids);
 app.use('/api/v1/tts', tts);
+app.use('/api/v1/weekly-status', weeklyStatus);
+app.use('/api/v1/monthly-status', monthlyStatus);
+app.use('/api/v1/project-timeline', projectTimeline);
 
 // Serve generated TTS audio cache
 app.use('/tts-cache', express.static(path.join(__dirname, 'public', 'tts-cache')));

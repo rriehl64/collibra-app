@@ -65,6 +65,9 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import DevLogin from './pages/DevLogin';
 import StudyAidsBusinessAnalytics from './pages/StudyAidsBusinessAnalytics';
+import WeeklyStatusList from './pages/WeeklyStatusList';
+import MonthlyStatusList from './pages/MonthlyStatusList';
+import DataGovernanceQuality from './pages/DataGovernanceQuality';
 
 // Import Auth Provider Context
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -210,6 +213,9 @@ function App() {
                 <Route path="/policy" element={<PolicyIndex />} />
                 <Route path="/policy/gdpr" element={<GDPRPolicy />} />
                 <Route path="/policy/standards" element={<Standards />} />
+                <Route path="/weekly-status" element={<WeeklyStatusList />} />
+                <Route path="/monthly-status" element={<MonthlyStatusList />} />
+                <Route path="/data-governance-quality" element={<DataGovernanceQuality />} />
               </Route>
               
               {/* Data Steward Only Routes */}

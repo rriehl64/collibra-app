@@ -3,6 +3,7 @@
  * Handles all API communication with the backend
  */
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { DataAsset } from '../types/DataAsset';
 
 // Set API base URL from env variable
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3002/api/v1';
@@ -125,39 +126,45 @@ export interface User {
   createdAt?: Date;
 }
 
-// Data Asset interfaces
-export interface DataAsset {
+// Weekly Status interfaces
+export interface WeeklyStatusItem {
   _id?: string;
+  userId: string;
   name: string;
-  type: string;
-  domain: string;
-  owner: string;
-  description?: string;
-  lastModified?: Date;
-  status: string;
+  team: string;
+  contractNumber: string;
+  periodOfPerformance: string;
+  supervisor: string;
+  weekStart: string | Date;
+  status: 'green' | 'yellow' | 'red';
+  summary?: string;
+  accomplishments?: string;
+  tasksStatus?: string;
+  issuesNeeds?: string;
+  nextSteps?: string;
+  hoursWorked?: number;
+  communications?: string;
   tags?: string[];
-  certification?: string;
-  stewards?: string[];
-  relatedAssets?: {
-    assetId: string;
-    relationshipType: string;
-  }[];
-  governance?: {
-    policies?: {
-      name: string;
-      description: string;
-      status: string;
-    }[];
-    complianceStatus?: string;
-  };
-  qualityMetrics?: {
-    completeness: number;
-    accuracy: number;
-    consistency: number;
-  };
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdBy?: string;
+  updatedBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
+
+export interface WeeklyStatusListResponse {
+  items: WeeklyStatusItem[];
+  total: number;
+}
+
+export interface WeeklySlaReport {
+  weekStart: string;
+  submittedCount: number;
+  totalUsers: number;
+  missing: { userId: string; name: string; email: string }[];
+}
+
+// Data Asset interfaces - using imported type
+// export { DataAsset }; // Commented out to avoid conflicts
 
 // Policy interfaces
 export interface Policy {
@@ -369,6 +376,106 @@ export const authService = {
       }
       throw new Error('Network error while updating password');
     }
+  },
+};
+
+// Weekly Status services
+// Monthly Status interfaces
+export interface MonthlyStatusItem {
+  _id?: string;
+  userId: string;
+  name: string;
+  team: string;
+  contractNumber?: string;
+  periodOfPerformance?: string;
+  supervisor?: string;
+  month: number;
+  year: number;
+  monthName: string;
+  overallStatus: 'green' | 'yellow' | 'red';
+  weeklyStatuses: Array<{
+    weekStart: string;
+    status: 'green' | 'yellow' | 'red';
+  }>;
+  totalHoursWorked: number;
+  averageHoursPerWeek: number;
+  weeksReported: number;
+  monthlyAccomplishments?: string;
+  monthlyTasksStatus?: string;
+  monthlyIssuesNeeds?: string;
+  monthlyNextSteps?: string;
+  monthlyCommunications?: string;
+  executiveSummary?: string;
+  weeklyReportIds: string[];
+  tags?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+}
+
+export interface MonthlyStatusListResponse {
+  items: MonthlyStatusItem[];
+  total: number;
+}
+
+export const weeklyStatusService = {
+  list: async (params?: Record<string, any>): Promise<WeeklyStatusListResponse> => {
+    const response = await api.get<ApiResponse<WeeklyStatusItem[]>>('/weekly-status', { params });
+    return {
+      items: response.data.data || [],
+      total: response.data.total || 0,
+    };
+  },
+  get: async (id: string): Promise<WeeklyStatusItem> => {
+    const response = await api.get<ApiResponse<WeeklyStatusItem>>(`/weekly-status/${id}`);
+    if (!response.data.data) throw new Error('Not found');
+    return response.data.data;
+  },
+  create: async (payload: WeeklyStatusItem): Promise<WeeklyStatusItem> => {
+    const response = await api.post<ApiResponse<WeeklyStatusItem>>('/weekly-status', payload);
+    if (!response.data.data) throw new Error('Create failed');
+    return response.data.data;
+  },
+  update: async (id: string, payload: Partial<WeeklyStatusItem>): Promise<WeeklyStatusItem> => {
+    const response = await api.put<ApiResponse<WeeklyStatusItem>>(`/weekly-status/${id}`, payload);
+    if (!response.data.data) throw new Error('Update failed');
+    return response.data.data;
+  },
+  remove: async (id: string): Promise<void> => {
+    await api.delete(`/weekly-status/${id}`);
+  },
+  sla: async (week?: string): Promise<WeeklySlaReport> => {
+    const response = await api.get<ApiResponse<{ weekStart: string; submittedCount: number; totalUsers: number; missing: any[] }>>('/weekly-status/sla', {
+      params: week ? { week } : undefined,
+    });
+    if (!response.data.data) throw new Error('SLA not available');
+    return response.data.data as WeeklySlaReport;
+  },
+};
+
+export const monthlyStatusService = {
+  list: async (params?: Record<string, any>): Promise<MonthlyStatusListResponse> => {
+    const response = await api.get<ApiResponse<MonthlyStatusItem[]>>('/monthly-status', { params });
+    return {
+      items: response.data.data || [],
+      total: response.data.total || 0,
+    };
+  },
+  get: async (id: string): Promise<MonthlyStatusItem> => {
+    const response = await api.get<ApiResponse<MonthlyStatusItem>>(`/monthly-status/${id}`);
+    if (!response.data.data) throw new Error('Not found');
+    return response.data.data;
+  },
+  create: async (payload: MonthlyStatusItem): Promise<MonthlyStatusItem> => {
+    const response = await api.post<ApiResponse<MonthlyStatusItem>>('/monthly-status', payload);
+    if (!response.data.data) throw new Error('Create failed');
+    return response.data.data;
+  },
+  update: async (id: string, payload: Partial<MonthlyStatusItem>): Promise<MonthlyStatusItem> => {
+    const response = await api.put<ApiResponse<MonthlyStatusItem>>(`/monthly-status/${id}`, payload);
+    if (!response.data.data) throw new Error('Update failed');
+    return response.data.data;
   },
 };
 

@@ -108,8 +108,21 @@ const Dashboard: React.FC = () => {
     fetchDashboardData();
   }, []);
 
-  // Chart configuration
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+  // Chart configuration - expanded color palette for better distribution
+  const COLORS = [
+    '#003366', // USCIS Blue
+    '#0088FE', // Blue
+    '#00C49F', // Green
+    '#FFBB28', // Yellow
+    '#FF8042', // Orange
+    '#8884d8', // Purple
+    '#82ca9d', // Light Green
+    '#ffc658', // Gold
+    '#ff7300', // Dark Orange
+    '#8dd1e1', // Light Blue
+    '#d084d0', // Pink
+    '#87d068'  // Lime
+  ];
 
   // Format domain distribution data for the pie chart
   const getDomainDistributionData = () => {
@@ -368,24 +381,37 @@ const Dashboard: React.FC = () => {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      outerRadius={80}
+                      outerRadius={90}
+                      innerRadius={30}
                       fill="#8884d8"
                       dataKey="value"
-                      label={({ name, percentage }) => `${name} ${percentage}%`}
+                      label={({ name, percentage }) => 
+                        percentage >= 5 ? `${percentage}%` : ''
+                      }
                     >
                       {getDomainDistributionData().map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip 
+                      formatter={(value, name) => [
+                        `${value} assets (${getDomainDistributionData().find(d => d.name === name)?.percentage}%)`,
+                        'Count'
+                      ]}
+                    />
                     <Legend 
                       formatter={(value, entry) => {
-                        // Use a custom formatter to avoid inactiveColor being passed to DOM
-                        return <span style={{ color: entry.color }}>{value}</span>;
+                        const data = getDomainDistributionData().find(d => d.name === value);
+                        return (
+                          <span style={{ color: entry.color }}>
+                            {value} ({data?.percentage}%)
+                          </span>
+                        );
                       }}
                       layout="vertical"
                       align="right"
                       verticalAlign="middle"
+                      wrapperStyle={{ fontSize: '12px', paddingLeft: '10px' }}
                     />
                   </PieChart>
                 </ResponsiveContainer>

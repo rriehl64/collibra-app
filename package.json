@@ -20,6 +20,7 @@
     "cors": "^2.8.5",
     "cra-template-typescript": "1.2.0",
     "crypto-browserify": "^3.12.1",
+    "dayjs": "^1.11.14",
     "dotenv": "^17.2.1",
     "elasticsearch-browser": "^16.7.1",
     "express": "^4.21.2",
@@ -51,7 +52,9 @@
     "server": "node server.js",
     "dev": "concurrently \"npm run start\" \"npm run server\"",
     "seed:project-charter": "node seed-project-charter.js",
-    "seed:study-aids": "node seed-study-aids.js"
+    "seed:study-aids": "node seed-study-aids.js",
+    "seed:weekly-status": "node seed-weekly-status.js",
+    "seed:weekly-status:sample": "node seed-weekly-status.js --team USCIS-DSSS --contract USCIS-DSSS-3 --week 2025-08-25 --count 40"
   },
   "eslintConfig": {
     "extends": [

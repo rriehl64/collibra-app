@@ -14,7 +14,7 @@ const DataAssetSchema = new mongoose.Schema({
   type: {
     type: String,
     required: [true, 'Please specify the asset type'],
-    enum: ['Database', 'Table', 'Report', 'Dashboard', 'Document', 'API', 'Data Warehouse']
+    enum: ['API', 'Business Term', 'Dashboard', 'Data Lake', 'Data Pipeline', 'Data Warehouse', 'Database', 'Dataset', 'Document', 'ETL Process', 'File', 'Index', 'Report', 'Schema', 'Table', 'View']
   },
   domain: {
     type: String,
@@ -47,7 +47,7 @@ const DataAssetSchema = new mongoose.Schema({
   }],
   certification: {
     type: String,
-    enum: ['certified', 'pending', 'none'],
+    enum: ['bronze', 'certified', 'gold', 'none', 'pending', 'platinum', 'silver'],
     default: 'none'
   },
   stewards: [{

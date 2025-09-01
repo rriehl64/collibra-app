@@ -59,7 +59,7 @@ const searchDataAssets = async (
       q: query
     };
     
-    const response = await api.get<ApiResponse<DataAsset[]>>(`/data-assets/search`, { 
+    const response = await api.get<ApiResponse<DataAsset[]>>(`/data-assets`, { 
       params: searchParams 
     });
     
