@@ -100,6 +100,9 @@ export interface RegisterCredentials {
   password: string;
   department?: string;
   jobTitle?: string;
+  role: 'user' | 'data-steward' | 'admin';
+  assignedDomains?: string[];
+  permissions?: string[]; // Added permissions array
 }
 
 export interface AuthResponse {
@@ -109,12 +112,14 @@ export interface AuthResponse {
 
 export interface User {
   _id: string;
+  id?: string; // Alias for _id for compatibility
   name: string;
   email: string;
   role: 'user' | 'data-steward' | 'admin';
   department?: string;
   jobTitle?: string;
   assignedDomains?: string[];
+  permissions?: string[]; // Added permissions array
   preferences?: {
     theme: 'light' | 'dark' | 'system';
     notifications: {
@@ -700,5 +705,30 @@ export const policyService = {
     }
   },
 };
+
+// Data Lineage APIs
+export const getAssetLineage = (assetId: string, direction = 'both', depth = 3) => 
+  api.get(`/data-assets/${assetId}/lineage?direction=${direction}&depth=${depth}`);
+
+export const getAllLineageRelationships = (params?: any) => 
+  api.get('/lineage', { params });
+
+export const createLineageRelationship = (relationshipData: any) => 
+  api.post('/lineage', relationshipData);
+
+export const updateLineageRelationship = (id: string, relationshipData: any) => 
+  api.put(`/lineage/${id}`, relationshipData);
+
+export const deleteLineageRelationship = (id: string) => 
+  api.delete(`/lineage/${id}`);
+
+export const getLineageStats = () => 
+  api.get('/lineage/stats');
+
+// User Management APIs
+export const getUserManagement = () => api.get('/users');
+export const createUser = (userData: any) => api.post('/users', userData);
+export const updateUser = (id: string, userData: any) => api.put(`/users/${id}`, userData);
+export const deleteUser = (id: string) => api.delete(`/users/${id}`);
 
 export default api;

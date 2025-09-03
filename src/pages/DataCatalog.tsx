@@ -35,11 +35,14 @@ import {
   Clear as ClearIcon,
   FilterList as FilterIcon,
   Edit as EditIcon,
-  Save as SaveIcon
+  Save as SaveIcon,
+  AccountTree as LineageIcon
 } from '@mui/icons-material';
 
 import { dataAssetService } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
+import AdvancedSearch from '../components/DataCatalog/AdvancedSearch';
+import DataLineageVisualization from '../components/DataLineage/DataLineageVisualization';
 
 // Type definitions
 type CertificationType = 'certified' | 'pending' | 'none';
@@ -132,7 +135,7 @@ const DataCatalog: React.FC = () => {
   
   // Pagination
   const [page, setPage] = useState(1);
-  const [limit] = useState(15); // Changed from 10 to 15 to show 15 records
+  const [limit] = useState(50); // Increased to show 50 records per page
   const [totalAssets, setTotalAssets] = useState(0);
   
   // Search history
@@ -143,6 +146,10 @@ const DataCatalog: React.FC = () => {
   const [selectedAsset, setSelectedAsset] = useState<DataAsset | null>(null);
   const [filterDialogOpen, setFilterDialogOpen] = useState(false);
   const [currentAsset, setCurrentAsset] = useState<DataAsset | null>(null);
+  
+  // State for lineage dialog
+  const [lineageDialogOpen, setLineageDialogOpen] = useState(false);
+  const [lineageAsset, setLineageAsset] = useState<DataAsset | null>(null);
   const [editedAsset, setEditedAsset] = useState<DataAsset | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -153,8 +160,85 @@ const DataCatalog: React.FC = () => {
   const [comparisonDialogOpen, setComparisonDialogOpen] = useState(false);
   
   // Data lineage functionality
-  const [lineageDialogOpen, setLineageDialogOpen] = useState(false);
-  const [selectedAssetForLineage, setSelectedAssetForLineage] = useState<DataAsset | null>(null);
+  const handleViewLineage = (asset: DataAsset) => {
+    setLineageAsset(asset);
+    setLineageDialogOpen(true);
+  };
+
+  const handleCloseLineageDialog = () => {
+    setLineageDialogOpen(false);
+    setLineageAsset(null);
+  };
+
+  // Generate sample lineage data for demonstration
+  const generateLineageData = (asset: DataAsset) => {
+    const nodes = [
+      {
+        id: asset._id || asset.name,
+        name: asset.name,
+        type: asset.type,
+        level: 0,
+        isCenter: true
+      },
+      {
+        id: `${asset.name}_source_1`,
+        name: `${asset.domain} Raw Data`,
+        type: 'Database',
+        level: -1,
+        isCenter: false
+      },
+      {
+        id: `${asset.name}_source_2`,
+        name: `${asset.domain} API`,
+        type: 'API',
+        level: -1,
+        isCenter: false
+      },
+      {
+        id: `${asset.name}_target_1`,
+        name: `${asset.name} Analytics`,
+        type: 'Dashboard',
+        level: 1,
+        isCenter: false
+      },
+      {
+        id: `${asset.name}_target_2`,
+        name: `${asset.name} Reports`,
+        type: 'Report',
+        level: 1,
+        isCenter: false
+      }
+    ];
+
+    const links = [
+      {
+        source: `${asset.name}_source_1`,
+        target: asset._id || asset.name,
+        type: 'data_flow',
+        strength: 0.8
+      },
+      {
+        source: `${asset.name}_source_2`,
+        target: asset._id || asset.name,
+        type: 'data_flow',
+        strength: 0.6
+      },
+      {
+        source: asset._id || asset.name,
+        target: `${asset.name}_target_1`,
+        type: 'data_flow',
+        strength: 0.9
+      },
+      {
+        source: asset._id || asset.name,
+        target: `${asset.name}_target_2`,
+        type: 'data_flow',
+        strength: 0.7
+      }
+    ];
+
+    return { nodes, links };
+  };
   
   // Bulk operations functionality
   const [bulkMode, setBulkMode] = useState(false);
@@ -401,59 +485,8 @@ const DataCatalog: React.FC = () => {
     setSaveSuccess(true);
   };
 
-  // Handle lineage visualization
-  const handleViewLineage = (asset: DataAsset) => {
-    setSelectedAssetForLineage(asset);
-    setLineageDialogOpen(true);
-  };
 
-  // Generate mock lineage data based on asset relationships
-  const generateLineageData = (asset: DataAsset) => {
-    const nodes = [
-      { id: asset._id || 'current', label: asset.name, type: asset.type, level: 0, isCenter: true }
-    ];
-    
-    const edges: Array<{source: string, target: string, type: string}> = [];
-    
-    // Add upstream dependencies (sources)
-    if (asset.relationships && asset.relationships.length > 0) {
-      asset.relationships.forEach((rel, index) => {
-        const upstreamId = `upstream-${index}`;
-        nodes.push({
-          id: upstreamId,
-          label: `Source ${index + 1}`,
-          type: 'Table',
-          level: -1,
-          isCenter: false
-        });
-        edges.push({
-          source: upstreamId,
-          target: asset._id || 'current',
-          type: rel.relationshipType || 'feeds'
-        });
-      });
-    }
-    
-    // Add downstream dependencies (targets) - mock data
-    const downstreamCount = Math.floor(Math.random() * 3) + 1;
-    for (let i = 0; i < downstreamCount; i++) {
-      const downstreamId = `downstream-${i}`;
-      nodes.push({
-        id: downstreamId,
-        label: `Target ${i + 1}`,
-        type: asset.type === 'Table' ? 'Report' : 'Dashboard',
-        level: 1,
-        isCenter: false
-      });
-      edges.push({
-        source: asset._id || 'current',
-        target: downstreamId,
-        type: 'feeds'
-      });
-    }
-    
-    return { nodes, edges };
-  };
+  // Handle debounced search
 
   // Debounced search effect
   useEffect(() => {
@@ -880,8 +913,27 @@ const DataCatalog: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Search Section */}
-      <Box sx={{ mb: 4 }}>
+      {/* Advanced Search Section */}
+      <AdvancedSearch
+        onSearch={(query, advancedFilters) => {
+          setSearchText(query);
+          setFilters(prev => ({ ...prev, ...advancedFilters }));
+        }}
+        searchHistory={searchHistory}
+        availableFilters={{
+          types: assetTypes,
+          domains: Array.from(new Set(dataAssets.map(asset => asset.domain))).filter(Boolean),
+          owners: Array.from(new Set(dataAssets.map(asset => asset.owner))).filter(Boolean),
+          tags: Array.from(new Set(dataAssets.flatMap(asset => asset.tags || []))).filter(Boolean),
+          statuses: ['Active', 'Deprecated', 'Draft', 'Archived'],
+          certifications: ['certified', 'pending', 'uncertified']
+        }}
+        totalResults={totalAssets}
+        isLoading={loading}
+      />
+      
+      {/* Legacy Search Section - Hidden but kept for compatibility */}
+      <Box sx={{ mb: 4, display: 'none' }}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} sm>                
             <TextField
@@ -1830,10 +1882,10 @@ const DataCatalog: React.FC = () => {
         aria-labelledby="lineage-dialog-title"
       >
         <DialogTitle id="lineage-dialog-title">
-          Data Lineage: {selectedAssetForLineage?.name}
+          Data Lineage: {lineageAsset?.name}
         </DialogTitle>
         <DialogContent>
-          {selectedAssetForLineage && (
+          {lineageAsset && (
             <Box sx={{ p: 2 }}>
               {/* Lineage Visualization */}
               <Box sx={{ 
@@ -1846,7 +1898,7 @@ const DataCatalog: React.FC = () => {
                 overflow: 'hidden'
               }}>
                 {(() => {
-                  const lineageData = generateLineageData(selectedAssetForLineage);
+                  const lineageData = generateLineageData(lineageAsset);
                   const centerX = 400;
                   const centerY = 200;
                   const levelSpacing = 200;
@@ -1855,7 +1907,7 @@ const DataCatalog: React.FC = () => {
                   return (
                     <svg width="100%" height="400" viewBox="0 0 800 400">
                       {/* Render edges first */}
-                      {lineageData.edges.map((edge, index) => {
+                      {lineageData.links.map((edge, index) => {
                         const sourceNode = lineageData.nodes.find(n => n.id === edge.source);
                         const targetNode = lineageData.nodes.find(n => n.id === edge.target);
                         if (!sourceNode || !targetNode) return null;
@@ -1932,7 +1984,7 @@ const DataCatalog: React.FC = () => {
                               fontWeight="600"
                               fill={isCenter ? "white" : "#003366"}
                             >
-                              {node.label}
+                              {node.name}
                             </text>
                             <text
                               x={x}
@@ -2001,27 +2053,27 @@ const DataCatalog: React.FC = () => {
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="body2" color="text.secondary">
-                      <strong>Type:</strong> {selectedAssetForLineage.type}
+                      <strong>Type:</strong> {lineageAsset.type}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="body2" color="text.secondary">
-                      <strong>Domain:</strong> {selectedAssetForLineage.domain}
+                      <strong>Domain:</strong> {lineageAsset.domain}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="body2" color="text.secondary">
-                      <strong>Status:</strong> {selectedAssetForLineage.status}
+                      <strong>Status:</strong> {lineageAsset.status}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Typography variant="body2" color="text.secondary">
-                      <strong>Owner:</strong> {selectedAssetForLineage.owner || 'Not specified'}
+                      <strong>Owner:</strong> {lineageAsset.owner || 'Not specified'}
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
                     <Typography variant="body2" color="text.secondary">
-                      <strong>Description:</strong> {selectedAssetForLineage.description || 'No description available'}
+                      <strong>Description:</strong> {lineageAsset.description || 'No description available'}
                     </Typography>
                   </Grid>
                 </Grid>

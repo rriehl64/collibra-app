@@ -8,6 +8,8 @@ const {
   getSuggestions
 } = require('../controllers/dataAssets');
 
+const { getAssetLineage } = require('../controllers/dataLineageController');
+
 // Create router
 const router = express.Router();
 
@@ -25,5 +27,8 @@ router.route('/:id')
   .get(getDataAsset)
   .put(protect, authorize('admin', 'data-steward'), updateDataAsset)
   .delete(protect, authorize('admin'), deleteDataAsset);
+
+router.route('/:id/lineage')
+  .get(getAssetLineage);
 
 module.exports = router;

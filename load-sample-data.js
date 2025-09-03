@@ -2,7 +2,7 @@
  * Sample Data Loader Script for Data Literacy Support Application
  * 
  * This script adds sample data assets and related entities to the MongoDB database
- * to demonstrate the various asset types available in a Collibra-like data catalog.
+ * to demonstrate the various asset types available in a MATRIX-like data catalog.
  */
 
 const mongoose = require('mongoose');

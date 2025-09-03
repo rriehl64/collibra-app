@@ -49,7 +49,7 @@ const menuItems = [
   { text: 'Asset Types', icon: StorageIcon, path: '/asset-types' },
   { text: 'Data Governance', icon: SecurityIcon, path: '/data-governance' },
   { text: 'DG vs MDM', icon: SecurityIcon, path: '/dgvsmdm' },
-  { text: 'Data Steward', icon: SecurityIcon, path: '/data-steward' },
+  { text: 'Data Steward Lesson', icon: SecurityIcon, path: '/data-steward-lesson' },
   { text: 'Analytics', icon: AnalyticsIcon, path: '/analytics' },
   { text: 'Study Aids: Business Analytics', icon: AnalyticsIcon, path: '/study-aids/business-analytics' },
   { text: 'Integration', icon: IntegrationIcon, path: '/integration' },

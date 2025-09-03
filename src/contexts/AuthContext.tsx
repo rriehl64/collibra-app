@@ -84,11 +84,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Register function
-  const register = async (name: string, email: string, password: string, department?: string, jobTitle?: string) => {
+  const register = async (name: string, email: string, password: string, department?: string, jobTitle?: string, role: 'user' | 'data-steward' | 'admin' = 'user') => {
     setLoading(true);
     setError(null);
     try {
-      await authService.register({ name, email, password, department, jobTitle });
+      await authService.register({ name, email, password, department, jobTitle, role });
       const userData = await authService.getCurrentUser();
       setUser(userData);
     } catch (err) {

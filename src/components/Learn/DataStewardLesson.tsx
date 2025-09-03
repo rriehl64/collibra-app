@@ -60,7 +60,7 @@ const DataStewardLesson: React.FC = () => {
       items: [
         {
           icon: <SecurityIcon />,
-          text: 'Ensure adherence to data governance frameworks within Collibra',
+          text: 'Ensure adherence to data governance frameworks within MATRIX',
         },
         {
           icon: <SecurityIcon />,
@@ -94,7 +94,7 @@ const DataStewardLesson: React.FC = () => {
       items: [
         {
           icon: <TaskIcon />,
-          text: 'Manage daily tasks efficiently using Collibra Stewardship application',
+          text: 'Manage daily tasks efficiently using MATRIX Stewardship application',
         },
         {
           icon: <BugReportIcon />,
@@ -119,7 +119,7 @@ const DataStewardLesson: React.FC = () => {
         },
         {
           icon: <StorageIcon />,
-          text: 'Maintain data models within Collibra Data Intelligence Platform',
+          text: 'Maintain data models within MATRIX Data Intelligence Platform',
         },
       ],
     },
@@ -128,11 +128,11 @@ const DataStewardLesson: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Data Steward Role in Collibra
+        Data Steward Role in MATRIX
       </Typography>
       <Typography variant="subtitle1" paragraph>
-        In Collibra, data stewards play a crucial role in managing and maintaining an organization's data assets. 
-        The Collibra Stewardship application is specifically designed to help data stewards fulfill their 
+        In MATRIX, data stewards play a crucial role in managing and maintaining an organization's data assets. 
+        The MATRIX Stewardship application is specifically designed to help data stewards fulfill their 
         responsibilities effectively while ensuring data quality and governance across the enterprise.
       </Typography>
 

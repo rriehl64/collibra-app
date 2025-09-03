@@ -47,7 +47,7 @@ const PolicyManager: React.FC = () => {
 
   useEffect(() => {
     // Fetch the documentation content
-    fetch('http://localhost:3002/docs/collibra-workflows.md', {
+    fetch('http://localhost:3002/docs/matrix-workflows.md', {
       headers: {
         'Accept': 'text/markdown',
         'Content-Type': 'text/markdown',

@@ -31,6 +31,8 @@ const tts = require('./server/routes/tts');
 const weeklyStatus = require('./server/routes/weeklyStatus');
 const monthlyStatus = require('./server/routes/monthlyStatus');
 const projectTimeline = require('./server/routes/projectTimeline');
+const dataLineage = require('./server/routes/dataLineage');
+const tasks = require('./server/routes/tasks');
 
 const app = express();
 
@@ -136,6 +138,8 @@ app.use('/api/v1/tts', tts);
 app.use('/api/v1/weekly-status', weeklyStatus);
 app.use('/api/v1/monthly-status', monthlyStatus);
 app.use('/api/v1/project-timeline', projectTimeline);
+app.use('/api/v1/lineage', dataLineage);
+app.use('/api/v1/tasks', tasks);
 
 // Serve generated TTS audio cache
 app.use('/tts-cache', express.static(path.join(__dirname, 'public', 'tts-cache')));

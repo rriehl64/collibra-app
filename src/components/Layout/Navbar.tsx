@@ -26,7 +26,12 @@ import {
   Language,
   Help,
   Info,
-  MenuBook
+  MenuBook,
+  Dashboard,
+  People,
+  Assessment,
+  AccountTree,
+  AdminPanelSettings
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { styled, alpha } from '@mui/material/styles';
@@ -265,6 +270,82 @@ const Navbar = () => {
                   Data Strategy
                 </Button>
               </Tooltip>
+              <Tooltip title="Data Quality Dashboard">
+                <Button
+                  component={Link}
+                  to="/data-quality"
+                  size="small"
+                  startIcon={<Assessment />}
+                  sx={{
+                    color: '#003366',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
+                    '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
+                  }}
+                  aria-label="Data Quality Dashboard"
+                >
+                  Data Quality
+                </Button>
+              </Tooltip>
+              <Tooltip title="Data Lineage Visualization">
+                <Button
+                  component={Link}
+                  to="/data-lineage"
+                  size="small"
+                  startIcon={<AccountTree />}
+                  sx={{
+                    color: '#003366',
+                    textTransform: 'none',
+                    fontWeight: 500,
+                    '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
+                    '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
+                  }}
+                  aria-label="Data Lineage Visualization"
+                >
+                  Data Lineage
+                </Button>
+              </Tooltip>
+              {user && (user.role === 'admin' || user.role === 'data-steward') && (
+                <Tooltip title="Data Steward Control Center">
+                  <Button
+                    component={Link}
+                    to="/data-steward"
+                    size="small"
+                    startIcon={<AdminPanelSettings />}
+                    sx={{
+                      color: '#003366',
+                      textTransform: 'none',
+                      fontWeight: 500,
+                      '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
+                      '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
+                    }}
+                    aria-label="Data Steward Control Center"
+                  >
+                    Data Steward
+                  </Button>
+                </Tooltip>
+              )}
+              {user && (user.role === 'admin' || user.role === 'data-steward') && (
+                <Tooltip title="User Management">
+                  <Button
+                    component={Link}
+                    to="/access/user-management"
+                    size="small"
+                    startIcon={<People />}
+                    sx={{
+                      color: '#003366',
+                      textTransform: 'none',
+                      fontWeight: 500,
+                      '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
+                      '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
+                    }}
+                    aria-label="User Management"
+                  >
+                    Users
+                  </Button>
+                </Tooltip>
+              )}
               <Tooltip title="Help Center">
                 <Button
                   component={Link}

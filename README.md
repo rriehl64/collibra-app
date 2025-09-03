@@ -207,7 +207,7 @@ This application showcases how modern data governance tools can help teams:
 
 ### User Interface
 
-The application features a modern, responsive UI built with Material-UI (MUI) that follows Collibra's design guidelines and color scheme. The interface prioritizes usability and accessibility with:
+The application features a modern, responsive UI built with Material-UI (MUI) that follows MATRIX's design guidelines and color scheme. The interface prioritizes usability and accessibility with:
 
 - Intuitive navigation
 - Responsive design for all device sizes
@@ -242,7 +242,7 @@ The application features a modern, responsive UI built with Material-UI (MUI) th
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd collibra-app
+cd matrix-app
 
 # Install dependencies
 npm install
@@ -345,11 +345,11 @@ After logging in as an admin user, you'll see the main dashboard with data gover
 
 ### Learning Resources
 
-The application includes a comprehensive learning path with Collibra 101 courses:
+The application includes a comprehensive learning path with MATRIX 101 courses:
 
-![Collibra 101](./images/admin-dashboard.png)
+![MATRIX 101](./images/admin-dashboard.png)
 
-*The learning section offers structured courses on data intelligence fundamentals, governance best practices, data catalog management, business glossary usage, data quality monitoring, and Collibra Ranger. Each course includes interactive modules with progress tracking.*
+*The learning section offers structured courses on data intelligence fundamentals, governance best practices, data catalog management, business glossary usage, data quality monitoring, and MATRIX Ranger. Each course includes interactive modules with progress tracking.*
 
 
 The application consists of both a frontend React application and a backend Express server.

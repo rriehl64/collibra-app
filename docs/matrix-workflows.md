@@ -1,7 +1,7 @@
-# Collibra Automation with Workflows
+# MATRIX Automation with Workflows
 
 ## Overview
-Collibra Workflows provide a powerful automation framework that enables organizations to streamline their data governance processes, enforce data policies, and maintain data quality standards. These workflows can automate repetitive tasks, enforce business rules, and ensure consistency across the data governance lifecycle.
+MATRIX Workflows provide a powerful automation framework that enables organizations to streamline their data governance processes, enforce data policies, and maintain data quality standards. These workflows can automate repetitive tasks, enforce business rules, and ensure consistency across the data governance lifecycle.
 
 ## Key Components
 
@@ -237,7 +237,7 @@ Steps:
     action: transform.json
     input: ${previous.response}
     
-  - name: Update Collibra Assets
+  - name: Update MATRIX Assets
     action: asset.bulkUpdate
     input: ${previous.transformed}
 ```
@@ -1000,7 +1000,7 @@ Security:
 ## Getting Started
 
 ### 1. Prerequisites
-- Collibra Data Intelligence Cloud access
+- MATRIX Data Intelligence Cloud access
 - Appropriate user permissions
 - Understanding of business processes
 - Basic workflow concepts
@@ -1014,4 +1014,4 @@ Security:
 6. Monitor and maintain
 
 ## Conclusion
-Collibra Workflows provide a robust framework for automating data governance processes. By following best practices and leveraging the available features, organizations can significantly improve their data governance efficiency and effectiveness.
+MATRIX Workflows provide a robust framework for automating data governance processes. By following best practices and leveraging the available features, organizations can significantly improve their data governance efficiency and effectiveness.

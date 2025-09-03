@@ -38,7 +38,7 @@ interface LessonContentProps {
   isCompleted: boolean;
 }
 
-const CollibraRangerLesson: React.FC<LessonContentProps> = ({
+const MatrixRangerLesson: React.FC<LessonContentProps> = ({
   onBack,
   onComplete,
   isCompleted,
@@ -71,11 +71,11 @@ const CollibraRangerLesson: React.FC<LessonContentProps> = ({
 
       <Paper sx={{ p: 4, mb: 4 }}>
         <Typography variant="h4" gutterBottom>
-          Collibra Ranger: Data Discovery and Metadata Management
+          MATRIX Ranger: Data Discovery and Metadata Management
         </Typography>
         
         <Typography variant="body1" paragraph>
-          Collibra Ranger is a powerful tool for automated data discovery, metadata harvesting, 
+          MATRIX Ranger is a powerful tool for automated data discovery, metadata harvesting, 
           and data lineage tracking. Learn how to leverage Ranger for comprehensive data governance.
         </Typography>
 
@@ -339,7 +339,7 @@ const CollibraRangerLesson: React.FC<LessonContentProps> = ({
             </ListItemIcon>
             <ListItemText 
               primary="Integration is Key"
-              secondary="Connect Ranger with other Collibra tools for comprehensive governance"
+              secondary="Connect Ranger with other MATRIX tools for comprehensive governance"
             />
           </ListItem>
           <ListItem>
@@ -357,4 +357,4 @@ const CollibraRangerLesson: React.FC<LessonContentProps> = ({
   );
 };
 
-export default CollibraRangerLesson;
+export default MatrixRangerLesson;

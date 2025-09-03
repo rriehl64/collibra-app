@@ -61,7 +61,7 @@ const Home = () => {
               opacity: 0.9
             }}
           >
-            Discover, understand, and trust your data with Collibra's intelligent data governance solution
+            Discover, understand, and trust your data with MATRIX's intelligent data governance solution
           </Typography>
           <Box sx={{ mt: 4 }}>
             <Button
@@ -69,20 +69,13 @@ const Home = () => {
               color="primary"
               size="large"
               sx={{ mr: 2 }}
+              href="/data-steward"
             >
-              Take a tour
+              Data Steward Center
             </Button>
             <Button
               variant="outlined"
-              sx={{
-                backgroundColor: 'transparent',
-                borderColor: 'white',
-                color: 'white',
-                '&:hover': {
-                  borderColor: 'white',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                }
-              }}
+              color="primary"
               size="large"
             >
               Request a demo

@@ -68,6 +68,10 @@ import StudyAidsBusinessAnalytics from './pages/StudyAidsBusinessAnalytics';
 import WeeklyStatusList from './pages/WeeklyStatusList';
 import MonthlyStatusList from './pages/MonthlyStatusList';
 import DataGovernanceQuality from './pages/DataGovernanceQuality';
+import DataQuality from './pages/DataQuality';
+import UserManagement from './pages/UserManagement';
+import DataLineage from './pages/DataLineage';
+import DataStewardCenter from './pages/DataStewardCenter';
 
 // Import Auth Provider Context
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -174,7 +178,7 @@ function App() {
               <Route path="/national-production-dataset" element={<NationalProductionDataset />} />
               <Route path="/e22-classification" element={<E22Classification isAdmin={true} />} />
               <Route path="/dgvsmdm" element={<DGvsMDMLesson />} />
-              <Route path="/data-steward" element={<DataStewardLesson />} />
+              <Route path="/data-steward-lesson" element={<DataStewardLesson />} />
               <Route path="/about" element={<About />} />
               <Route path="/data-strategy-support" element={<DataStrategySupport />} />
               <Route path="/help" element={<Help />} />
@@ -216,6 +220,7 @@ function App() {
                 <Route path="/weekly-status" element={<WeeklyStatusList />} />
                 <Route path="/monthly-status" element={<MonthlyStatusList />} />
                 <Route path="/data-governance-quality" element={<DataGovernanceQuality />} />
+                <Route path="/data-quality" element={<DataQuality />} />
               </Route>
               
               {/* Data Steward Only Routes */}
@@ -223,6 +228,9 @@ function App() {
                 <Route path="/data-governance" element={<DataGovernance />} />
               </Route>
               
+              {/* Data Steward Routes - Direct access for testing */}
+              <Route path="/data-steward" element={<DataStewardCenter />} />
+
               {/* Admin Only Routes */}
               <Route element={<AdminRoute />}>
                 <Route path="/admin" element={<Outlet />}>
@@ -236,12 +244,16 @@ function App() {
                   <Route path="/admin/workflows" element={<Workflows />} />
                 </Route>
                 
+                {/* Data Management Routes */}
+                <Route path="/data-quality" element={<DataQuality />} />
+                <Route path="/data-lineage" element={<DataLineage />} />
+                
                 {/* Access Management Routes */}
                 <Route path="/access" element={<Outlet />}>
-                  <Route path="/access/users" element={<Users />} />
-                  <Route path="/access/roles" element={<Roles />} />
-                  <Route path="/access/permissions" element={<Permissions />} />
-                  <Route path="/access/jurisdictions" element={<Jurisdictions />} />
+                  <Route path="user-management" element={<UserManagement />} />
+                  <Route path="roles" element={<Roles />} />
+                  <Route path="permissions" element={<Permissions />} />
+                  <Route path="jurisdictions" element={<Jurisdictions />} />
                 </Route>
               </Route>
               
