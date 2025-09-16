@@ -33,6 +33,7 @@ const monthlyStatus = require('./server/routes/monthlyStatus');
 const projectTimeline = require('./server/routes/projectTimeline');
 const dataLineage = require('./server/routes/dataLineage');
 const tasks = require('./server/routes/tasks');
+const menuSettings = require('./server/routes/menuSettings');
 
 const app = express();
 
@@ -140,6 +141,7 @@ app.use('/api/v1/monthly-status', monthlyStatus);
 app.use('/api/v1/project-timeline', projectTimeline);
 app.use('/api/v1/lineage', dataLineage);
 app.use('/api/v1/tasks', tasks);
+app.use('/api/v1/menu-settings', menuSettings);
 
 // Serve generated TTS audio cache
 app.use('/tts-cache', express.static(path.join(__dirname, 'public', 'tts-cache')));

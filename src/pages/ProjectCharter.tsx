@@ -15,6 +15,8 @@ import {
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import DownloadIcon from '@mui/icons-material/Download';
 import api, { ApiResponse } from '../services/api';
 
 interface ProjectCharterDoc {
@@ -146,12 +148,52 @@ const ProjectCharter: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" sx={{ color: headingColor, fontWeight: 700 }} gutterBottom>
-        Project Charter Template (USCIS Styled)
-      </Typography>
-      <Typography variant="body2" color="text.secondary" gutterBottom>
-        Use USCIS blue ({headingColor}) for headings in slide exports. Ensure Section 508 compliance for shared versions.
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+        <Box>
+          <Typography variant="h4" sx={{ color: headingColor, fontWeight: 700 }} gutterBottom>
+            Project Charter Template (USCIS Styled)
+          </Typography>
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            Use USCIS blue ({headingColor}) for headings in slide exports. Ensure Section 508 compliance for shared versions.
+          </Typography>
+        </Box>
+        
+        <Box sx={{ display: 'flex', gap: 1, flexDirection: 'column', alignItems: 'flex-end' }}>
+          <Button
+            variant="outlined"
+            startIcon={<PictureAsPdfIcon />}
+            component={MuiLink}
+            href="/templates/project-charter-data-governance-app.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ 
+              borderColor: headingColor, 
+              color: headingColor,
+              '&:hover': {
+                borderColor: headingColor,
+                backgroundColor: `${headingColor}08`
+              }
+            }}
+            aria-label="Download Data Governance Project Charter PDF"
+          >
+            Data Governance Charter (PDF)
+          </Button>
+          
+          <Button
+            variant="text"
+            size="small"
+            startIcon={<DownloadIcon />}
+            component={MuiLink}
+            href="/templates/project-charter-template.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ color: headingColor }}
+            aria-label="View Project Charter Template Markdown"
+          >
+            Template (Markdown)
+          </Button>
+        </Box>
+      </Box>
 
       {/* Click-anywhere to edit card */}
       <Paper

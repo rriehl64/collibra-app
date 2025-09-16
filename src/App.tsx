@@ -72,6 +72,7 @@ import DataQuality from './pages/DataQuality';
 import UserManagement from './pages/UserManagement';
 import DataLineage from './pages/DataLineage';
 import DataStewardCenter from './pages/DataStewardCenter';
+import AdminMenuManagement from './pages/AdminMenuManagement';
 
 // Import Auth Provider Context
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -255,6 +256,9 @@ function App() {
                   <Route path="permissions" element={<Permissions />} />
                   <Route path="jurisdictions" element={<Jurisdictions />} />
                 </Route>
+                
+                {/* Admin Menu Management */}
+                <Route path="/admin/menu-management" element={<AdminMenuManagement />} />
               </Route>
               
               {/* Error Routes */}

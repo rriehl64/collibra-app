@@ -346,6 +346,26 @@ const Navbar = () => {
                   </Button>
                 </Tooltip>
               )}
+              {user && user.role === 'admin' && (
+                <Tooltip title="Menu Management">
+                  <Button
+                    component={Link}
+                    to="/admin/menu-management"
+                    size="small"
+                    startIcon={<Settings />}
+                    sx={{
+                      color: '#003366',
+                      textTransform: 'none',
+                      fontWeight: 500,
+                      '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
+                      '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
+                    }}
+                    aria-label="Menu Management"
+                  >
+                    Menu
+                  </Button>
+                </Tooltip>
+              )}
               <Tooltip title="Help Center">
                 <Button
                   component={Link}
