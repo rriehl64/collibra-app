@@ -85,13 +85,31 @@ const initializeMenuItems = async () => {
         console.log('E22 Classification is already enabled');
       }
       
+      // Add Team Roster menu item if it doesn't exist
+      const teamRosterItem = await MenuSettings.findOne({ menuId: 'team-roster' });
+      if (!teamRosterItem) {
+        console.log('Creating Team Roster menu item...');
+        await MenuSettings.create({
+          menuId: 'team-roster',
+          text: 'Team Roster',
+          path: '/admin/team-roster',
+          category: 'primary',
+          order: 16,
+          isEnabled: true,
+          requiredRole: 'user'
+        });
+        console.log('✅ Team Roster menu item created');
+      } else {
+        console.log('Team Roster menu item already exists');
+      }
+
       // Add Administration menu items if they don't exist
       const adminItems = [
-        { menuId: 'user-management', text: 'User Management', path: '/access/user-management', category: 'administration', order: 1, requiredRole: 'admin' },
-        { menuId: 'roles-permissions', text: 'Roles & Permissions', path: '/access/roles', category: 'administration', order: 2, requiredRole: 'admin' },
-        { menuId: 'jurisdictions', text: 'Jurisdictions', path: '/access/jurisdictions', category: 'administration', order: 3, requiredRole: 'admin' },
-        { menuId: 'menu-management', text: 'Menu Management', path: '/admin/menu-management', category: 'administration', order: 4, requiredRole: 'admin' },
-        { menuId: 'system-settings', text: 'System Settings', path: '/admin/system-settings', category: 'administration', order: 5, requiredRole: 'admin' }
+        { menuId: 'user-management', text: 'User Management', path: '/access/user-management', category: 'secondary', order: 1, requiredRole: 'admin' },
+        { menuId: 'roles-permissions', text: 'Roles & Permissions', path: '/access/roles', category: 'secondary', order: 2, requiredRole: 'admin' },
+        { menuId: 'jurisdictions', text: 'Jurisdictions', path: '/access/jurisdictions', category: 'secondary', order: 3, requiredRole: 'admin' },
+        { menuId: 'menu-management', text: 'Menu Management', path: '/admin/menu-management', category: 'secondary', order: 4, requiredRole: 'admin' },
+        { menuId: 'system-settings', text: 'System Settings', path: '/admin/system-settings', category: 'secondary', order: 5, requiredRole: 'admin' }
       ];
       
       let addedCount = 0;

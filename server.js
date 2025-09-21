@@ -34,6 +34,9 @@ const projectTimeline = require('./server/routes/projectTimeline');
 const dataLineage = require('./server/routes/dataLineage');
 const tasks = require('./server/routes/tasks');
 const menuSettings = require('./server/routes/menuSettings');
+const dataStrategyPlanning = require('./server/routes/dataStrategyPlanning');
+const federalDataStrategy = require('./server/routes/federalDataStrategy');
+const uscisTracking = require('./server/routes/uscisTracking');
 
 const app = express();
 
@@ -142,6 +145,9 @@ app.use('/api/v1/project-timeline', projectTimeline);
 app.use('/api/v1/lineage', dataLineage);
 app.use('/api/v1/tasks', tasks);
 app.use('/api/v1/menu-settings', menuSettings);
+app.use('/api/v1/data-strategy', dataStrategyPlanning);
+app.use('/api/v1/federal-data-strategy', federalDataStrategy);
+app.use('/api/v1/uscis-tracking', uscisTracking);
 
 // Serve generated TTS audio cache
 app.use('/tts-cache', express.static(path.join(__dirname, 'public', 'tts-cache')));

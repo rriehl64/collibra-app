@@ -48,6 +48,7 @@ import Permissions from './pages/access/Permissions';
 import Profile from './pages/Profile';
 import Jurisdictions from './pages/access/Jurisdictions';
 import Documentation from './pages/Documentation';
+import Compliance from './pages/Compliance';
 import Settings from './pages/Settings';
 import About from './pages/About';
 import TestPage from './pages/TestPage';
@@ -73,6 +74,11 @@ import UserManagement from './pages/UserManagement';
 import DataLineage from './pages/DataLineage';
 import DataStewardCenter from './pages/DataStewardCenter';
 import AdminMenuManagement from './pages/AdminMenuManagement';
+import DataStrategyPlanning from './pages/DataStrategyPlanning';
+import TeamRoster from './pages/TeamRoster';
+import OpenTasks from './pages/OpenTasks';
+import FederalDataStrategy from './pages/FederalDataStrategy';
+import USCISApplicationTracking from './pages/USCISApplicationTracking';
 
 // Import Auth Provider Context
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -222,6 +228,9 @@ function App() {
                 <Route path="/monthly-status" element={<MonthlyStatusList />} />
                 <Route path="/data-governance-quality" element={<DataGovernanceQuality />} />
                 <Route path="/data-quality" element={<DataQuality />} />
+                <Route path="/compliance" element={<Compliance />} />
+                <Route path="/tasks" element={<OpenTasks />} />
+                <Route path="/federal-data-strategy" element={<FederalDataStrategy />} />
               </Route>
               
               {/* Data Steward Only Routes */}
@@ -259,6 +268,15 @@ function App() {
                 
                 {/* Admin Menu Management */}
                 <Route path="/admin/menu-management" element={<AdminMenuManagement />} />
+                
+                {/* Data Strategy Planning */}
+                <Route path="/admin/data-strategy-planning" element={<DataStrategyPlanning />} />
+                
+                {/* USCIS Application Tracking */}
+                <Route path="/admin/uscis-application-tracking" element={<USCISApplicationTracking />} />
+                
+                {/* Team Roster */}
+                <Route path="/admin/team-roster" element={<TeamRoster />} />
               </Route>
               
               {/* Error Routes */}

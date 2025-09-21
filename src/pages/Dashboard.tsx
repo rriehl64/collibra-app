@@ -145,6 +145,11 @@ const Dashboard: React.FC = () => {
     }));
   };
 
+  // Format numbers with commas
+  const formatNumber = (num: number) => {
+    return num.toLocaleString();
+  };
+
   // Format timestamp to relative time
   const formatRelativeTime = (timestamp: Date) => {
     const now = new Date();
@@ -195,10 +200,11 @@ const Dashboard: React.FC = () => {
         </Box>
       ) : (
         <>
-          {/* Quick Access Links */}
+
+          {/* Stats Overview */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} md={6} lg={4}>
-              <Card
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper
                 role="button"
                 tabIndex={0}
                 aria-label="Open Data Strategy Support Services"
@@ -209,84 +215,6 @@ const Dashboard: React.FC = () => {
                     navigate('/data-strategy-support');
                   }
                 }}
-                sx={{
-                  cursor: 'pointer',
-                  outline: 'none',
-                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 },
-                }}
-              >
-                <CardHeader
-                  avatar={<MenuBookIcon color="primary" />}
-                  title={<Typography component="h2" variant="h6">Data Strategy Support</Typography>}
-                  subheader={<Typography variant="body2" color="text.secondary">Plan, govern, and execute your data strategy</Typography>}
-                />
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">
-                    Access the Data Strategy Plan, Capstone Project, and curated resources to drive agency-wide data outcomes.
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={6} lg={4}>
-              <Card
-                role="button"
-                tabIndex={0}
-                aria-label="Open Project Charter form"
-                onClick={() => navigate('/project-charter')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    navigate('/project-charter');
-                  }
-                }}
-                sx={{
-                  cursor: 'pointer',
-                  outline: 'none',
-                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 },
-                }}
-              >
-                <CardHeader
-                  avatar={<AssignmentIcon color="primary" />}
-                  title={<Typography component="h2" variant="h6">Project Charter</Typography>}
-                  subheader={<Typography variant="body2" color="text.secondary">Create and manage your USCIS-styled charters</Typography>}
-                />
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">
-                    Click to open the editable module form capturing problem statement, KPIs, scope, RACI, risks, and more.
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-
-          {/* Stats Overview */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: 140,
-                  backgroundColor: '#E3F2FD',
-                  borderRadius: 2
-                }}
-              >
-                <Typography variant="h6" gutterBottom component="div">
-                  Data Assets
-                </Typography>
-                <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-                  {dashboardMetrics?.dataAssets.total || 0}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  +{dashboardMetrics?.dataAssets.newThisMonth || 0} this month
-                </Typography>
-              </Paper>
-            </Grid>
-            
-            <Grid item xs={12} sm={6} md={3}>
-              <Paper
                 elevation={0}
                 sx={{
                   p: 2,
@@ -294,23 +222,113 @@ const Dashboard: React.FC = () => {
                   flexDirection: 'column',
                   height: 140,
                   backgroundColor: '#E8F5E9',
-                  borderRadius: 2
+                  borderRadius: 2,
+                  cursor: 'pointer',
+                  outline: 'none',
+                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 },
+                  '&:hover': { backgroundColor: '#E0F2E1' }
                 }}
               >
                 <Typography variant="h6" gutterBottom component="div">
-                  Data Domains
+                  Data Strategy Support
                 </Typography>
-                <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-                  {dashboardMetrics?.dataDomains.total || 0}
+                <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: '1.5rem' }}>
+                  <MenuBookIcon sx={{ fontSize: '2rem', mr: 1, verticalAlign: 'middle' }} />
+                  Plan & Execute
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {dashboardMetrics?.dataDomains.active || 0} active
+                  Access strategy resources
+                </Typography>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper
+                role="button"
+                tabIndex={0}
+                aria-label="View Data Assets catalog"
+                onClick={() => navigate('/data-catalog')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate('/data-catalog');
+                  }
+                }}
+                elevation={0}
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: 140,
+                  backgroundColor: '#E3F2FD',
+                  borderRadius: 2,
+                  cursor: 'pointer',
+                  outline: 'none',
+                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 },
+                  '&:hover': { backgroundColor: '#BBDEFB' }
+                }}
+              >
+                <Typography variant="h6" gutterBottom component="div">
+                  Data Assets
+                </Typography>
+                <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+                  {formatNumber(dashboardMetrics?.dataAssets.total || 0)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  +{formatNumber(dashboardMetrics?.dataAssets.newThisMonth || 0)} this month
                 </Typography>
               </Paper>
             </Grid>
             
             <Grid item xs={12} sm={6} md={3}>
               <Paper
+                role="button"
+                tabIndex={0}
+                aria-label="View Data Domains"
+                onClick={() => navigate('/assets/data-domains')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate('/assets/data-domains');
+                  }
+                }}
+                elevation={0}
+                sx={{
+                  p: 2,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: 140,
+                  backgroundColor: '#E8F5E9',
+                  borderRadius: 2,
+                  cursor: 'pointer',
+                  outline: 'none',
+                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 },
+                  '&:hover': { backgroundColor: '#C8E6C9' }
+                }}
+              >
+                <Typography variant="h6" gutterBottom component="div">
+                  Data Domains
+                </Typography>
+                <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+                  {formatNumber(dashboardMetrics?.dataDomains.total || 0)}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {formatNumber(dashboardMetrics?.dataDomains.active || 0)} active
+                </Typography>
+              </Paper>
+            </Grid>
+            
+            <Grid item xs={12} sm={6} md={3}>
+              <Paper
+                role="button"
+                tabIndex={0}
+                aria-label="View Compliance Dashboard"
+                onClick={() => navigate('/compliance')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate('/compliance');
+                  }
+                }}
                 elevation={0}
                 sx={{
                   p: 2,
@@ -318,7 +336,11 @@ const Dashboard: React.FC = () => {
                   flexDirection: 'column',
                   height: 140,
                   backgroundColor: '#FFF8E1',
-                  borderRadius: 2
+                  borderRadius: 2,
+                  cursor: 'pointer',
+                  outline: 'none',
+                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 },
+                  '&:hover': { backgroundColor: '#FFF3E0' }
                 }}
               >
                 <Typography variant="h6" gutterBottom component="div">
@@ -337,23 +359,44 @@ const Dashboard: React.FC = () => {
             <Grid item xs={12} sm={6} md={3}>
               <Paper
                 elevation={0}
+                onClick={() => navigate('/tasks')}
                 sx={{
                   p: 2,
                   display: 'flex',
                   flexDirection: 'column',
                   height: 140,
                   backgroundColor: '#F3E5F5',
-                  borderRadius: 2
+                  borderRadius: 2,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    backgroundColor: '#E1BEE7',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.12)'
+                  },
+                  '&:focus': {
+                    outline: '2px solid #003366',
+                    outlineOffset: '2px'
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label="Open Tasks - Click to view task management page"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    navigate('/tasks');
+                  }
                 }}
               >
                 <Typography variant="h6" gutterBottom component="div">
                   Open Tasks
                 </Typography>
                 <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-                  {dashboardMetrics?.tasks.open || 0}
+                  {formatNumber(dashboardMetrics?.tasks.open || 0)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {dashboardMetrics?.tasks.urgent || 0} urgent
+                  {formatNumber(dashboardMetrics?.tasks.urgent || 0)} urgent
                 </Typography>
               </Paper>
             </Grid>

@@ -12,6 +12,7 @@ import {
   MenuItem,
   Divider,
   ListItemIcon,
+  ListItemText,
   InputBase,
   Paper,
   IconButton,
@@ -31,7 +32,8 @@ import {
   People,
   Assessment,
   AccountTree,
-  AdminPanelSettings
+  AdminPanelSettings,
+  Assignment
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { styled, alpha } from '@mui/material/styles';
@@ -86,6 +88,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [settingsAnchorEl, setSettingsAnchorEl] = useState<null | HTMLElement>(null);
   
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -109,6 +112,19 @@ const Navbar = () => {
   const handleSettingsClick = () => {
     setAnchorEl(null);
     navigate('/settings');
+  };
+
+  const handleSettingsMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setSettingsAnchorEl(event.currentTarget);
+  };
+
+  const handleSettingsMenuClose = () => {
+    setSettingsAnchorEl(null);
+  };
+
+  const handleSettingsNavigation = (path: string) => {
+    setSettingsAnchorEl(null);
+    navigate(path);
   };
   
   const handleSearch = (event: React.FormEvent) => {
@@ -326,52 +342,11 @@ const Navbar = () => {
                   </Button>
                 </Tooltip>
               )}
-              {user && (user.role === 'admin' || user.role === 'data-steward') && (
-                <Tooltip title="User Management">
-                  <Button
-                    component={Link}
-                    to="/access/user-management"
-                    size="small"
-                    startIcon={<People />}
-                    sx={{
-                      color: '#003366',
-                      textTransform: 'none',
-                      fontWeight: 500,
-                      '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
-                      '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
-                    }}
-                    aria-label="User Management"
-                  >
-                    Users
-                  </Button>
-                </Tooltip>
-              )}
-              {user && user.role === 'admin' && (
-                <Tooltip title="Menu Management">
-                  <Button
-                    component={Link}
-                    to="/admin/menu-management"
-                    size="small"
-                    startIcon={<Settings />}
-                    sx={{
-                      color: '#003366',
-                      textTransform: 'none',
-                      fontWeight: 500,
-                      '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
-                      '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
-                    }}
-                    aria-label="Menu Management"
-                  >
-                    Menu
-                  </Button>
-                </Tooltip>
-              )}
-              <Tooltip title="Help Center">
+              <Tooltip title="Settings & Tools">
                 <Button
-                  component={Link}
-                  to="/help"
                   size="small"
-                  startIcon={<Help />}
+                  startIcon={<Settings />}
+                  onClick={handleSettingsMenuOpen}
                   sx={{
                     color: '#003366',
                     textTransform: 'none',
@@ -379,11 +354,60 @@ const Navbar = () => {
                     '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
                     '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
                   }}
-                  aria-label="Help Center"
+                  aria-label="Settings & Tools"
                 >
-                  Help
+                  Settings
                 </Button>
               </Tooltip>
+              <Menu
+                anchorEl={settingsAnchorEl}
+                open={Boolean(settingsAnchorEl)}
+                onClose={handleSettingsMenuClose}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              >
+                <MenuItem onClick={() => handleSettingsNavigation('/tasks')}>
+                  <ListItemIcon>
+                    <Assignment fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Open Tasks</ListItemText>
+                </MenuItem>
+                {user && (user.role === 'admin' || user.role === 'data-steward') && (
+                  <MenuItem onClick={() => handleSettingsNavigation('/access/user-management')}>
+                    <ListItemIcon>
+                      <People fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Users</ListItemText>
+                  </MenuItem>
+                )}
+                {user && user.role === 'admin' && (
+                  <MenuItem onClick={() => handleSettingsNavigation('/admin/menu-management')}>
+                    <ListItemIcon>
+                      <Settings fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Menu</ListItemText>
+                  </MenuItem>
+                )}
+                <Divider />
+                <MenuItem onClick={() => handleSettingsNavigation('/settings')}>
+                  <ListItemIcon>
+                    <Settings fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>App Settings</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => handleSettingsNavigation('/help')}>
+                  <ListItemIcon>
+                    <Help fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Help Center</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => handleSettingsNavigation('/federal-data-strategy')}>
+                  <ListItemIcon>
+                    <MenuBook fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Federal Data Strategy</ListItemText>
+                </MenuItem>
+              </Menu>
             </Box>
             
             {/* Right side: Sign In/Admin User */}
