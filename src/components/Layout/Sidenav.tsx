@@ -100,6 +100,9 @@ const getIconForMenuItem = (menuId: string, path: string): React.ComponentType =
     '/access/jurisdictions': JurisdictionIcon,
     '/admin/menu-management': MenuIcon,
     '/admin/system-settings': SettingsIcon,
+    '/admin/uscis-application-tracking': AssignmentIndIcon,
+    '/admin/data-strategy-planning': GovernanceIcon,
+    '/admin/team-roster': PeopleIcon,
     '/federal-data-strategy': GovernanceIcon,
     '/tasks': AssignmentIndIcon,
   };

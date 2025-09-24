@@ -2685,7 +2685,7 @@ const USCISApplicationTracking: React.FC = () => {
             <Card>
               <CardContent>
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                  DHS Chat - Natural Language Query Interface
+                  DHS Chat - Interface
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                   Ask questions about application status, processing times, backlogs, and trends in natural language.

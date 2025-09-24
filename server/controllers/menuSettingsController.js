@@ -21,12 +21,13 @@ exports.getMenuSettings = asyncHandler(async (req, res, next) => {
 exports.getEnabledMenuItems = asyncHandler(async (req, res, next) => {
   const userRole = req.user?.role || 'user';
   
+  // In development mode, include admin items for testing
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  const rolesToInclude = isDevelopment ? ['user', 'data-steward', 'admin'] : ['user', userRole];
+  
   const enabledMenus = await MenuSettings.find({
     isEnabled: true,
-    $or: [
-      { requiredRole: 'user' },
-      { requiredRole: userRole }
-    ]
+    requiredRole: { $in: rolesToInclude }
   }).sort({ category: 1, order: 1 });
   
   res.status(200).json({
