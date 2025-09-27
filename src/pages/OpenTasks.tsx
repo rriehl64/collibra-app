@@ -30,7 +30,8 @@ import {
   CircularProgress,
   Menu,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Container
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -45,7 +46,8 @@ import {
   MoreVert as MoreVertIcon,
   Person as PersonIcon,
   CalendarToday as CalendarIcon,
-  Flag as PriorityIcon
+  Flag as PriorityIcon,
+  Schedule as ScheduleIcon
 } from '@mui/icons-material';
 import taskService, { Task, CreateTaskData, UpdateTaskData } from '../services/taskService';
 import { useAuth } from '../contexts/AuthContext';
@@ -274,7 +276,7 @@ const OpenTasks: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Header */}
       <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box>
@@ -297,52 +299,52 @@ const OpenTasks: React.FC = () => {
       </Box>
 
       {/* Metrics Cards */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card elevation={0} sx={{ backgroundColor: '#E3F2FD', height: '100%' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Total Tasks</Typography>
-              <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+          <Card elevation={0} sx={{ backgroundColor: '#E3F2FD' }}>
+            <CardContent sx={{ py: 2, px: 2, '&:last-child': { pb: 2 } }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontSize: '0.875rem' }}>Total Tasks</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
                 {metrics.total}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card elevation={0} sx={{ backgroundColor: '#E8F5E9', height: '100%' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Open</Typography>
-              <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#388e3c' }}>
+          <Card elevation={0} sx={{ backgroundColor: '#E8F5E9' }}>
+            <CardContent sx={{ py: 2, px: 2, '&:last-child': { pb: 2 } }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontSize: '0.875rem' }}>Open</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#388e3c' }}>
                 {metrics.open}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card elevation={0} sx={{ backgroundColor: '#FFF3E0', height: '100%' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>In Progress</Typography>
-              <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#f57c00' }}>
+          <Card elevation={0} sx={{ backgroundColor: '#FFF3E0' }}>
+            <CardContent sx={{ py: 2, px: 2, '&:last-child': { pb: 2 } }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontSize: '0.875rem' }}>In Progress</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#f57c00' }}>
                 {metrics.inProgress}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card elevation={0} sx={{ backgroundColor: '#E8F5E9', height: '100%' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Completed</Typography>
-              <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#4caf50' }}>
+          <Card elevation={0} sx={{ backgroundColor: '#E8F5E9' }}>
+            <CardContent sx={{ py: 2, px: 2, '&:last-child': { pb: 2 } }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontSize: '0.875rem' }}>Completed</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#4caf50' }}>
                 {metrics.completed}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card elevation={0} sx={{ backgroundColor: '#FFEBEE', height: '100%' }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>Overdue</Typography>
-              <Typography variant="h3" sx={{ fontWeight: 'bold', color: '#d32f2f' }}>
+          <Card elevation={0} sx={{ backgroundColor: '#FFEBEE' }}>
+            <CardContent sx={{ py: 2, px: 2, '&:last-child': { pb: 2 } }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontSize: '0.875rem' }}>Overdue</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#d32f2f' }}>
                 {metrics.overdue}
               </Typography>
             </CardContent>
@@ -444,46 +446,84 @@ const OpenTasks: React.FC = () => {
         </Grid>
       </Paper>
 
-      {/* Tasks Table */}
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Tasks ({filteredTasks.length})
-        </Typography>
+      {/* Tasks Cards */}
+      <Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography variant="h6">
+            Tasks ({filteredTasks.length})
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+            Click anywhere on a task card to edit
+          </Typography>
+        </Box>
         
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Task</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Priority</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell>Assignee</TableCell>
-                <TableCell>Due Date</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredTasks.map((task) => (
-                <TableRow key={task._id} hover>
-                  <TableCell>
-                    <Box>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                        {task.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" noWrap>
-                        {task.description}
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
+        <Grid container spacing={3}>
+          {filteredTasks.map((task) => (
+            <Grid item xs={12} sm={6} md={4} key={task._id}>
+              <Card 
+                sx={{
+                  cursor: 'pointer',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  '&:hover': { 
+                    transform: 'translateY(-2px)', 
+                    boxShadow: 3,
+                    backgroundColor: '#f8f9fa' 
+                  },
+                  '&:focus-within': { 
+                    outline: '2px solid #003366', 
+                    outlineOffset: '2px' 
+                  },
+                  border: isOverdue(task.dueDate, task.status) ? '2px solid #d32f2f' : '1px solid #e0e0e0'
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label={`Edit task ${task.title}`}
+                onClick={() => openEditDialog(task)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openEditDialog(task);
+                  }
+                }}
+              >
+                <CardContent sx={{ flexGrow: 1, pb: 1 }}>
+                  {/* Header with Title and Actions */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Typography variant="h6" component="h3" sx={{ 
+                      fontWeight: 'bold', 
+                      color: '#003366',
+                      flex: 1,
+                      mr: 1
+                    }}>
+                      {task.title}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMenuClick(e, task);
+                      }}
+                      aria-label="Task actions"
+                      sx={{ mt: -1 }}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                  </Box>
+
+                  {/* Description */}
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: '2.5em' }}>
+                    {task.description || 'No description provided'}
+                  </Typography>
+
+                  {/* Status and Priority */}
+                  <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
                     <Chip
                       label={task.status}
                       color={getStatusColor(task.status) as any}
                       size="small"
                     />
-                  </TableCell>
-                  <TableCell>
                     <Chip
                       label={task.priority}
                       size="small"
@@ -492,48 +532,83 @@ const OpenTasks: React.FC = () => {
                         color: 'white'
                       }}
                     />
-                  </TableCell>
-                  <TableCell>{task.taskType}</TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <PersonIcon sx={{ mr: 1, fontSize: 16 }} />
-                      {task.assignee?.name || 'Unassigned'}
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <CalendarIcon sx={{ mr: 1, fontSize: 16 }} />
-                      <Typography 
-                        variant="body2" 
-                        color={isOverdue(task.dueDate, task.status) ? 'error' : 'inherit'}
-                      >
-                        {formatDate(task.dueDate)}
+                  </Box>
+
+                  {/* Task Type */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <TaskIcon sx={{ mr: 1, fontSize: 16, color: '#666' }} />
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Type:</strong> {task.taskType}
+                    </Typography>
+                  </Box>
+
+                  {/* Assignee */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <PersonIcon sx={{ mr: 1, fontSize: 16, color: '#666' }} />
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Assignee:</strong> {task.assignee?.name || 'Unassigned'}
+                    </Typography>
+                  </Box>
+
+                  {/* Due Date */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <CalendarIcon sx={{ mr: 1, fontSize: 16, color: '#666' }} />
+                    <Typography 
+                      variant="body2" 
+                      color={isOverdue(task.dueDate, task.status) ? 'error' : 'text.secondary'}
+                      sx={{ fontWeight: isOverdue(task.dueDate, task.status) ? 'bold' : 'normal' }}
+                    >
+                      <strong>Due:</strong> {formatDate(task.dueDate)}
+                      {isOverdue(task.dueDate, task.status) && ' (Overdue)'}
+                    </Typography>
+                  </Box>
+
+                  {/* Created Date */}
+                  {task.createdAt && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                      <ScheduleIcon sx={{ mr: 1, fontSize: 16, color: '#666' }} />
+                      <Typography variant="body2" color="text.secondary">
+                        <strong>Created:</strong> {formatDate(task.createdAt)}
                       </Typography>
                     </Box>
-                  </TableCell>
-                  <TableCell>
-                    <IconButton
-                      size="small"
-                      onClick={(e) => handleMenuClick(e, task)}
-                      aria-label="Task actions"
-                    >
-                      <MoreVertIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                  )}
+
+                  {/* Progress Indicator for In Progress tasks */}
+                  {task.status === 'In Progress' && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
+                        Task in progress
+                      </Typography>
+                      <Box sx={{ width: '100%', bgcolor: '#e0e0e0', borderRadius: 1, height: 4 }}>
+                        <Box 
+                          sx={{ 
+                            width: '60%', // You could make this dynamic based on actual progress
+                            bgcolor: '#f57c00', 
+                            height: '100%', 
+                            borderRadius: 1 
+                          }} 
+                        />
+                      </Box>
+                    </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
 
         {filteredTasks.length === 0 && (
-          <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant="body1" color="text.secondary">
-              No tasks match the current filters
+          <Paper sx={{ p: 4, textAlign: 'center' }}>
+            <TaskIcon sx={{ fontSize: 48, color: '#ccc', mb: 2 }} />
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              No tasks found
             </Typography>
-          </Box>
+            <Typography variant="body2" color="text.secondary">
+              No tasks match the current filters. Try adjusting your search criteria or create a new task.
+            </Typography>
+          </Paper>
         )}
-      </Paper>
+      </Box>
 
       {/* Action Menu */}
       <Menu
@@ -762,7 +837,7 @@ const OpenTasks: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Container>
   );
 };
 

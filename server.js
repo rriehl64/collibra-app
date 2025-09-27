@@ -37,6 +37,13 @@ const menuSettings = require('./server/routes/menuSettings');
 const dataStrategyPlanning = require('./server/routes/dataStrategyPlanning');
 const federalDataStrategy = require('./server/routes/federalDataStrategy');
 const uscisTracking = require('./server/routes/uscisTracking');
+const dataQuality = require('./server/routes/dataQuality');
+const projects = require('./server/routes/projects');
+const teamUtilization = require('./server/routes/teamUtilization');
+const compliance = require('./server/routes/compliance');
+const automatedProcesses = require('./server/routes/automatedProcesses');
+const processMonitoring = require('./server/routes/processMonitoring');
+const domains = require('./server/routes/domains');
 
 const app = express();
 
@@ -148,6 +155,13 @@ app.use('/api/v1/menu-settings', menuSettings);
 app.use('/api/v1/data-strategy', dataStrategyPlanning);
 app.use('/api/v1/federal-data-strategy', federalDataStrategy);
 app.use('/api/v1/uscis-tracking', uscisTracking);
+app.use('/api/v1/data-quality', dataQuality);
+app.use('/api/v1/projects', projects);
+app.use('/api/v1/team-utilization', teamUtilization);
+app.use('/api/v1/compliance', compliance);
+app.use('/api/v1/automated-processes', automatedProcesses);
+app.use('/api/v1/process-monitoring', processMonitoring);
+app.use('/api/v1/domains', domains);
 
 // Serve generated TTS audio cache
 app.use('/tts-cache', express.static(path.join(__dirname, 'public', 'tts-cache')));

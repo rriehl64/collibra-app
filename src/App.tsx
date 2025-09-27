@@ -79,6 +79,13 @@ import TeamRoster from './pages/TeamRoster';
 import OpenTasks from './pages/OpenTasks';
 import FederalDataStrategy from './pages/FederalDataStrategy';
 import USCISApplicationTracking from './pages/USCISApplicationTracking';
+import DataStrategyOperationsCenter from './pages/DataStrategyOperationsCenter';
+import ProjectDetails from './pages/ProjectDetails';
+import TeamUtilizationDetails from './pages/TeamUtilizationDetails';
+import ComplianceDetails from './pages/ComplianceDetails';
+import AutomatedProcesses from './pages/AutomatedProcesses';
+import ScheduledProcessesPage from './pages/ScheduledProcessesPage';
+import ProcessMonitoring from './components/ProcessMonitoring';
 
 // Import Auth Provider Context
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -274,6 +281,21 @@ function App() {
                 
                 {/* USCIS Application Tracking */}
                 <Route path="/admin/uscis-application-tracking" element={<USCISApplicationTracking />} />
+                
+                {/* Data Strategy Operations Center */}
+                <Route path="/admin/data-strategy-operations-center" element={<DataStrategyOperationsCenter />} />
+            <Route path="/admin/project-details" element={<ProjectDetails />} />
+            <Route path="/admin/team-utilization-details" element={<TeamUtilizationDetails />} />
+            <Route path="/admin/compliance-details" element={<ComplianceDetails />} />
+                
+                {/* Automated Processes */}
+                <Route path="/admin/automated-processes" element={<AutomatedProcesses />} />
+                
+                {/* Scheduled Processes (standalone access) */}
+                <Route path="/admin/scheduled-processes" element={<ScheduledProcessesPage />} />
+                
+                {/* Process Monitoring */}
+                <Route path="/admin/process-monitoring" element={<ProcessMonitoring />} />
                 
                 {/* Team Roster */}
                 <Route path="/admin/team-roster" element={<TeamRoster />} />

@@ -79,6 +79,11 @@ const Dashboard: React.FC = () => {
   const [recentAssets, setRecentAssets] = useState<any[]>([]);
   const [dashboardMetrics, setDashboardMetrics] = useState<DashboardMetrics | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
+  
+  // Interactive enhancements: Animation and loading states
+  const [announcementText, setAnnouncementText] = useState('');
+  const [cardLoadingStates, setCardLoadingStates] = useState<{[key: string]: boolean}>({});
+  const [animationTrigger, setAnimationTrigger] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -106,7 +111,47 @@ const Dashboard: React.FC = () => {
     };
 
     fetchDashboardData();
+    
+    // Set up auto-refresh every 30 seconds to keep data current
+    const refreshInterval = setInterval(fetchDashboardData, 30000);
+    
+    // Cleanup interval on component unmount
+    return () => clearInterval(refreshInterval);
   }, []);
+
+  // Trigger entrance animations on mount
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimationTrigger(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Interactive enhancement functions
+  const handleCardFocus = (cardName: string, value: string | number | null) => {
+    const announcement = `${cardName} card focused. Current value: ${value || 'No data available'}. Press Enter or Space to view details.`;
+    setAnnouncementText(announcement);
+  };
+
+  const handleCardClick = (cardName: string, onClick: () => void) => {
+    setCardLoadingStates(prev => ({ ...prev, [cardName]: true }));
+    setAnnouncementText(`Loading ${cardName} details...`);
+    
+    // Simulate loading state
+    setTimeout(() => {
+      setCardLoadingStates(prev => ({ ...prev, [cardName]: false }));
+      onClick();
+    }, 800);
+  };
+
+  const handleCardKeyDown = (event: React.KeyboardEvent, onClick: () => void, cardName: string) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleCardClick(cardName, onClick);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      (event.target as HTMLElement).blur();
+      setAnnouncementText(`${cardName} card unfocused`);
+    }
+  };
 
   // Chart configuration - expanded color palette for better distribution
   const COLORS = [
@@ -200,86 +245,283 @@ const Dashboard: React.FC = () => {
         </Box>
       ) : (
         <>
+          {/* CSS Animations */}
+          <style>
+            {`
+              @keyframes shimmer {
+                0% { left: -100%; }
+                100% { left: 100%; }
+              }
+              @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.7; }
+              }
+              @keyframes countUp {
+                0% { transform: translateY(20px); opacity: 0; }
+                100% { transform: translateY(0); opacity: 1; }
+              }
+            `}
+          </style>
+
+          {/* Screen reader announcements */}
+          <div 
+            aria-live="polite" 
+            aria-atomic="true"
+            style={{ 
+              position: 'absolute', 
+              left: '-10000px', 
+              width: '1px', 
+              height: '1px', 
+              overflow: 'hidden' 
+            }}
+          >
+            {announcementText}
+          </div>
 
           {/* Stats Overview */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
+          <Grid container spacing={2} sx={{ mb: 4 }}>
+            <Grid item xs={12} sm={6} md={2.4}>
               <Paper
                 role="button"
                 tabIndex={0}
-                aria-label="Open Data Strategy Support Services"
-                onClick={() => navigate('/data-strategy-support')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    navigate('/data-strategy-support');
-                  }
-                }}
+                aria-labelledby="data-strategy-label"
+                aria-describedby="data-strategy-description"
+                onClick={() => handleCardClick('Data Strategy Support', () => navigate('/data-strategy-support'))}
+                onFocus={() => handleCardFocus('Data Strategy Support', 'Plan & Execute')}
+                onKeyDown={(e) => handleCardKeyDown(e, () => navigate('/data-strategy-support'), 'Data Strategy Support')}
                 elevation={0}
                 sx={{
-                  p: 2,
+                  textAlign: 'center',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  background: 'linear-gradient(135deg, #4caf5008 0%, #4caf5015 100%)',
+                  border: '2px solid #4caf50',
+                  borderRadius: 3,
+                  boxShadow: '0 4px 12px rgba(0, 51, 102, 0.08)',
+                  transform: animationTrigger ? 'translateY(0)' : 'translateY(20px)',
+                  opacity: animationTrigger ? 1 : 0,
+                  transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transitionDelay: '0.1s',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    transform: animationTrigger ? 'translateY(-4px) scale(1.02)' : 'translateY(20px)',
+                    boxShadow: '0 12px 32px rgba(0, 51, 102, 0.18)',
+                    borderColor: '#4caf50',
+                    '&::before': {
+                      height: '6px'
+                    }
+                  },
+                  '&:focus': {
+                    outline: '3px solid #005fcc',
+                    outlineOffset: '2px',
+                    transform: animationTrigger ? 'translateY(-2px) scale(1.01)' : 'translateY(20px)',
+                    boxShadow: '0 8px 24px rgba(0, 51, 102, 0.2)'
+                  },
+                  '&:active': {
+                    transform: animationTrigger ? 'translateY(-1px) scale(0.98)' : 'translateY(20px)',
+                    transition: 'all 0.1s cubic-bezier(0.4, 0, 0.2, 1)'
+                  },
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    background: 'linear-gradient(90deg, #4caf50 0%, #4caf5080 100%)',
+                    borderRadius: '3px 3px 0 0',
+                    transition: 'height 0.3s ease'
+                  },
+                  '&::after': cardLoadingStates['Data Strategy Support'] ? {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+                    animation: 'shimmer 1.5s infinite'
+                  } : {},
+                  p: '12px 8px 8px !important',
                   display: 'flex',
                   flexDirection: 'column',
-                  height: 140,
-                  backgroundColor: '#E8F5E9',
-                  borderRadius: 2,
-                  cursor: 'pointer',
-                  outline: 'none',
-                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 },
-                  '&:hover': { backgroundColor: '#E0F2E1' }
+                  height: 140
                 }}
               >
-                <Typography variant="h6" gutterBottom component="div">
+                <Typography variant="subtitle2" gutterBottom component="div" sx={{ fontSize: '0.95rem', fontWeight: 600 }}>
                   Data Strategy Support
                 </Typography>
-                <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: '1.5rem' }}>
-                  <MenuBookIcon sx={{ fontSize: '2rem', mr: 1, verticalAlign: 'middle' }} />
+                <Typography variant="h4" component="div" sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: '1.6rem', mb: 0.5 }}>
+                  <MenuBookIcon sx={{ fontSize: '1.9rem', mr: 0.5, verticalAlign: 'middle' }} />
                   Plan & Execute
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
                   Access strategy resources
                 </Typography>
               </Paper>
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={2.4}>
               <Paper
                 role="button"
                 tabIndex={0}
-                aria-label="View Data Assets catalog"
-                onClick={() => navigate('/data-catalog')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    navigate('/data-catalog');
-                  }
-                }}
+                aria-labelledby="data-assets-label"
+                aria-describedby="data-assets-value data-assets-description"
+                onClick={() => handleCardClick('Data Assets', () => navigate('/data-catalog'))}
+                onFocus={() => handleCardFocus('Data Assets', formatNumber(dashboardMetrics?.dataAssets.total || 0))}
+                onKeyDown={(e) => handleCardKeyDown(e, () => navigate('/data-catalog'), 'Data Assets')}
                 elevation={0}
                 sx={{
-                  p: 2,
+                  textAlign: 'center',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  background: 'linear-gradient(135deg, #1976d208 0%, #1976d215 100%)',
+                  border: '2px solid #1976d2',
+                  borderRadius: 3,
+                  boxShadow: '0 4px 12px rgba(0, 51, 102, 0.08)',
+                  transform: animationTrigger ? 'translateY(0)' : 'translateY(20px)',
+                  opacity: animationTrigger ? 1 : 0,
+                  transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transitionDelay: '0.2s',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    transform: animationTrigger ? 'translateY(-4px) scale(1.02)' : 'translateY(20px)',
+                    boxShadow: '0 12px 32px rgba(0, 51, 102, 0.18)',
+                    borderColor: '#1976d2',
+                    '&::before': {
+                      height: '6px'
+                    }
+                  },
+                  '&:focus': {
+                    outline: '3px solid #005fcc',
+                    outlineOffset: '2px',
+                    transform: animationTrigger ? 'translateY(-2px) scale(1.01)' : 'translateY(20px)',
+                    boxShadow: '0 8px 24px rgba(0, 51, 102, 0.2)'
+                  },
+                  '&:active': {
+                    transform: animationTrigger ? 'translateY(-1px) scale(0.98)' : 'translateY(20px)',
+                    transition: 'all 0.1s cubic-bezier(0.4, 0, 0.2, 1)'
+                  },
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    background: 'linear-gradient(90deg, #1976d2 0%, #1976d280 100%)',
+                    borderRadius: '3px 3px 0 0',
+                    transition: 'height 0.3s ease'
+                  },
+                  '&::after': cardLoadingStates['Data Assets'] ? {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+                    animation: 'shimmer 1.5s infinite'
+                  } : {},
+                  p: '12px 8px 8px !important',
                   display: 'flex',
                   flexDirection: 'column',
-                  height: 140,
-                  backgroundColor: '#E3F2FD',
-                  borderRadius: 2,
-                  cursor: 'pointer',
-                  outline: 'none',
-                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 },
-                  '&:hover': { backgroundColor: '#BBDEFB' }
+                  height: 140
                 }}
               >
-                <Typography variant="h6" gutterBottom component="div">
+                <Typography variant="subtitle2" gutterBottom component="div" sx={{ fontSize: '0.95rem', fontWeight: 600 }}>
                   Data Assets
                 </Typography>
-                <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+                <Typography variant="h4" component="div" sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: '2.6rem', mb: 0.5 }}>
                   {formatNumber(dashboardMetrics?.dataAssets.total || 0)}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
                   +{formatNumber(dashboardMetrics?.dataAssets.newThisMonth || 0)} this month
                 </Typography>
               </Paper>
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={2.4}>
+              <Paper
+                role="button"
+                tabIndex={0}
+                aria-labelledby="compliance-label"
+                aria-describedby="compliance-value compliance-description"
+                onClick={() => handleCardClick('Compliance', () => navigate('/compliance'))}
+                onFocus={() => handleCardFocus('Compliance', `${dashboardMetrics?.compliance.percentage || 0}%`)}
+                onKeyDown={(e) => handleCardKeyDown(e, () => navigate('/compliance'), 'Compliance')}
+                elevation={0}
+                sx={{
+                  textAlign: 'center',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  background: 'linear-gradient(135deg, #ff980008 0%, #ff980015 100%)',
+                  border: '2px solid #ff9800',
+                  borderRadius: 3,
+                  boxShadow: '0 4px 12px rgba(0, 51, 102, 0.08)',
+                  transform: animationTrigger ? 'translateY(0)' : 'translateY(20px)',
+                  opacity: animationTrigger ? 1 : 0,
+                  transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transitionDelay: '0.4s',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    transform: animationTrigger ? 'translateY(-4px) scale(1.02)' : 'translateY(20px)',
+                    boxShadow: '0 12px 32px rgba(0, 51, 102, 0.18)',
+                    borderColor: '#ff9800',
+                    '&::before': {
+                      height: '6px'
+                    }
+                  },
+                  '&:focus': {
+                    outline: '3px solid #005fcc',
+                    outlineOffset: '2px',
+                    transform: animationTrigger ? 'translateY(-2px) scale(1.01)' : 'translateY(20px)',
+                    boxShadow: '0 8px 24px rgba(0, 51, 102, 0.2)'
+                  },
+                  '&:active': {
+                    transform: animationTrigger ? 'translateY(-1px) scale(0.98)' : 'translateY(20px)',
+                    transition: 'all 0.1s cubic-bezier(0.4, 0, 0.2, 1)'
+                  },
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    background: 'linear-gradient(90deg, #ff9800 0%, #ff980080 100%)',
+                    borderRadius: '3px 3px 0 0',
+                    transition: 'height 0.3s ease'
+                  },
+                  '&::after': cardLoadingStates['Compliance'] ? {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+                    animation: 'shimmer 1.5s infinite'
+                  } : {},
+                  p: '12px 8px 8px !important',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: 140
+                }}
+              >
+                <Typography variant="subtitle2" gutterBottom component="div" sx={{ fontSize: '0.95rem', fontWeight: 600 }}>
+                  Compliance
+                </Typography>
+                <Typography variant="h4" component="div" sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: '2.6rem', mb: 0.5 }}>
+                  {dashboardMetrics?.compliance.percentage || 0}%
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                  {dashboardMetrics && dashboardMetrics.compliance.changeFromLastMonth > 0 ? '+' : ''}
+                  {dashboardMetrics?.compliance.changeFromLastMonth || 0}% from last month
+                </Typography>
+              </Paper>
+            </Grid>
+            
+            <Grid item xs={12} sm={6} md={2.4}>
               <Paper
                 role="button"
                 tabIndex={0}
@@ -293,109 +535,120 @@ const Dashboard: React.FC = () => {
                 }}
                 elevation={0}
                 sx={{
-                  p: 2,
+                  textAlign: 'center',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  background: 'linear-gradient(135deg, #fbc02d08 0%, #fbc02d15 100%)',
+                  border: '2px solid #fbc02d',
+                  borderRadius: 3,
+                  boxShadow: '0 4px 12px rgba(0, 51, 102, 0.08)',
+                  transform: animationTrigger ? 'translateY(0)' : 'translateY(20px)',
+                  opacity: animationTrigger ? 1 : 0,
+                  transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transitionDelay: '0.4s',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    transform: animationTrigger ? 'translateY(-4px) scale(1.02)' : 'translateY(20px)',
+                    boxShadow: '0 12px 32px rgba(0, 51, 102, 0.18)',
+                    borderColor: '#fbc02d'
+                  },
+                  '&:focus': {
+                    outline: '3px solid #005fcc',
+                    outlineOffset: '2px'
+                  },
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    background: 'linear-gradient(90deg, #fbc02d 0%, #fbc02d80 100%)',
+                    borderRadius: '3px 3px 0 0'
+                  },
+                  p: '12px 8px 8px !important',
                   display: 'flex',
                   flexDirection: 'column',
-                  height: 140,
-                  backgroundColor: '#E8F5E9',
-                  borderRadius: 2,
-                  cursor: 'pointer',
-                  outline: 'none',
-                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 },
-                  '&:hover': { backgroundColor: '#C8E6C9' }
+                  height: 140
                 }}
               >
-                <Typography variant="h6" gutterBottom component="div">
+                <Typography variant="subtitle2" gutterBottom component="div" sx={{ fontSize: '0.95rem', fontWeight: 600 }}>
                   Data Domains
                 </Typography>
-                <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+                <Typography variant="h4" component="div" sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: '2.6rem', mb: 0.5 }}>
                   {formatNumber(dashboardMetrics?.dataDomains.total || 0)}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
                   {formatNumber(dashboardMetrics?.dataDomains.active || 0)} active
                 </Typography>
               </Paper>
             </Grid>
             
-            <Grid item xs={12} sm={6} md={3}>
-              <Paper
-                role="button"
-                tabIndex={0}
-                aria-label="View Compliance Dashboard"
-                onClick={() => navigate('/compliance')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    navigate('/compliance');
-                  }
-                }}
-                elevation={0}
-                sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: 140,
-                  backgroundColor: '#FFF8E1',
-                  borderRadius: 2,
-                  cursor: 'pointer',
-                  outline: 'none',
-                  '&:focus': { outline: '3px solid #003366', outlineOffset: 2 },
-                  '&:hover': { backgroundColor: '#FFF3E0' }
-                }}
-              >
-                <Typography variant="h6" gutterBottom component="div">
-                  Compliance
-                </Typography>
-                <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-                  {dashboardMetrics?.compliance.percentage || 0}%
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {dashboardMetrics && dashboardMetrics.compliance.changeFromLastMonth > 0 ? '+' : ''}
-                  {dashboardMetrics?.compliance.changeFromLastMonth || 0}% from last month
-                </Typography>
-              </Paper>
-            </Grid>
-            
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid item xs={12} sm={6} md={2.4}>
               <Paper
                 elevation={0}
-                onClick={() => navigate('/tasks')}
+                onClick={() => handleCardClick('Open Tasks', () => navigate('/tasks'))}
+                onFocus={() => handleCardFocus('Open Tasks', formatNumber(dashboardMetrics?.tasks.open || 0))}
+                onKeyDown={(e) => handleCardKeyDown(e, () => navigate('/tasks'), 'Open Tasks')}
                 sx={{
-                  p: 2,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: 140,
-                  backgroundColor: '#F3E5F5',
-                  borderRadius: 2,
+                  textAlign: 'center',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  background: 'linear-gradient(135deg, #9c27b008 0%, #9c27b015 100%)',
+                  border: '2px solid #9c27b0',
+                  borderRadius: 3,
+                  boxShadow: '0 4px 12px rgba(0, 51, 102, 0.08)',
+                  transform: animationTrigger ? 'translateY(0)' : 'translateY(20px)',
+                  opacity: animationTrigger ? 1 : 0,
+                  transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transitionDelay: '0.5s',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease-in-out',
                   '&:hover': {
-                    backgroundColor: '#E1BEE7',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.12)'
+                    transform: animationTrigger ? 'translateY(-4px) scale(1.02)' : 'translateY(20px)',
+                    boxShadow: '0 12px 32px rgba(0, 51, 102, 0.18)',
+                    borderColor: '#9c27b0'
                   },
                   '&:focus': {
-                    outline: '2px solid #003366',
+                    outline: '3px solid #005fcc',
                     outlineOffset: '2px'
-                  }
+                  },
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    background: 'linear-gradient(90deg, #9c27b0 0%, #9c27b080 100%)',
+                    borderRadius: '3px 3px 0 0'
+                  },
+                  '&::after': cardLoadingStates['Open Tasks'] ? {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+                    animation: 'shimmer 1.5s infinite'
+                  } : {},
+                  p: '12px 8px 8px !important',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: 140
                 }}
                 tabIndex={0}
                 role="button"
-                aria-label="Open Tasks - Click to view task management page"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    navigate('/tasks');
-                  }
-                }}
+                aria-labelledby="open-tasks-label"
+                aria-describedby="open-tasks-value open-tasks-description"
               >
-                <Typography variant="h6" gutterBottom component="div">
+                <Typography variant="subtitle2" gutterBottom component="div" sx={{ fontSize: '0.95rem', fontWeight: 600 }}>
                   Open Tasks
                 </Typography>
-                <Typography variant="h3" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
+                <Typography variant="h4" component="div" sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: '2.6rem', mb: 0.5 }}>
                   {formatNumber(dashboardMetrics?.tasks.open || 0)}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
                   {formatNumber(dashboardMetrics?.tasks.urgent || 0)} urgent
                 </Typography>
               </Paper>

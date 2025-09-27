@@ -17,6 +17,16 @@ const DomainSchema = new mongoose.Schema({
     trim: true,
     maxlength: [500, 'Description cannot be more than 500 characters']
   },
+  type: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Type cannot be more than 100 characters']
+  },
+  category: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Category cannot be more than 100 characters']
+  },
   status: {
     type: String,
     required: [true, 'Please specify a status'],
@@ -24,9 +34,10 @@ const DomainSchema = new mongoose.Schema({
     default: 'Active'
   },
   owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'Please specify a domain owner']
+    type: String,
+    required: [true, 'Please specify a domain owner'],
+    trim: true,
+    maxlength: [200, 'Owner cannot be more than 200 characters']
   },
   stewards: [{
     type: mongoose.Schema.Types.ObjectId,

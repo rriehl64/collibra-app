@@ -380,9 +380,18 @@ const DataStrategyPlanning: React.FC = () => {
           <>
             {/* Filters */}
             <Paper sx={{ p: 3, mb: 3 }}>
-              <Typography variant="h6" gutterBottom color="#003366">
-                Team Filters & Groupings
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6" color="#003366">
+                  Team Filters & Groupings
+                </Typography>
+                <Button
+                  variant="outlined"
+                  onClick={() => setTeamFilters({ branch: '', role: '', utilizationLevel: '', skills: [] })}
+                  sx={{ color: '#003366', borderColor: '#003366' }}
+                >
+                  Clear All Filters
+                </Button>
+              </Box>
               <Grid container spacing={2} sx={{ mb: 3 }}>
                 <Grid item xs={12} md={3}>
                   <FormControl fullWidth size="small">
@@ -457,16 +466,6 @@ const DataStrategyPlanning: React.FC = () => {
                 </Grid>
               </Grid>
 
-              {/* Clear Filters Button */}
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-                <Button
-                  variant="outlined"
-                  onClick={() => setTeamFilters({ branch: '', role: '', utilizationLevel: '', skills: [] })}
-                  sx={{ color: '#003366', borderColor: '#003366' }}
-                >
-                  Clear All Filters
-                </Button>
-              </Box>
             </Paper>
 
             {/* Team Members */}

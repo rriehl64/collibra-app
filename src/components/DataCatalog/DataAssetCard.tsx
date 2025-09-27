@@ -600,7 +600,7 @@ export const DataAssetCard: React.FC<DataAssetCardProps> = ({
   return (
     <AccessibleCard
       title={asset.name}
-      subtitle={`Last updated: ${new Date(asset.updatedAt || '').toLocaleDateString()}`}
+      subtitle={`Last updated: ${new Date(asset.updatedAt || '').toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}`}
       editComponent={editContent}
       onEdit={handleEdit}
       onSave={handleSave}

@@ -28,7 +28,8 @@ import {
   Divider,
   FormHelperText,
   InputAdornment,
-  Checkbox
+  Checkbox,
+  Collapse
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -36,7 +37,8 @@ import {
   FilterList as FilterIcon,
   Edit as EditIcon,
   Save as SaveIcon,
-  AccountTree as LineageIcon
+  AccountTree as LineageIcon,
+  ExpandMore as ExpandMoreIcon
 } from '@mui/icons-material';
 
 import { dataAssetService } from '../services/api';
@@ -247,6 +249,9 @@ const DataCatalog: React.FC = () => {
   
   // Export functionality
   const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  
+  // Help section collapse state (collapsed by default)
+  const [helpSectionExpanded, setHelpSectionExpanded] = useState(false);
 
   // Handle asset selection for comparison
   const handleAssetSelection = (assetId: string) => {
@@ -811,11 +816,39 @@ const DataCatalog: React.FC = () => {
         Browse, search, and manage data assets across the enterprise.
       </Typography>
 
-      {/* How It Works Section */}
+      {/* How It Works Section - Collapsible */}
       <Box sx={{ mb: 4, p: 3, bgcolor: '#f8f9fa', borderRadius: 2, border: '1px solid #e9ecef' }}>
-        <Typography variant="h5" component="h2" gutterBottom sx={{ color: '#003366', fontWeight: 600, mb: 2 }}>
-          How It Works
-        </Typography>
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            cursor: 'pointer',
+            '&:hover': { bgcolor: 'rgba(0, 51, 102, 0.04)' },
+            borderRadius: 1,
+            p: 1,
+            ml: -1
+          }}
+          onClick={() => setHelpSectionExpanded(!helpSectionExpanded)}
+          role="button"
+          aria-expanded={helpSectionExpanded}
+          aria-controls="help-section-content"
+        >
+          <Typography variant="h5" component="h2" sx={{ color: '#003366', fontWeight: 600, flexGrow: 1 }}>
+            How It Works
+          </Typography>
+          <IconButton 
+            size="small"
+            sx={{ 
+              transform: helpSectionExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.3s ease'
+            }}
+          >
+            <ExpandMoreIcon />
+          </IconButton>
+        </Box>
+        
+        <Collapse in={helpSectionExpanded} timeout="auto" unmountOnExit>
+          <Box id="help-section-content" sx={{ mt: 2 }}>
         
         <Grid container spacing={3}>
           <Grid item xs={12} md={4}>
@@ -911,6 +944,8 @@ const DataCatalog: React.FC = () => {
             • Check recent searches below the search bar for quick access
           </Typography>
         </Box>
+          </Box>
+        </Collapse>
       </Box>
 
       {/* Advanced Search Section */}

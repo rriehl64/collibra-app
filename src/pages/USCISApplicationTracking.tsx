@@ -653,8 +653,8 @@ const USCISApplicationTracking: React.FC = () => {
             USCIS Benefit Application Tracking
           </Typography>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-            <Typography variant="body2" color="text.secondary">
-              Last updated: {lastRefresh.toLocaleTimeString()}
+            <Typography variant="caption" color="text.secondary">
+              Last updated: {lastRefresh.toLocaleString()}
             </Typography>
             <Tooltip title="Refresh Data">
               <IconButton onClick={loadDashboardData} color="primary">

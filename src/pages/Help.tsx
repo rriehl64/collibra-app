@@ -1066,7 +1066,7 @@ const Help: React.FC = () => {
                         <Typography variant="h6" component="h5" gutterBottom>
                           Understanding Data Governance Fundamentals
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" paragraph>
+                        <Typography variant="caption" color="text.secondary" paragraph>
                           Last updated: August 10, 2025
                         </Typography>
                         <Typography paragraph>
@@ -1094,7 +1094,7 @@ const Help: React.FC = () => {
                         <Typography variant="h6" component="h5" gutterBottom>
                           Data Classification Guidelines
                         </Typography>
-                        <Typography variant="body2" color="text.secondary" paragraph>
+                        <Typography variant="caption" color="text.secondary" paragraph>
                           Last updated: July 28, 2025
                         </Typography>
                         <Typography paragraph>

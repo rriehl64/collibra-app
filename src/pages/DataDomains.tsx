@@ -53,21 +53,52 @@ interface RelatedAsset {
 
 // Data domain interface that matches the MongoDB model
 interface DataDomain {
-  id: string;
+  _id: string;
+  id?: string; // For backward compatibility
   name: string;
-  description: string;
-  owner: string;
-  type: string;
-  category: string;
-  status: 'active' | 'inactive' | 'draft' | 'archived';
-  lastUpdated: string;
+  description?: string;
+  owner?: string; // MongoDB stores ObjectId, we'll handle conversion
+  type?: string;
+  category?: string;
+  status: 'Active' | 'Inactive' | 'Under Development' | 'Deprecated';
+  lastUpdated?: string;
   relatedAssets?: RelatedAsset[];
   tags?: string[];
   createdAt?: string;
   updatedAt?: string;
 }
 
-const DataDomains: React.FC = () => {
+// Predefined dropdown options for Type and Category
+const DOMAIN_TYPES = [
+  'Business Domain',
+  'Technical Domain', 
+  'Data Domain',
+  'Application Domain',
+  'Infrastructure Domain',
+  'Regulatory Domain',
+  'Customer Domain',
+  'Product Domain'
+];
+
+const DOMAIN_CATEGORIES = [
+  'Financial Operations',
+  'Human Resources',
+  'Marketing Operations', 
+  'Sales Operations',
+  'Information Technology',
+  'Customer Service',
+  'Supply Chain',
+  'Legal & Compliance',
+  'Research & Development',
+  'Quality Assurance',
+  'Business Intelligence',
+  'Data Analytics',
+  'Security & Risk',
+  'Operations Management',
+  'Strategic Planning'
+];
+
+const DataDomains: React.FC = (): JSX.Element => {
   // State management
   const [domains, setDomains] = useState<DataDomain[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -87,7 +118,7 @@ const DataDomains: React.FC = () => {
     owner: '',
     type: '',
     category: '',
-    status: 'active' as 'active' | 'inactive' | 'draft' | 'archived',
+    status: 'Active' as 'Active' | 'Inactive' | 'Under Development' | 'Deprecated',
     tags: [] as string[]
   });
   
@@ -106,24 +137,27 @@ const DataDomains: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      // Use the correct API endpoint path format for domains
-      let endpoint = '/data-concepts/domains';
+      // Use the test endpoint for development (no auth required)
+      let endpoint = '/domains/test';
       let params = {};
       
       // Add search query if provided
       if (debouncedSearchText) {
-        params = { q: debouncedSearchText };
+        params = { search: debouncedSearchText };
         
         // Add to search history if it's a new search
-        if (!searchHistory.includes(debouncedSearchText)) {
-          const newHistory = [...searchHistory.slice(-4), debouncedSearchText];
-          setSearchHistory(newHistory);
-          localStorage.setItem('dataDomainsSearchHistory', JSON.stringify(newHistory));
-        }
+        setSearchHistory(prevHistory => {
+          if (!prevHistory.includes(debouncedSearchText)) {
+            const newHistory = [...prevHistory.slice(-4), debouncedSearchText];
+            localStorage.setItem('dataDomainsSearchHistory', JSON.stringify(newHistory));
+            return newHistory;
+          }
+          return prevHistory;
+        });
       }
       
-      // For temporary testing - use sample data while we fix auth issues
-      const useSampleData = true;
+      // Use real API data now that we have MongoDB collection
+      const useSampleData = false;
       let response;
       
       if (useSampleData) {
@@ -132,8 +166,28 @@ const DataDomains: React.FC = () => {
         let sampleData;
         
         if (savedDomains) {
-          // We have previously saved domains, use those
+          // We have previously saved domains, check if they need updating
           sampleData = JSON.parse(savedDomains);
+          
+          // Check if any domain has old status values and needs updating
+          const needsUpdate = sampleData.some((domain: any) => 
+            ['active', 'inactive', 'draft', 'archived'].includes(domain.status)
+          );
+          
+          if (needsUpdate) {
+            // Update existing domains to use proper case and new status values
+            sampleData = sampleData.map((domain: any) => ({
+              ...domain,
+              status: domain.status === 'active' ? 'Active' :
+                     domain.status === 'inactive' ? 'Inactive' :
+                     domain.status === 'draft' ? 'Under Development' :
+                     domain.status === 'archived' ? 'Deprecated' :
+                     domain.status
+            }));
+            
+            // Save the updated data back to localStorage
+            localStorage.setItem('sampleDomains', JSON.stringify(sampleData));
+          }
           
           // Simulate API response format with saved domains
           response = {
@@ -157,7 +211,7 @@ const DataDomains: React.FC = () => {
             owner: 'Data Governance Team',
             type: 'Business Domain',
             category: 'Data Management',
-            status: 'active' as const,
+            status: 'Active' as const,
             lastUpdated: new Date().toISOString().split('T')[0],
             tags: [domainName.toLowerCase()],
             createdAt: new Date().toISOString(),
@@ -189,7 +243,7 @@ const DataDomains: React.FC = () => {
           // Case 1: API returns array of domain objects
           if (response.data.data.length > 0 && typeof response.data.data[0] === 'object') {
             setDomains(response.data.data);
-            showSnackbar('Data domains loaded successfully', 'success');
+            // Data loaded successfully - no need for notification
           }
           // Case 2: API returns array of domain strings
           else if (response.data.data.length > 0 && typeof response.data.data[0] === 'string') {
@@ -209,7 +263,7 @@ const DataDomains: React.FC = () => {
             }));
             
             setDomains(domainsArray);
-            showSnackbar('Data domains loaded successfully', 'success');
+            // Data loaded successfully - no need for notification
           }
           // Case 3: Empty array
           else {
@@ -240,20 +294,20 @@ const DataDomains: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearchText, searchHistory, showSnackbar]);
+  }, [debouncedSearchText, showSnackbar]);
   
   // Handle opening the edit dialog for a data domain
   const handleEditDomain = (domain: DataDomain) => {
     setCurrentDomain(domain);
     
-    // Initialize form data with domain values
+    // Initialize form data with domain values, providing defaults for undefined fields
     setFormData({
-      name: domain.name,
-      description: domain.description,
-      owner: domain.owner,
-      type: domain.type,
+      name: domain.name || '',
+      description: domain.description || '',
+      owner: domain.owner || '',
+      type: domain.type || '',
       category: domain.category || '',
-      status: domain.status,
+      status: domain.status || 'Active',
       tags: domain.tags || []
     });
     
@@ -317,94 +371,46 @@ const DataDomains: React.FC = () => {
   const validateForm = () => {
     const errors: {[key: string]: string} = {};
     
-    if (!formData.name.trim()) errors.name = 'Name is required';
-    if (!formData.description.trim()) errors.description = 'Description is required';
-    if (!formData.owner.trim()) errors.owner = 'Owner is required';
-    if (!formData.type.trim()) errors.type = 'Type is required';
-    if (!formData.category.trim()) errors.category = 'Category is required';
+    if (!formData.name?.trim()) errors.name = 'Name is required';
+    if (!formData.description?.trim()) errors.description = 'Description is required';
+    if (!formData.owner?.trim()) errors.owner = 'Owner is required';
+    if (!formData.type?.trim()) errors.type = 'Type is required';
+    if (!formData.category?.trim()) errors.category = 'Category is required';
     
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
   
   // Save data domain changes
-  const handleSaveDomain = async () => {
+  const handleSaveDomain = async (): Promise<void> => {
     if (!validateForm() || !currentDomain) return;
     
     try {
       setLoading(true);
       
-      // API endpoint for updating domain
-      const endpoint = `/data-concepts/domains/${currentDomain.id}`;
+      const domainId = currentDomain._id || currentDomain.id;
+      const endpoint = `/domains/test/${domainId}`;
       
-      // Prepare updated domain object
       const updatedDomain = {
-        ...currentDomain,
         name: formData.name,
         description: formData.description,
         owner: formData.owner,
         type: formData.type,
         category: formData.category,
-        status: formData.status as 'active' | 'inactive' | 'draft' | 'archived',
-        tags: formData.tags,
-        updatedAt: new Date().toISOString(),
-        lastUpdated: new Date().toISOString().split('T')[0]
+        status: formData.status,
+        tags: formData.tags
       };
       
-      // For temporary testing - simulate saving while we fix auth issues
-      const useSampleData = true;
-      let response;
+      const response = await api.put(endpoint, updatedDomain);
       
-      if (useSampleData) {
-        // Simulate API save response
-        response = {
-          data: {
-            success: true,
-            data: updatedDomain
-          }
-        };
-        // Delay to simulate network request
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // For our sample data implementation, we need to fully replace the domain object
-        // with the updated values to ensure the component re-renders properly
-        const updatedDomains = domains.map(domain => {
-          if (domain.id === updatedDomain.id) {
-            return {
-              ...updatedDomain,
-              // Ensure these fields are set properly
-              name: formData.name,
-              description: formData.description,
-              owner: formData.owner,
-              type: formData.type,
-              category: formData.category,
-              status: formData.status,
-              tags: formData.tags,
-              lastUpdated: new Date().toISOString().split('T')[0],
-              updatedAt: new Date().toISOString()
-            };
-          }
-          return domain;
-        });
-        
-        // Update the state with the new domains array
-        setDomains(updatedDomains);
-        showSnackbar('Data domain updated successfully', 'success');
-        
-        // Also save to localStorage for persistence between page refreshes
-        localStorage.setItem('sampleDomains', JSON.stringify(updatedDomains));
-      } else {
-        // Attempt to use real API
-        response = await api.put(endpoint, updatedDomain);
-        
-        // Refresh the domains list
+      if (response?.data?.success) {
         await fetchDataDomains();
         showSnackbar('Data domain updated successfully', 'success');
+        setEditDialogOpen(false);
+        setCurrentDomain(null);
+      } else {
+        throw new Error('Failed to update domain');
       }
-      
-      // Close the dialog
-      setEditDialogOpen(false);
-      setCurrentDomain(null);
     } catch (error) {
       console.error('Error updating data domain:', error);
       showSnackbar('Failed to update data domain', 'error');
@@ -436,13 +442,13 @@ const DataDomains: React.FC = () => {
   // Get status color based on status value
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active':
+      case 'Active':
         return '#4CAF50'; // Green
-      case 'inactive':
+      case 'Inactive':
         return '#FFC107'; // Yellow
-      case 'draft':
+      case 'Under Development':
         return '#2196F3'; // Blue
-      case 'archived':
+      case 'Deprecated':
         return '#9E9E9E'; // Gray
       default:
         return '#9E9E9E'; // Gray
@@ -539,7 +545,7 @@ const DataDomains: React.FC = () => {
       {!loading && !error && domains.length > 0 && (
         <Grid container spacing={3} role="list" aria-label="List of data domains">
           {domains.map(domain => (
-            <Grid item xs={12} sm={6} md={4} key={domain.id} role="listitem">
+            <Grid item xs={12} sm={6} md={4} key={domain._id || domain.id} role="listitem">
               <Card 
                 sx={{ 
                   height: '100%',
@@ -748,36 +754,52 @@ const DataDomains: React.FC = () => {
             />
             
             {/* Type field */}
-            <TextField
-              margin="dense"
-              id="type"
-              name="type"
-              label="Type *"
-              type="text"
-              fullWidth
-              value={formData.type}
-              onChange={handleFormChange}
-              error={!!formErrors.type}
-              helperText={formErrors.type || ''}
-              variant="outlined"
-              sx={{ mt: 2 }}
-            />
+            <FormControl fullWidth margin="dense" sx={{ mt: 2 }} error={!!formErrors.type}>
+              <InputLabel id="type-select-label">Type *</InputLabel>
+              <Select
+                labelId="type-select-label"
+                id="type"
+                name="type"
+                value={formData.type}
+                label="Type *"
+                onChange={handleSelectChange}
+              >
+                {DOMAIN_TYPES.map((type) => (
+                  <MenuItem key={type} value={type}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </Select>
+              {formErrors.type && (
+                <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                  {formErrors.type}
+                </Typography>
+              )}
+            </FormControl>
             
             {/* Category field */}
-            <TextField
-              margin="dense"
-              id="category"
-              name="category"
-              label="Category *"
-              type="text"
-              fullWidth
-              value={formData.category}
-              onChange={handleFormChange}
-              error={!!formErrors.category}
-              helperText={formErrors.category || ''}
-              variant="outlined"
-              sx={{ mt: 2 }}
-            />
+            <FormControl fullWidth margin="dense" sx={{ mt: 2 }} error={!!formErrors.category}>
+              <InputLabel id="category-select-label">Category *</InputLabel>
+              <Select
+                labelId="category-select-label"
+                id="category"
+                name="category"
+                value={formData.category}
+                label="Category *"
+                onChange={handleSelectChange}
+              >
+                {DOMAIN_CATEGORIES.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category}
+                  </MenuItem>
+                ))}
+              </Select>
+              {formErrors.category && (
+                <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                  {formErrors.category}
+                </Typography>
+              )}
+            </FormControl>
             
             {/* Status field */}
             <FormControl fullWidth margin="dense" sx={{ mt: 2 }}>
@@ -790,10 +812,10 @@ const DataDomains: React.FC = () => {
                 label="Status"
                 onChange={handleSelectChange}
               >
-                <MenuItem value="active">Active</MenuItem>
-                <MenuItem value="inactive">Inactive</MenuItem>
-                <MenuItem value="draft">Draft</MenuItem>
-                <MenuItem value="archived">Archived</MenuItem>
+                <MenuItem value="Active">Active</MenuItem>
+                <MenuItem value="Inactive">Inactive</MenuItem>
+                <MenuItem value="Under Development">Under Development</MenuItem>
+                <MenuItem value="Deprecated">Deprecated</MenuItem>
               </Select>
             </FormControl>
             

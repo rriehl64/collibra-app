@@ -29,6 +29,31 @@ const PolicySchema = new mongoose.Schema({
     enum: ['Draft', 'Active', 'Under Review', 'Deprecated', 'Archived'],
     default: 'Draft'
   },
+  complianceStatus: {
+    type: String,
+    enum: ['compliant', 'non-compliant', 'pending-review'],
+    default: 'pending-review'
+  },
+  complianceFramework: [{
+    type: String,
+    trim: true
+  }],
+  lastReviewDate: {
+    type: Date
+  },
+  nextReviewDate: {
+    type: Date
+  },
+  riskLevel: {
+    type: String,
+    enum: ['low', 'medium', 'high'],
+    default: 'medium'
+  },
+  implementationStatus: {
+    type: String,
+    enum: ['not-started', 'in-progress', 'implemented', 'verified'],
+    default: 'not-started'
+  },
   version: {
     type: String,
     required: [true, 'Please specify a version'],
