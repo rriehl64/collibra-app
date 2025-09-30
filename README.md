@@ -1,6 +1,6 @@
 # Collibra Data Governance Platform
 
-*Last Updated: September 27, 2025*
+*Last Updated: September 29, 2025 - Team Roster Management System*
 
 A comprehensive React-based data governance platform designed to improve data literacy and governance within organizations. This enterprise-grade application helps teams discover, understand, and trust their data with intelligent governance solutions, advanced analytics, and AI/ML insights.
 
@@ -138,6 +138,35 @@ A comprehensive React-based data governance platform designed to improve data li
 - **Force Push Capability**: Reliable deployment process with proper conflict resolution
 - **Automated Token Management**: Seamless GitHub integration with secure token handling
 - **Documentation**: Comprehensive deployment workflow documentation for future reference
+
+#### Portfolio Management System
+- **Executive Dashboard Suite**: Comprehensive 5-view portfolio management system for strategic oversight
+  - **Executive View**: KPIs, OKRs, risks, innovations, and AI readiness tracking
+  - **Portfolio Overview**: Traditional portfolio management with program details
+  - **Programs Detail**: In-depth program information and progress tracking
+  - **Roadmap Timeline**: Strategic milestone management with dependency visualization
+  - **Cross-Portfolio Analytics**: Enterprise-wide insights and performance comparison
+- **AI-First Strategy Integration**: Enterprise AI readiness tracking (70% average) with transformation roadmap
+- **Strategic Investment Tracking**: $11.0M total portfolio budget management across 4 active portfolios
+- **Risk Management**: Real-time visibility into 6 critical risks with mitigation strategies
+- **Innovation Pipeline**: 14 AI-first initiatives tracking with impact assessment
+- **Dashboard Integration**: Portfolio summary widgets integrated into main executive dashboard
+- **USCIS Program Alignment**: Actual USCIS programs including Data Request Management, Data Governance, Data Enterprise, and Data Product Management portfolios
+- **Performance Metrics**: KPI tracking with target vs. current performance visualization
+- **Milestone Management**: Strategic deliverables with cross-portfolio dependencies and timeline tracking
+
+#### Team Roster Management System
+- **Comprehensive Team Database**: Complete team member management with 45 staff members from actual USCIS roster
+- **Real-time Team Data**: Live synchronization between database and frontend with accurate names and roles
+- **Advanced Filtering & Search**: Multi-dimensional filtering by status (Active/Archived/All), branch, role, and search terms
+- **Bulk Operations**: Checkbox-based selection for bulk archive, reactivate, and management operations
+- **Archive Management**: Soft delete functionality preserving historical data with reactivation capabilities
+- **Skills & Capacity Tracking**: Individual skill proficiency tracking with certification status and capacity utilization
+- **Branch Organization**: 8 organizational branches including Front Office, Data Management, Analytics, Engineering, Science, BI, Governance, and Product & Design
+- **Role-Based Access Control**: Admin and data-steward permissions for team management operations
+- **Database Seeding**: Automated team roster seeding from live application data with accurate team member information
+- **Section 508 Compliance**: Full accessibility with keyboard navigation, screen reader support, and ARIA attributes
+- **API Integration**: RESTful endpoints for team management operations with comprehensive error handling
 
 ## Application Screenshots
 
@@ -290,28 +319,47 @@ This application showcases how modern data governance tools can help teams:
    - ROI analysis and cost-benefit tracking
    - Portfolio analytics and performance metrics
 
-#### 3. **Advanced Data Catalog**
+#### 3. **Portfolio Management & Executive Oversight**
+   - Comprehensive 5-view portfolio management system
+   - Enterprise AI readiness tracking and transformation roadmap
+   - Strategic investment management ($11.0M across 4 portfolios)
+   - Cross-portfolio risk management and mitigation
+   - Innovation pipeline tracking (14 AI-first initiatives)
+   - Executive dashboard integration with real-time KPIs
+   - Milestone and dependency management
+   - Performance analytics and strategic decision support
+
+#### 4. **Advanced Data Catalog**
    - AI-powered asset discovery and classification
    - Interactive data lineage visualization
    - Real-time quality metrics and scoring
    - Automated certification workflows
    - Comprehensive metadata management
 
-#### 4. **Governance & Compliance**
+#### 5. **Governance & Compliance**
    - Policy management and enforcement
    - Role-based access controls
    - Audit trails and compliance reporting
    - Workflow automation and approvals
    - Risk assessment and mitigation
 
-#### 5. **Analytics & Intelligence**
+#### 6. **Analytics & Intelligence**
    - Executive dashboards and KPI tracking
    - Predictive analytics and forecasting
    - Business intelligence reporting
    - Performance monitoring and optimization
    - Data-driven decision support
 
-#### 6. **Administration & Security**
+#### 7. **Team Roster & Human Resources Management**
+   - Comprehensive team member database with 45+ staff records
+   - Real-time skills and capacity tracking with utilization metrics
+   - Advanced filtering and search across multiple dimensions
+   - Archive management with soft delete and reactivation capabilities
+   - Bulk operations for efficient team management
+   - Branch and role-based organization structure
+   - Section 508 compliant interface with full accessibility
+
+#### 8. **Administration & Security**
    - Dynamic menu and feature management
    - User role and permission management
    - System configuration and customization

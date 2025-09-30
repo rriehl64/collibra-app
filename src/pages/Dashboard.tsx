@@ -23,13 +23,62 @@ import {
   AssignmentTurnedIn as AssignmentIcon,
   Notifications as NotificationsIcon,
   LibraryBooks as LibraryBooksIcon,
-  MenuBook as MenuBookIcon
+  MenuBook as MenuBookIcon,
+  Business as BusinessIcon,
+  SmartToy as AIIcon,
+  Warning as RiskIcon,
+  Timeline as TimelineIcon,
+  AutoAwesome as AutoAwesomeIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { dataAssetService } from '../services/api';
 import DashboardService from '../services/dashboardService';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+
+// Portfolio data import (simplified for dashboard use)
+const portfolioSummaryData = [
+  {
+    id: 'portfolio-data-request',
+    name: 'Data Request Management',
+    aiReadiness: 65,
+    totalBudget: '$2.1M',
+    programs: 3,
+    criticalRisks: 2,
+    aiInnovations: 3,
+    status: 'Active'
+  },
+  {
+    id: 'portfolio-data-governance',
+    name: 'Data Governance',
+    aiReadiness: 72,
+    totalBudget: '$2.8M',
+    programs: 4,
+    criticalRisks: 1,
+    aiInnovations: 4,
+    status: 'Active'
+  },
+  {
+    id: 'portfolio-data-engineering',
+    name: 'Data Enterprise',
+    aiReadiness: 85,
+    totalBudget: '$4.2M',
+    programs: 8,
+    criticalRisks: 2,
+    aiInnovations: 4,
+    status: 'Active'
+  },
+  {
+    id: 'portfolio-data-product',
+    name: 'Data Product Management',
+    aiReadiness: 58,
+    totalBudget: '$1.9M',
+    programs: 3,
+    criticalRisks: 1,
+    aiInnovations: 3,
+    status: 'Active'
+  }
+];
 
 // Define interfaces for dashboard data
 interface DashboardMetrics {
@@ -827,6 +876,256 @@ const Dashboard: React.FC = () => {
               </Paper>
             </Grid>
           </Grid>
+
+          {/* Portfolio Management Summary */}
+          <Box sx={{ mt: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+              <Typography variant="h5" sx={{ fontWeight: 600, color: '#003366' }}>
+                Portfolio Management Overview
+              </Typography>
+              <Button 
+                variant="outlined"
+                startIcon={<BusinessIcon />}
+                onClick={() => navigate('/portfolio')}
+                sx={{ color: '#003366', borderColor: '#003366' }}
+              >
+                View Full Portfolio
+              </Button>
+            </Box>
+
+            {/* Portfolio Summary Cards */}
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              {/* Enterprise AI Readiness */}
+              <Grid item xs={12} sm={6} md={3}>
+                <Paper
+                  onClick={() => navigate('/portfolio')}
+                  sx={{
+                    p: 2,
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    border: '2px solid #2196f3',
+                    borderRadius: 2,
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 8px 24px rgba(33, 150, 243, 0.15)'
+                    },
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                    <AIIcon sx={{ fontSize: 32, color: '#2196f3', mr: 1 }} />
+                    <Typography variant="h6" sx={{ color: '#003366', fontWeight: 600 }}>
+                      AI Readiness
+                    </Typography>
+                  </Box>
+                  <Typography variant="h3" sx={{ color: '#2196f3', fontWeight: 600, mb: 1 }}>
+                    {Math.round(portfolioSummaryData.reduce((sum, p) => sum + p.aiReadiness, 0) / portfolioSummaryData.length)}%
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Enterprise Average
+                  </Typography>
+                  <Box sx={{ mt: 1, display: 'flex', justifyContent: 'center', gap: 0.5 }}>
+                    {portfolioSummaryData.map((portfolio, idx) => (
+                      <Box
+                        key={idx}
+                        sx={{
+                          width: 8,
+                          height: 20,
+                          bgcolor: portfolio.aiReadiness > 70 ? '#4caf50' : 
+                                   portfolio.aiReadiness > 60 ? '#ff9800' : '#f44336',
+                          borderRadius: 1
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Paper>
+              </Grid>
+
+              {/* Total Investment */}
+              <Grid item xs={12} sm={6} md={3}>
+                <Paper
+                  onClick={() => navigate('/portfolio')}
+                  sx={{
+                    p: 2,
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    border: '2px solid #4caf50',
+                    borderRadius: 2,
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 8px 24px rgba(76, 175, 80, 0.15)'
+                    },
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                    <TrendingUpIcon sx={{ fontSize: 32, color: '#4caf50', mr: 1 }} />
+                    <Typography variant="h6" sx={{ color: '#003366', fontWeight: 600 }}>
+                      Investment
+                    </Typography>
+                  </Box>
+                  <Typography variant="h3" sx={{ color: '#4caf50', fontWeight: 600, mb: 1 }}>
+                    ${portfolioSummaryData.reduce((sum, p) => sum + parseFloat(p.totalBudget.replace(/[$M]/g, '')), 0).toFixed(1)}M
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Total Portfolio Budget
+                  </Typography>
+                  <Typography variant="caption" color="success.main" sx={{ fontWeight: 600 }}>
+                    4 Active Portfolios
+                  </Typography>
+                </Paper>
+              </Grid>
+
+              {/* Critical Risks */}
+              <Grid item xs={12} sm={6} md={3}>
+                <Paper
+                  onClick={() => navigate('/portfolio')}
+                  sx={{
+                    p: 2,
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    border: '2px solid #ff9800',
+                    borderRadius: 2,
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 8px 24px rgba(255, 152, 0, 0.15)'
+                    },
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                    <RiskIcon sx={{ fontSize: 32, color: '#ff9800', mr: 1 }} />
+                    <Typography variant="h6" sx={{ color: '#003366', fontWeight: 600 }}>
+                      Critical Risks
+                    </Typography>
+                  </Box>
+                  <Typography variant="h3" sx={{ color: '#ff9800', fontWeight: 600, mb: 1 }}>
+                    {portfolioSummaryData.reduce((sum, p) => sum + p.criticalRisks, 0)}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Across All Portfolios
+                  </Typography>
+                  <Typography variant="caption" color="warning.main" sx={{ fontWeight: 600 }}>
+                    Requires Attention
+                  </Typography>
+                </Paper>
+              </Grid>
+
+              {/* AI Innovations */}
+              <Grid item xs={12} sm={6} md={3}>
+                <Paper
+                  onClick={() => navigate('/portfolio')}
+                  sx={{
+                    p: 2,
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    border: '2px solid #9c27b0',
+                    borderRadius: 2,
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 8px 24px rgba(156, 39, 176, 0.15)'
+                    },
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 1 }}>
+                    <AutoAwesomeIcon sx={{ fontSize: 32, color: '#9c27b0', mr: 1 }} />
+                    <Typography variant="h6" sx={{ color: '#003366', fontWeight: 600 }}>
+                      AI Innovations
+                    </Typography>
+                  </Box>
+                  <Typography variant="h3" sx={{ color: '#9c27b0', fontWeight: 600, mb: 1 }}>
+                    {portfolioSummaryData.reduce((sum, p) => sum + p.aiInnovations, 0)}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    AI-First Initiatives
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: '#9c27b0', fontWeight: 600 }}>
+                    In Development
+                  </Typography>
+                </Paper>
+              </Grid>
+            </Grid>
+
+            {/* Portfolio Health Matrix */}
+            <Paper sx={{ p: 3, borderRadius: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h6" sx={{ color: '#003366', fontWeight: 600 }}>
+                  Portfolio Health Matrix
+                </Typography>
+                <Button
+                  size="small"
+                  startIcon={<TimelineIcon />}
+                  onClick={() => navigate('/portfolio')}
+                  sx={{ textTransform: 'none' }}
+                >
+                  View Analytics
+                </Button>
+              </Box>
+              
+              <Grid container spacing={2}>
+                {portfolioSummaryData.map((portfolio) => (
+                  <Grid item xs={12} sm={6} md={3} key={portfolio.id}>
+                    <Card 
+                      variant="outlined"
+                      onClick={() => navigate('/portfolio')}
+                      sx={{ 
+                        cursor: 'pointer',
+                        '&:hover': {
+                          boxShadow: '0 4px 12px rgba(0, 51, 102, 0.1)',
+                          transform: 'translateY(-2px)'
+                        },
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <CardContent sx={{ p: 2 }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                          {portfolio.name}
+                        </Typography>
+                        
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                          <CircularProgress
+                            variant="determinate"
+                            value={portfolio.aiReadiness}
+                            size={30}
+                            thickness={6}
+                            sx={{ 
+                              color: portfolio.aiReadiness > 70 ? '#4caf50' : 
+                                     portfolio.aiReadiness > 60 ? '#ff9800' : '#f44336',
+                              mr: 1
+                            }}
+                          />
+                          <Box>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {portfolio.aiReadiness}% AI Ready
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {portfolio.programs} Programs • {portfolio.totalBudget}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <RiskIcon sx={{ fontSize: 14, color: portfolio.criticalRisks > 1 ? '#ff9800' : '#4caf50' }} />
+                            <Typography variant="caption">
+                              {portfolio.criticalRisks} risks
+                            </Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <AutoAwesomeIcon sx={{ fontSize: 14, color: '#2196f3' }} />
+                            <Typography variant="caption">
+                              {portfolio.aiInnovations} AI
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </Paper>
+          </Box>
         </>
       )}
     </Container>

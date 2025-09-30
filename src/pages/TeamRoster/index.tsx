@@ -21,7 +21,9 @@ import {
   MenuItem,
   LinearProgress,
   Paper,
-  Divider
+  Divider,
+  Checkbox,
+  Tooltip
 } from '@mui/material';
 import {
   Search,
@@ -34,6 +36,8 @@ import {
   Visibility,
   Add,
   Delete,
+  Archive,
+  Restore,
   Code,
   Storage,
   Analytics,
@@ -56,6 +60,8 @@ interface TeamMember {
   branch: string;
   currentUtilization: number;
   availableCapacity: number;
+  isActive: boolean;
+  endDate?: string;
   skills: Array<{
     skillName: string;
     proficiency: string;
@@ -84,9 +90,13 @@ const TeamRoster: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [branchFilter, setBranchFilter] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('active');
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [bulkActionDialog, setBulkActionDialog] = useState(false);
   const [detailsDialog, setDetailsDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
+  const [addMemberDialog, setAddMemberDialog] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [editForm, setEditForm] = useState({
     name: '',
@@ -100,6 +110,19 @@ const TeamRoster: React.FC = () => {
       allocation: number;
       startDate?: string;
       endDate?: string;
+    }>
+  });
+  const [newMemberForm, setNewMemberForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    personalPhone: '',
+    role: '',
+    branch: '',
+    skills: [] as Array<{
+      skillName: string;
+      proficiency: string;
+      certified: boolean;
     }>
   });
 
@@ -128,7 +151,7 @@ const TeamRoster: React.FC = () => {
 
   useEffect(() => {
     loadTeamData();
-  }, []);
+  }, [statusFilter]);
 
   useEffect(() => {
     filterMembers();
@@ -137,12 +160,24 @@ const TeamRoster: React.FC = () => {
   const loadTeamData = async () => {
     try {
       setLoading(true);
-      const response = await dataStrategyPlanningService.getTeamCapacity();
+      
+      // Use the new team management API
+      const response = await fetch(`http://localhost:3002/api/v1/team-management/members?status=${statusFilter}`);
+      const result = await response.json();
+      
+      if (!result.success) {
+        throw new Error(result.message || 'Failed to load team data');
+      }
       
       // Map the API response to match our interface
-      const mappedMembers = (response.teamMembers || []).map((member: any) => ({
+      const mappedMembers = (result.data || []).map((member: any) => ({
         ...member,
-        name: typeof member.name === 'string' ? member.name : `${member.name?.firstName || ''} ${member.name?.lastName || ''}`.trim()
+        name: typeof member.name === 'string' 
+          ? member.name 
+          : `${member.name?.firstName || ''} ${member.name?.lastName || ''}`.trim(),
+        isActive: member.isActive !== false, // Default to true if not specified
+        currentUtilization: member.currentUtilization || 0,
+        availableCapacity: member.availableCapacity || 100
       }));
       
       setTeamMembers(mappedMembers);
@@ -150,6 +185,7 @@ const TeamRoster: React.FC = () => {
       // Also update filtered members to ensure immediate UI refresh
       setFilteredMembers(mappedMembers);
     } catch (error) {
+      console.error('Load team data error:', error);
       setSaveStatus('❌ Error loading data');
     } finally {
       setLoading(false);
@@ -303,16 +339,195 @@ const TeamRoster: React.FC = () => {
       
     } catch (error) {
       console.error('Save error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      setSaveStatus(`❌ Save failed: ${errorMessage}`);
-      setTimeout(() => setSaveStatus(''), 5000);
+      setSaveStatus('❌ Error saving changes');
     }
+  };
+
+  const handleAddNewMember = async () => {
+    try {
+      setSaveStatus('Adding new team member...');
+      
+      const response = await fetch('http://localhost:3002/api/v1/team-management/members', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newMemberForm),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to add team member');
+      }
+      
+      setSaveStatus('✅ Team member added successfully!');
+      
+      // Reset form
+      setNewMemberForm({
+        firstName: '',
+        lastName: '',
+        email: '',
+        personalPhone: '',
+        role: '',
+        branch: '',
+        skills: []
+      });
+      
+      // Reload team data
+      await loadTeamData();
+      
+      setTimeout(() => {
+        setAddMemberDialog(false);
+        setSaveStatus('');
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Add member error:', error);
+      setSaveStatus('❌ Error adding team member');
+    }
+  };
+
+  const handleArchiveMember = async (memberId: string) => {
+    try {
+      setSaveStatus('Archiving team member...');
+      
+      const response = await fetch(`http://localhost:3002/api/v1/team-management/members/${memberId}/archive`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reason: 'Archived via Team Roster interface' }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to archive team member');
+      }
+      
+      setSaveStatus('✅ Team member archived successfully!');
+      
+      // Reload team data
+      await loadTeamData();
+      
+      setTimeout(() => {
+        setDetailsDialog(false);
+        setSaveStatus('');
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Archive member error:', error);
+      setSaveStatus('❌ Error archiving team member');
+    }
+  };
+
+  const handleReactivateMember = async (memberId: string) => {
+    try {
+      setSaveStatus('Reactivating team member...');
+      
+      const response = await fetch(`http://localhost:3002/api/v1/team-management/members/${memberId}/reactivate`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to reactivate team member');
+      }
+      
+      setSaveStatus('✅ Team member reactivated successfully!');
+      
+      // Reload team data
+      await loadTeamData();
+      
+      setTimeout(() => {
+        setDetailsDialog(false);
+        setSaveStatus('');
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Reactivate member error:', error);
+      setSaveStatus('❌ Error reactivating team member');
+    }
+  };
+
+  const handleBulkArchive = async () => {
+    try {
+      setSaveStatus('Archiving selected members...');
+      
+      const promises = selectedMembers.map(memberId =>
+        fetch(`http://localhost:3002/api/v1/team-management/members/${memberId}/archive`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: 'Bulk archive operation' }),
+        })
+      );
+      
+      await Promise.all(promises);
+      setSaveStatus(`✅ Successfully archived ${selectedMembers.length} members!`);
+      
+      setSelectedMembers([]);
+      await loadTeamData();
+      
+      setTimeout(() => {
+        setBulkActionDialog(false);
+        setSaveStatus('');
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Bulk archive error:', error);
+      setSaveStatus('❌ Error archiving members');
+    }
+  };
+
+  const handleBulkReactivate = async () => {
+    try {
+      setSaveStatus('Reactivating selected members...');
+      
+      const promises = selectedMembers.map(memberId =>
+        fetch(`http://localhost:3002/api/v1/team-management/members/${memberId}/reactivate`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+        })
+      );
+      
+      await Promise.all(promises);
+      setSaveStatus(`✅ Successfully reactivated ${selectedMembers.length} members!`);
+      
+      setSelectedMembers([]);
+      await loadTeamData();
+      
+      setTimeout(() => {
+        setBulkActionDialog(false);
+        setSaveStatus('');
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Bulk reactivate error:', error);
+      setSaveStatus('❌ Error reactivating members');
+    }
+  };
+
+  const toggleMemberSelection = (memberId: string) => {
+    setSelectedMembers(prev => 
+      prev.includes(memberId) 
+        ? prev.filter(id => id !== memberId)
+        : [...prev, memberId]
+    );
+  };
+
+  const selectAllMembers = () => {
+    const allIds = filteredMembers.map(m => m._id);
+    setSelectedMembers(allIds);
+  };
+
+  const clearSelection = () => {
+    setSelectedMembers([]);
   };
 
   const clearFilters = () => {
     setSearchTerm('');
     setBranchFilter('');
     setRoleFilter('');
+    setStatusFilter('active');
   };
 
   if (loading) {
@@ -326,18 +541,35 @@ const TeamRoster: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom sx={{ color: '#003366', fontWeight: 'bold' }}>
-        Team Roster
-      </Typography>
-      
-      <Typography variant="subtitle1" gutterBottom sx={{ mb: 3 }}>
-        Comprehensive view of all team members, their skills, and current capacity
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Box>
+          <Typography variant="h4" gutterBottom sx={{ color: '#003366', fontWeight: 'bold', mb: 1 }}>
+            Team Roster
+          </Typography>
+          <Typography variant="subtitle1" sx={{ color: '#666' }}>
+            Comprehensive view of all team members, their skills, and current capacity
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<Add />}
+          onClick={() => setAddMemberDialog(true)}
+          sx={{
+            backgroundColor: '#003366',
+            '&:hover': { backgroundColor: '#002244' },
+            borderRadius: 2,
+            px: 3,
+            py: 1.5
+          }}
+        >
+          Add New Team Member
+        </Button>
+      </Box>
 
       {/* Filters */}
       <Paper sx={{ p: 2, mb: 3 }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={3}>
             <TextField
               fullWidth
               placeholder="Search by name, email, or role..."
@@ -352,7 +584,21 @@ const TeamRoster: React.FC = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2}>
+            <FormControl fullWidth>
+              <InputLabel>Status</InputLabel>
+              <Select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                label="Status"
+              >
+                <MenuItem value="active">Active</MenuItem>
+                <MenuItem value="archived">Archived</MenuItem>
+                <MenuItem value="all">All</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={2}>
             <FormControl fullWidth>
               <InputLabel>Branch</InputLabel>
               <Select
@@ -367,7 +613,7 @@ const TeamRoster: React.FC = () => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={2}>
             <FormControl fullWidth>
               <InputLabel>Role</InputLabel>
               <Select
@@ -382,7 +628,7 @@ const TeamRoster: React.FC = () => {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} md={2}>
+          <Grid item xs={12} md={3}>
             <Button
               fullWidth
               variant="outlined"
@@ -397,7 +643,7 @@ const TeamRoster: React.FC = () => {
 
       {/* Team Summary */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2.4}>
           <Card>
             <CardContent>
               <Typography variant="h6" color="primary">Total Members</Typography>
@@ -405,37 +651,92 @@ const TeamRoster: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2.4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" sx={{ color: '#4caf50' }}>Active</Typography>
+              <Typography variant="h4" sx={{ color: '#4caf50' }}>
+                {teamMembers.filter(m => m.isActive !== false).length}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={2.4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" sx={{ color: '#ff9800' }}>Archived</Typography>
+              <Typography variant="h4" sx={{ color: '#ff9800' }}>
+                {teamMembers.filter(m => m.isActive === false).length}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={2.4}>
           <Card>
             <CardContent>
               <Typography variant="h6" color="primary">Available</Typography>
               <Typography variant="h4" sx={{ color: '#4caf50' }}>
-                {teamMembers.filter(m => m.currentUtilization < 80).length}
+                {teamMembers.filter(m => m.isActive !== false && m.currentUtilization < 80).length}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" color="primary">At Capacity</Typography>
-              <Typography variant="h4" sx={{ color: '#ff9800' }}>
-                {teamMembers.filter(m => m.currentUtilization >= 80 && m.currentUtilization < 100).length}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={3}>
+        <Grid item xs={12} md={2.4}>
           <Card>
             <CardContent>
               <Typography variant="h6" color="primary">Overallocated</Typography>
               <Typography variant="h4" sx={{ color: '#f44336' }}>
-                {teamMembers.filter(m => m.currentUtilization >= 100).length}
+                {teamMembers.filter(m => m.isActive !== false && m.currentUtilization >= 100).length}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
+
+      {/* Status Indicator & Bulk Actions */}
+      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="h6" sx={{ color: '#003366' }}>
+            {statusFilter === 'active' && 'Active Team Members'}
+            {statusFilter === 'archived' && 'Archived Team Members'}
+            {statusFilter === 'all' && 'All Team Members'}
+            {filteredMembers.length > 0 && ` (${filteredMembers.length})`}
+          </Typography>
+          
+          {filteredMembers.length > 0 && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Tooltip title="Select all visible members">
+                <Checkbox
+                  checked={selectedMembers.length === filteredMembers.length && filteredMembers.length > 0}
+                  indeterminate={selectedMembers.length > 0 && selectedMembers.length < filteredMembers.length}
+                  onChange={(e) => e.target.checked ? selectAllMembers() : clearSelection()}
+                />
+              </Tooltip>
+              {selectedMembers.length > 0 && (
+                <>
+                  <Typography variant="body2" sx={{ color: '#003366' }}>
+                    {selectedMembers.length} selected
+                  </Typography>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => setBulkActionDialog(true)}
+                    sx={{ ml: 1 }}
+                  >
+                    Bulk Actions
+                  </Button>
+                </>
+              )}
+            </Box>
+          )}
+        </Box>
+        
+        {filteredMembers.length === 0 && (
+          <Typography variant="body2" color="text.secondary">
+            No members found matching current filters
+          </Typography>
+        )}
+      </Box>
 
       {/* Team Members Grid */}
       <Grid container spacing={2}>
@@ -445,34 +746,49 @@ const TeamRoster: React.FC = () => {
               sx={{ 
                 height: '100%',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
+                transition: 'all 0.2s ease-in-out',
+                opacity: member.isActive === false ? 0.7 : 1,
+                border: member.isActive === false ? '2px solid #ff9800' : 'none',
                 '&:hover': {
                   transform: 'translateY(-2px)',
-                  boxShadow: 4
+                  boxShadow: 3
                 },
                 '&:focus': {
                   outline: '2px solid #003366',
                   outlineOffset: '2px'
                 }
               }}
-              onClick={() => handleCardClick(member)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleCardClick(member);
-                }
-              }}
               role="button"
               tabIndex={0}
-              aria-label={`Click anywhere to edit ${member.name}`}
+              aria-label={`Click anywhere to edit ${member.name}${member.isActive === false ? ' (Archived)' : ''}`}
+              onClick={() => handleCardClick(member)}
             >
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Checkbox
+                    checked={selectedMembers.includes(member._id)}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      toggleMemberSelection(member._id);
+                    }}
+                    sx={{ mr: 1 }}
+                    size="small"
+                  />
                   <Avatar sx={{ bgcolor: '#003366', mr: 2 }}>
                     <Person />
                   </Avatar>
                   <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" noWrap>{member.name}</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                      <Typography variant="h6" noWrap>{member.name}</Typography>
+                      {member.isActive === false && (
+                        <Chip 
+                          label="Archived" 
+                          size="small" 
+                          color="warning"
+                          sx={{ fontSize: '0.75rem' }}
+                        />
+                      )}
+                    </Box>
                     <Typography variant="body2" color="text.secondary" noWrap>
                       {member.role}
                     </Typography>
@@ -568,13 +884,33 @@ const TeamRoster: React.FC = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography variant="h6">Team Member Details</Typography>
             <Box>
-              <IconButton 
-                onClick={() => selectedMember && handleEditMember(selectedMember)}
-                sx={{ mr: 1 }}
-                aria-label="Edit team member"
-              >
-                <Edit />
-              </IconButton>
+              {selectedMember?.isActive !== false && (
+                <>
+                  <IconButton 
+                    onClick={() => selectedMember && handleEditMember(selectedMember)}
+                    sx={{ mr: 1 }}
+                    aria-label="Edit team member"
+                  >
+                    <Edit />
+                  </IconButton>
+                  <IconButton 
+                    onClick={() => selectedMember && handleArchiveMember(selectedMember._id)}
+                    sx={{ mr: 1, color: 'orange' }}
+                    aria-label="Archive team member"
+                  >
+                    <Archive />
+                  </IconButton>
+                </>
+              )}
+              {selectedMember?.isActive === false && (
+                <IconButton 
+                  onClick={() => selectedMember && handleReactivateMember(selectedMember._id)}
+                  sx={{ mr: 1, color: 'green' }}
+                  aria-label="Reactivate team member"
+                >
+                  <Restore />
+                </IconButton>
+              )}
               <IconButton onClick={() => setDetailsDialog(false)}>
                 <Close />
               </IconButton>
@@ -984,6 +1320,172 @@ const TeamRoster: React.FC = () => {
           <Button onClick={handleSaveMember} variant="contained" color="primary" disabled={saveStatus === 'Saving...'}>
             {saveStatus === 'Saving...' ? 'Saving...' : 'Save Changes'}
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Add New Team Member Dialog */}
+      <Dialog
+        open={addMemberDialog}
+        onClose={() => setAddMemberDialog(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 2 }
+        }}
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography variant="h6">Add New Team Member</Typography>
+            <IconButton onClick={() => setAddMemberDialog(false)}>
+              <Close />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ padding: 3 }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="First Name"
+                value={newMemberForm.firstName}
+                onChange={(e) => setNewMemberForm({...newMemberForm, firstName: e.target.value})}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Last Name"
+                value={newMemberForm.lastName}
+                onChange={(e) => setNewMemberForm({...newMemberForm, lastName: e.target.value})}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Email"
+                type="email"
+                value={newMemberForm.email}
+                onChange={(e) => setNewMemberForm({...newMemberForm, email: e.target.value})}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Personal Phone"
+                value={newMemberForm.personalPhone}
+                onChange={(e) => setNewMemberForm({...newMemberForm, personalPhone: e.target.value})}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Role/Title"
+                value={newMemberForm.role}
+                onChange={(e) => setNewMemberForm({...newMemberForm, role: e.target.value})}
+                required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth required>
+                <InputLabel>Branch</InputLabel>
+                <Select
+                  value={newMemberForm.branch}
+                  onChange={(e) => setNewMemberForm({...newMemberForm, branch: e.target.value})}
+                  label="Branch"
+                >
+                  {branches.map(branch => (
+                    <MenuItem key={branch} value={branch}>{branch}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          {saveStatus && (
+            <Typography variant="body2" sx={{ mr: 2, color: saveStatus.includes('✅') ? 'green' : saveStatus.includes('❌') ? 'red' : 'blue' }}>
+              {saveStatus}
+            </Typography>
+          )}
+          <Button onClick={() => setAddMemberDialog(false)}>Cancel</Button>
+          <Button 
+            onClick={handleAddNewMember} 
+            variant="contained" 
+            color="primary"
+            disabled={!newMemberForm.firstName || !newMemberForm.lastName || !newMemberForm.email || !newMemberForm.role || !newMemberForm.branch || saveStatus === 'Adding new team member...'}
+          >
+            {saveStatus === 'Adding new team member...' ? 'Adding...' : 'Add Team Member'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Bulk Actions Dialog */}
+      <Dialog
+        open={bulkActionDialog}
+        onClose={() => setBulkActionDialog(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography variant="h6">Bulk Actions</Typography>
+            <IconButton onClick={() => setBulkActionDialog(false)}>
+              <Close />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            You have selected {selectedMembers.length} team member{selectedMembers.length !== 1 ? 's' : ''}. 
+            Choose an action to apply to all selected members:
+          </Typography>
+          
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {statusFilter !== 'archived' && (
+              <Button
+                variant="outlined"
+                startIcon={<Archive />}
+                onClick={handleBulkArchive}
+                disabled={saveStatus.includes('...') || selectedMembers.length === 0}
+                sx={{ justifyContent: 'flex-start', color: '#ff9800', borderColor: '#ff9800' }}
+              >
+                Archive Selected Members
+              </Button>
+            )}
+            
+            {statusFilter !== 'active' && (
+              <Button
+                variant="outlined"
+                startIcon={<Restore />}
+                onClick={handleBulkReactivate}
+                disabled={saveStatus.includes('...') || selectedMembers.length === 0}
+                sx={{ justifyContent: 'flex-start', color: '#4caf50', borderColor: '#4caf50' }}
+              >
+                Reactivate Selected Members
+              </Button>
+            )}
+          </Box>
+          
+          {saveStatus && (
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                mt: 2, 
+                p: 1, 
+                borderRadius: 1, 
+                backgroundColor: saveStatus.includes('✅') ? '#e8f5e8' : saveStatus.includes('❌') ? '#ffeaea' : '#e3f2fd',
+                color: saveStatus.includes('✅') ? 'green' : saveStatus.includes('❌') ? 'red' : 'blue' 
+              }}
+            >
+              {saveStatus}
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkActionDialog(false)}>Close</Button>
         </DialogActions>
       </Dialog>
     </Box>

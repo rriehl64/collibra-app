@@ -38,6 +38,7 @@ import {
   Menu as MenuIcon,
   ExpandLess,
   ExpandMore,
+  WorkOutline as PortfolioIcon,
 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -48,6 +49,7 @@ const DRAWER_WIDTH = 240;
 // Icon mapping for dynamic menu items
 const iconMap: { [key: string]: React.ComponentType } = {
   dashboard: DashboardIcon,
+  portfolio: PortfolioIcon,
   school: SchoolIcon,
   storage: StorageIcon,
   governance: GovernanceIcon,
@@ -71,6 +73,7 @@ const getIconForMenuItem = (menuId: string, path: string): React.ComponentType =
   // Map specific menu items to icons
   const pathIconMap: { [key: string]: React.ComponentType } = {
     '/': DashboardIcon,
+    '/portfolio': PortfolioIcon,
     '/learn101': SchoolIcon,
     '/data-literacy': SchoolIcon,
     '/national-production-dataset': StorageIcon,
@@ -194,6 +197,7 @@ const Sidenav = () => {
       // Fallback to default menu items if API fails
       setMenuItems([
         { text: 'Dashboard', icon: DashboardIcon, path: '/', isEnabled: true },
+        { text: 'Portfolio', icon: PortfolioIcon, path: '/portfolio', isEnabled: true },
         { text: 'E-Unify 101', icon: SchoolIcon, path: '/learn101', isEnabled: true },
         { text: 'Data Assets', icon: StorageIcon, path: '/data-assets', isEnabled: true },
       ]);

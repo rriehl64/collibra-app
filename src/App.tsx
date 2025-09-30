@@ -86,6 +86,7 @@ import ComplianceDetails from './pages/ComplianceDetails';
 import AutomatedProcesses from './pages/AutomatedProcesses';
 import ScheduledProcessesPage from './pages/ScheduledProcessesPage';
 import ProcessMonitoring from './components/ProcessMonitoring';
+import Portfolio from './pages/Portfolio';
 
 // Import Auth Provider Context
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -200,6 +201,7 @@ function App() {
               {/* Protected Routes - Require Authentication */}
               <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/portfolio" element={<Portfolio />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/data-catalog" element={<DataCatalog />} />
                 <Route path="/data-assets" element={<DataAssetDemo />} />

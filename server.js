@@ -44,6 +44,9 @@ const compliance = require('./server/routes/compliance');
 const automatedProcesses = require('./server/routes/automatedProcesses');
 const processMonitoring = require('./server/routes/processMonitoring');
 const domains = require('./server/routes/domains');
+const portfolios = require('./server/routes/portfolios');
+const programDocumentation = require('./server/routes/programDocumentation');
+const teamManagement = require('./server/routes/teamManagement');
 
 const app = express();
 
@@ -162,6 +165,9 @@ app.use('/api/v1/compliance', compliance);
 app.use('/api/v1/automated-processes', automatedProcesses);
 app.use('/api/v1/process-monitoring', processMonitoring);
 app.use('/api/v1/domains', domains);
+app.use('/api/v1/portfolios', portfolios);
+app.use('/api/v1/program-documentation', programDocumentation);
+app.use('/api/v1/team-management', teamManagement);
 
 // Serve generated TTS audio cache
 app.use('/tts-cache', express.static(path.join(__dirname, 'public', 'tts-cache')));

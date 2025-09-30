@@ -48,6 +48,7 @@ import {
   KeyboardArrowLeft as KeyboardArrowLeftIcon,
   Menu as MenuIcon,
   Lock as LockIcon,
+  Description as DocumentationIcon,
   Visibility as VisibilityIcon,
   ExpandMore as ExpandMoreIcon,
   Search as SearchIcon,
@@ -338,6 +339,14 @@ function About() {
                   index={5}
                   tabId={tabId}
                 />
+                <SideNavItem 
+                  icon={<DocumentationIcon />} 
+                  label="Platform Documentation"
+                  selected={tabValue === 6}
+                  onClick={() => handleSideNavClick(6)}
+                  index={6}
+                  tabId={tabId}
+                />
               </List>
             </Paper>
           </Collapse>
@@ -400,6 +409,11 @@ function About() {
                   label="FAQ" 
                   id={`${tabId}-tab-5`}
                   aria-controls={`${tabId}-tabpanel-5`}
+                />
+                <Tab 
+                  label="Platform Documentation" 
+                  id={`${tabId}-tab-6`}
+                  aria-controls={`${tabId}-tabpanel-6`}
                 />
               </Tabs>
             </Box>
@@ -2063,6 +2077,169 @@ function About() {
                     </Typography>
                   </AccordionDetails>
                 </Accordion>
+              </Box>
+            </TabPanel>
+
+            {/* Tab 6: Platform Documentation */}
+            <TabPanel value={tabValue} index={6} id={tabId}>
+              <Typography variant="h5" gutterBottom sx={{ color: '#003366', fontWeight: 600 }}>
+                Platform Documentation
+              </Typography>
+              
+              <Typography paragraph>
+                Comprehensive documentation for the E-Unify Data Governance Platform, including recent updates, features, and technical specifications.
+              </Typography>
+
+              <Box sx={{ 
+                maxHeight: '70vh', 
+                overflow: 'auto', 
+                border: '1px solid #e0e0e0', 
+                borderRadius: 2, 
+                p: 3,
+                backgroundColor: '#fafafa'
+              }}>
+                <Typography variant="h6" gutterBottom sx={{ color: '#003366', fontWeight: 600 }}>
+                  README - Collibra Data Governance Platform
+                </Typography>
+                
+                <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+                  Last Updated: September 27, 2025
+                </Typography>
+
+                <Typography paragraph>
+                  A comprehensive React-based data governance platform designed to improve data literacy and governance within organizations. This enterprise-grade application helps teams discover, understand, and trust their data with intelligent governance solutions, advanced analytics, and AI/ML insights.
+                </Typography>
+
+                <Typography variant="h6" gutterBottom sx={{ color: '#003366', fontWeight: 600, mt: 3 }}>
+                  September 2025: Major Platform Enhancements & Optimizations
+                </Typography>
+
+                <Typography variant="subtitle1" gutterBottom sx={{ color: '#003366', fontWeight: 600, mt: 2 }}>
+                  Data Domains Management System
+                </Typography>
+                <Box component="ul" sx={{ pl: 3, mb: 2 }}>
+                  <Box component="li" sx={{ mb: 1 }}>
+                    <Typography><strong>MongoDB Integration</strong>: Complete backend-frontend synchronization with real-time data persistence</Typography>
+                  </Box>
+                  <Box component="li" sx={{ mb: 1 }}>
+                    <Typography><strong>CRUD Operations</strong>: Full Create, Read, Update, Delete functionality for domain management</Typography>
+                  </Box>
+                  <Box component="li" sx={{ mb: 1 }}>
+                    <Typography><strong>Standardized Dropdowns</strong>: Predefined Type and Category options for consistent data entry</Typography>
+                  </Box>
+                  <Box component="li" sx={{ mb: 1 }}>
+                    <Typography><strong>Enhanced Form Validation</strong>: Robust client-side and server-side validation with error handling</Typography>
+                  </Box>
+                </Box>
+
+                <Typography variant="subtitle1" gutterBottom sx={{ color: '#003366', fontWeight: 600, mt: 2 }}>
+                  Dashboard Enhancements
+                </Typography>
+                <Box component="ul" sx={{ pl: 3, mb: 2 }}>
+                  <Box component="li" sx={{ mb: 1 }}>
+                    <Typography><strong>Auto-Refresh Functionality</strong>: Real-time data updates every 30 seconds for current metrics</Typography>
+                  </Box>
+                  <Box component="li" sx={{ mb: 1 }}>
+                    <Typography><strong>Enhanced Typography</strong>: Significantly improved font sizes for better readability and accessibility</Typography>
+                  </Box>
+                  <Box component="li" sx={{ mb: 1 }}>
+                    <Typography><strong>Performance Optimization</strong>: Eliminated infinite refresh loops and improved loading efficiency</Typography>
+                  </Box>
+                </Box>
+
+                <Typography variant="subtitle1" gutterBottom sx={{ color: '#003366', fontWeight: 600, mt: 2 }}>
+                  Data Catalog User Experience
+                </Typography>
+                <Box component="ul" sx={{ pl: 3, mb: 2 }}>
+                  <Box component="li" sx={{ mb: 1 }}>
+                    <Typography><strong>Collapsible Help Section</strong>: "How It Works" section now collapsed by default for cleaner interface</Typography>
+                  </Box>
+                  <Box component="li" sx={{ mb: 1 }}>
+                    <Typography><strong>Improved Accessibility</strong>: Enhanced keyboard navigation and screen reader support</Typography>
+                  </Box>
+                  <Box component="li" sx={{ mb: 1 }}>
+                    <Typography><strong>Interactive Elements</strong>: Smooth animations and hover effects for better user engagement</Typography>
+                  </Box>
+                </Box>
+
+                <Typography variant="subtitle1" gutterBottom sx={{ color: '#003366', fontWeight: 600, mt: 2 }}>
+                  Technology Stack
+                </Typography>
+                <Grid container spacing={2} sx={{ mt: 1 }}>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>Frontend</Typography>
+                    <Box component="ul" sx={{ pl: 3 }}>
+                      <Box component="li"><Typography variant="body2">React 18 with TypeScript</Typography></Box>
+                      <Box component="li"><Typography variant="body2">Material-UI (MUI) v5</Typography></Box>
+                      <Box component="li"><Typography variant="body2">React Router v6</Typography></Box>
+                      <Box component="li"><Typography variant="body2">Recharts for data visualization</Typography></Box>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>Backend</Typography>
+                    <Box component="ul" sx={{ pl: 3 }}>
+                      <Box component="li"><Typography variant="body2">Node.js with Express.js</Typography></Box>
+                      <Box component="li"><Typography variant="body2">MongoDB with Mongoose ODM</Typography></Box>
+                      <Box component="li"><Typography variant="body2">JWT Authentication</Typography></Box>
+                      <Box component="li"><Typography variant="body2">RESTful API Design</Typography></Box>
+                    </Box>
+                  </Grid>
+                </Grid>
+
+                <Typography variant="h6" gutterBottom sx={{ color: '#003366', fontWeight: 600, mt: 3 }}>
+                  Key Features
+                </Typography>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={4}>
+                    <Card elevation={2} sx={{ height: '100%' }}>
+                      <CardContent>
+                        <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600, color: '#003366' }}>
+                          USCIS Application Management
+                        </Typography>
+                        <Typography variant="body2">
+                          Complete benefit application lifecycle tracking with real-time analytics and AI/ML insights.
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Card elevation={2} sx={{ height: '100%' }}>
+                      <CardContent>
+                        <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600, color: '#003366' }}>
+                          Data Strategy & Planning
+                        </Typography>
+                        <Typography variant="body2">
+                          Strategic priority management with team capacity planning and ROI analysis.
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Card elevation={2} sx={{ height: '100%' }}>
+                      <CardContent>
+                        <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600, color: '#003366' }}>
+                          Advanced Data Catalog
+                        </Typography>
+                        <Typography variant="body2">
+                          AI-powered asset discovery with interactive data lineage visualization.
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                </Grid>
+
+                <Box sx={{ mt: 3, p: 2, backgroundColor: '#e3f2fd', borderRadius: 1, border: '1px solid #bbdefb' }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: '#1565c0', mb: 1 }}>
+                    💡 Development Highlights:
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    • 50 files changed with 16,257+ lines of new code<br/>
+                    • Complete MongoDB integration with CRUD operations<br/>
+                    • Enhanced accessibility and Section 508 compliance<br/>
+                    • Real-time dashboard updates and performance optimization<br/>
+                    • Comprehensive documentation and GitHub integration
+                  </Typography>
+                </Box>
               </Box>
             </TabPanel>
           </Paper>
