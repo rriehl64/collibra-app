@@ -76,6 +76,7 @@ import DataStewardCenter from './pages/DataStewardCenter';
 import AdminMenuManagement from './pages/AdminMenuManagement';
 import DataStrategyPlanning from './pages/DataStrategyPlanning';
 import TeamRoster from './pages/TeamRoster';
+import JanusGraphVisualization from './pages/JanusGraphVisualization';
 import OpenTasks from './pages/OpenTasks';
 import FederalDataStrategy from './pages/FederalDataStrategy';
 import USCISApplicationTracking from './pages/USCISApplicationTracking';
@@ -87,6 +88,7 @@ import AutomatedProcesses from './pages/AutomatedProcesses';
 import ScheduledProcessesPage from './pages/ScheduledProcessesPage';
 import ProcessMonitoring from './components/ProcessMonitoring';
 import Portfolio from './pages/Portfolio';
+import DocumentationCenter from './pages/DocumentationCenter';
 
 // Import Auth Provider Context
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -299,8 +301,14 @@ function App() {
                 {/* Process Monitoring */}
                 <Route path="/admin/process-monitoring" element={<ProcessMonitoring />} />
                 
-                {/* Team Roster */}
+                {/* Team Roster Management */}
                 <Route path="/admin/team-roster" element={<TeamRoster />} />
+                
+                {/* JanusGraph Visualization */}
+                <Route path="/admin/janusgraph" element={<JanusGraphVisualization />} />
+                
+                {/* Documentation Center */}
+                <Route path="/admin/documentation" element={<DocumentationCenter />} />
               </Route>
               
               {/* Error Routes */}

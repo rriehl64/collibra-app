@@ -39,6 +39,8 @@ import {
   ExpandLess,
   ExpandMore,
   WorkOutline as PortfolioIcon,
+  MenuBook as MenuBookIcon,
+  AccountTree as GraphIcon,
 } from '@mui/icons-material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -66,6 +68,19 @@ const iconMap: { [key: string]: React.ComponentType } = {
   info: InfoIcon,
   description: DescriptionIcon,
   settings: SettingsIcon,
+};
+
+// Get icon color for specific menu items
+const getIconColor = (menuId: string, path: string): string | undefined => {
+  const colorMap: { [key: string]: string } = {
+    '/admin/documentation': '#003366',
+    '/admin/janusgraph': '#f44336',
+    '/admin/data-strategy-operations-center': '#2196f3',
+    '/admin/automated-processes': '#9c27b0',
+    '/portfolio': '#4caf50',
+  };
+  
+  return colorMap[path];
 };
 
 // Get icon for menu item based on path or menuId
@@ -106,6 +121,8 @@ const getIconForMenuItem = (menuId: string, path: string): React.ComponentType =
     '/admin/uscis-application-tracking': AssignmentIndIcon,
     '/admin/data-strategy-planning': GovernanceIcon,
     '/admin/team-roster': PeopleIcon,
+    '/admin/documentation': MenuBookIcon,
+    '/admin/janusgraph': GraphIcon,
     '/federal-data-strategy': GovernanceIcon,
     '/tasks': AssignmentIndIcon,
   };
@@ -118,6 +135,7 @@ interface MenuItem {
   icon: React.ComponentType;
   path: string;
   isEnabled: boolean;
+  iconColor?: string;
 }
 
 const Sidenav = () => {
@@ -165,7 +183,8 @@ const Sidenav = () => {
           text: menu.text,
           icon: getIconForMenuItem(menu.menuId, menu.path),
           path: menu.path,
-          isEnabled: menu.isEnabled
+          isEnabled: menu.isEnabled,
+          iconColor: getIconColor(menu.menuId, menu.path)
         }));
         
       const secondary = filteredMenus
@@ -175,7 +194,8 @@ const Sidenav = () => {
           text: menu.text,
           icon: getIconForMenuItem(menu.menuId, menu.path),
           path: menu.path,
-          isEnabled: menu.isEnabled
+          isEnabled: menu.isEnabled,
+          iconColor: getIconColor(menu.menuId, menu.path)
         }));
         
       const administration = filteredMenus
@@ -185,7 +205,8 @@ const Sidenav = () => {
           text: menu.text,
           icon: getIconForMenuItem(menu.menuId, menu.path),
           path: menu.path,
-          isEnabled: menu.isEnabled
+          isEnabled: menu.isEnabled,
+          iconColor: getIconColor(menu.menuId, menu.path)
         }));
       
       setMenuItems(primary);
@@ -282,7 +303,7 @@ const Sidenav = () => {
                 <ListItemIcon
                   sx={{
                     minWidth: 40,
-                    color: isCurrentPath(item.path) ? 'white' : 'inherit',
+                    color: isCurrentPath(item.path) ? 'white' : (item.iconColor || 'inherit'),
                   }}
                 >
                   <item.icon />
@@ -344,7 +365,7 @@ const Sidenav = () => {
                       <ListItemIcon
                         sx={{
                           minWidth: 40,
-                          color: isCurrentPath(item.path) ? 'white' : 'inherit',
+                          color: isCurrentPath(item.path) ? 'white' : (item.iconColor || 'inherit'),
                         }}
                       >
                         <item.icon />
@@ -365,8 +386,25 @@ const Sidenav = () => {
               <ListItemButton
                 selected={isCurrentPath(item.path)}
                 onClick={() => navigate(item.path)}
+                sx={{
+                  '&.Mui-selected': {
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: 'primary.dark',
+                    },
+                    '& .MuiListItemIcon-root': {
+                      color: 'white',
+                    },
+                  },
+                }}
               >
-                <ListItemIcon sx={{ minWidth: 40 }}>
+                <ListItemIcon 
+                  sx={{ 
+                    minWidth: 40,
+                    color: isCurrentPath(item.path) ? 'white' : (item.iconColor || 'inherit'),
+                  }}
+                >
                   <item.icon />
                 </ListItemIcon>
                 <ListItemText primary={item.text} />

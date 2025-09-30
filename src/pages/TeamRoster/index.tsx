@@ -23,7 +23,9 @@ import {
   Paper,
   Divider,
   Checkbox,
-  Tooltip
+  Tooltip,
+  Tabs,
+  Tab
 } from '@mui/material';
 import {
   Search,
@@ -47,15 +49,21 @@ import {
   Business,
   CloudQueue,
   DataObject,
-  Functions
+  Functions,
+  CalendarToday,
+  Info,
+  ExpandMore,
+  ExpandLess
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import dataStrategyPlanningService from '../../services/dataStrategyPlanningService';
+import SprintPlanning from '../../components/teamRoster/SprintPlanning';
 
 interface TeamMember {
   _id: string;
   name: string;
   email: string;
+  personalPhone?: string;
   role: string;
   branch: string;
   currentUtilization: number;
@@ -82,6 +90,66 @@ interface TeamMember {
   }>;
 }
 
+// Sprint configuration: 10-day sprints starting Wednesday Oct 1, 2025
+const SPRINT_ZERO_START = new Date('2025-10-01'); // First sprint start date
+const SPRINT_DURATION_DAYS = 10;
+
+interface SprintInfo {
+  number: number;
+  startDate: Date;
+  endDate: Date;
+}
+
+// Calculate current sprint based on today's date
+const getCurrentSprint = (): SprintInfo => {
+  const today = new Date();
+  const daysSinceStart = Math.floor((today.getTime() - SPRINT_ZERO_START.getTime()) / (1000 * 60 * 60 * 24));
+  const sprintNumber = Math.floor(daysSinceStart / SPRINT_DURATION_DAYS);
+  
+  const sprintStart = new Date(SPRINT_ZERO_START);
+  sprintStart.setDate(sprintStart.getDate() + (sprintNumber * SPRINT_DURATION_DAYS));
+  
+  const sprintEnd = new Date(sprintStart);
+  sprintEnd.setDate(sprintEnd.getDate() + SPRINT_DURATION_DAYS - 1);
+  
+  return {
+    number: sprintNumber + 1,
+    startDate: sprintStart,
+    endDate: sprintEnd
+  };
+};
+
+// Calculate next sprint
+const getNextSprint = (currentSprint: SprintInfo): SprintInfo => {
+  const nextSprintStart = new Date(currentSprint.endDate);
+  nextSprintStart.setDate(nextSprintStart.getDate() + 1);
+  
+  const nextSprintEnd = new Date(nextSprintStart);
+  nextSprintEnd.setDate(nextSprintEnd.getDate() + SPRINT_DURATION_DAYS - 1);
+  
+  return {
+    number: currentSprint.number + 1,
+    startDate: nextSprintStart,
+    endDate: nextSprintEnd
+  };
+};
+
+// Calculate sprint-specific utilization for a team member
+const calculateSprintUtilization = (member: TeamMember, sprint: SprintInfo): number => {
+  if (!member.assignments || member.assignments.length === 0) {
+    return 0;
+  }
+  
+  return member.assignments
+    .filter(assignment => {
+      const assignmentStart = new Date(assignment.startDate);
+      const assignmentEnd = new Date(assignment.endDate);
+      // Check if assignment overlaps with sprint
+      return assignmentStart <= sprint.endDate && assignmentEnd >= sprint.startDate;
+    })
+    .reduce((sum, assignment) => sum + assignment.allocation, 0);
+};
+
 const TeamRoster: React.FC = () => {
   const { user } = useAuth();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
@@ -97,10 +165,17 @@ const TeamRoster: React.FC = () => {
   const [detailsDialog, setDetailsDialog] = useState(false);
   const [editDialog, setEditDialog] = useState(false);
   const [addMemberDialog, setAddMemberDialog] = useState(false);
+  const [currentSprint, setCurrentSprint] = useState<SprintInfo>(getCurrentSprint());
+  const [nextSprint, setNextSprint] = useState<SprintInfo>(getNextSprint(getCurrentSprint()));
+  const [sprintTimelineExpanded, setSprintTimelineExpanded] = useState(true);
+  const [sprintInfoDialogOpen, setSprintInfoDialogOpen] = useState(false);
+  const [selectedSprintView, setSelectedSprintView] = useState<'current' | 'next' | 'both'>('both');
+  const [currentTab, setCurrentTab] = useState(0);
   const [saveStatus, setSaveStatus] = useState('');
   const [editForm, setEditForm] = useState({
     name: '',
     email: '',
+    personalPhone: '',
     role: '',
     branch: '',
     skills: [] as string[],
@@ -254,19 +329,21 @@ const TeamRoster: React.FC = () => {
     setEditForm({
       name: member.name,
       email: member.email,
+      personalPhone: member.personalPhone || '',
       role: member.role,
       branch: member.branch,
       skills: member.skills?.map(s => s.skillName) || [],
       currentAssignments: member.assignments?.map(a => ({
-        priorityId: (a.priorityId as any)?._id || a.priorityId || '',
-        priorityName: a.priorityName || '',
-        allocation: a.allocation || 0,
+        priorityId: a.priorityId || '',
+        priorityName: a.priorityName,
+        allocation: a.allocation,
         startDate: a.startDate ? new Date(a.startDate).toISOString().split('T')[0] : '',
         endDate: a.endDate ? new Date(a.endDate).toISOString().split('T')[0] : ''
       })) || []
     });
     setDetailsDialog(false);
     setEditDialog(true);
+    setSaveStatus('');
   };
 
   const handleCardClick = (member: TeamMember) => {
@@ -275,6 +352,7 @@ const TeamRoster: React.FC = () => {
     setEditForm({
       name: member.name,
       email: member.email,
+      personalPhone: member.personalPhone || '',
       role: member.role,
       branch: member.branch,
       skills: member.skills?.map(s => s.skillName) || [],
@@ -303,6 +381,7 @@ const TeamRoster: React.FC = () => {
           lastName: editForm.name.split(' ').slice(1).join(' ') || ''
         },
         email: editForm.email,
+        personalPhone: editForm.personalPhone,
         role: editForm.role,
         title: editForm.role,
         branch: editForm.branch,
@@ -335,7 +414,7 @@ const TeamRoster: React.FC = () => {
       setTimeout(() => {
         setEditDialog(false);
         setSaveStatus('');
-      }, 1500);
+      }, 800);
       
     } catch (error) {
       console.error('Save error:', error);
@@ -378,7 +457,7 @@ const TeamRoster: React.FC = () => {
       setTimeout(() => {
         setAddMemberDialog(false);
         setSaveStatus('');
-      }, 1500);
+      }, 800);
       
     } catch (error) {
       console.error('Add member error:', error);
@@ -410,7 +489,7 @@ const TeamRoster: React.FC = () => {
       setTimeout(() => {
         setDetailsDialog(false);
         setSaveStatus('');
-      }, 1500);
+      }, 800);
       
     } catch (error) {
       console.error('Archive member error:', error);
@@ -441,7 +520,7 @@ const TeamRoster: React.FC = () => {
       setTimeout(() => {
         setDetailsDialog(false);
         setSaveStatus('');
-      }, 1500);
+      }, 800);
       
     } catch (error) {
       console.error('Reactivate member error:', error);
@@ -470,7 +549,7 @@ const TeamRoster: React.FC = () => {
       setTimeout(() => {
         setBulkActionDialog(false);
         setSaveStatus('');
-      }, 1500);
+      }, 800);
       
     } catch (error) {
       console.error('Bulk archive error:', error);
@@ -498,7 +577,7 @@ const TeamRoster: React.FC = () => {
       setTimeout(() => {
         setBulkActionDialog(false);
         setSaveStatus('');
-      }, 1500);
+      }, 800);
       
     } catch (error) {
       console.error('Bulk reactivate error:', error);
@@ -566,7 +645,31 @@ const TeamRoster: React.FC = () => {
         </Button>
       </Box>
 
-      {/* Filters */}
+      {/* Tabs */}
+      <Paper sx={{ mb: 3 }}>
+        <Tabs 
+          value={currentTab} 
+          onChange={(e, newValue) => setCurrentTab(newValue)}
+          sx={{
+            borderBottom: 1,
+            borderColor: 'divider',
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontSize: '1rem',
+              fontWeight: 500
+            },
+            '& .Mui-selected': {
+              color: '#003366'
+            }
+          }}
+        >
+          <Tab label="Team Members" />
+          <Tab label="Sprint Planning" icon={<CalendarToday />} iconPosition="start" />
+        </Tabs>
+      </Paper>
+
+      {/* Filters (Tab 0 only) */}
+      {currentTab === 0 && (
       <Paper sx={{ p: 2, mb: 3 }}>
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={12} md={3}>
@@ -640,8 +743,10 @@ const TeamRoster: React.FC = () => {
           </Grid>
         </Grid>
       </Paper>
+      )}
 
-      {/* Team Summary */}
+      {/* Team Summary (Tab 0 only) */}
+      {currentTab === 0 && (
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid item xs={12} md={2.4}>
           <Card>
@@ -692,7 +797,11 @@ const TeamRoster: React.FC = () => {
           </Card>
         </Grid>
       </Grid>
+      )}
 
+      {/* Tab 0: Team Members */}
+      {currentTab === 0 && (
+        <Box>
       {/* Status Indicator & Bulk Actions */}
       <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -811,23 +920,12 @@ const TeamRoster: React.FC = () => {
                     <Email sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
                     {member.email}
                   </Typography>
-                </Box>
-
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="body2" gutterBottom>
-                    Utilization: {member.currentUtilization}%
-                  </Typography>
-                  <LinearProgress
-                    variant="determinate"
-                    value={Math.min(member.currentUtilization, 100)}
-                    sx={{
-                      height: 8,
-                      borderRadius: 4,
-                      '& .MuiLinearProgress-bar': {
-                        backgroundColor: getUtilizationColor(member.currentUtilization)
-                      }
-                    }}
-                  />
+                  {member.personalPhone && (
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                      <Phone sx={{ fontSize: 16, mr: 1, verticalAlign: 'middle' }} />
+                      {member.personalPhone}
+                    </Typography>
+                  )}
                 </Box>
 
                 <Box>
@@ -871,6 +969,22 @@ const TeamRoster: React.FC = () => {
             No team members found matching your criteria
           </Typography>
         </Box>
+      )}
+      </Box>
+      )}
+
+      {/* Tab 1: Sprint Planning */}
+      {currentTab === 1 && (
+        <SprintPlanning
+          teamMembers={teamMembers}
+          filteredMembers={filteredMembers}
+          currentSprint={currentSprint}
+          nextSprint={nextSprint}
+          calculateSprintUtilization={calculateSprintUtilization}
+          getUtilizationColor={getUtilizationColor}
+          handleCardClick={handleCardClick}
+          onOpenSprintInfo={() => setSprintInfoDialogOpen(true)}
+        />
       )}
 
       {/* Member Details Dialog */}
@@ -940,6 +1054,12 @@ const TeamRoster: React.FC = () => {
                   <Email sx={{ mr: 1, verticalAlign: 'middle' }} />
                   {selectedMember.email}
                 </Typography>
+                {selectedMember.personalPhone && (
+                  <Typography variant="body1" gutterBottom>
+                    <Phone sx={{ mr: 1, verticalAlign: 'middle' }} />
+                    {selectedMember.personalPhone}
+                  </Typography>
+                )}
               </Grid>
 
               <Grid item xs={12} md={6}>
@@ -1059,6 +1179,29 @@ const TeamRoster: React.FC = () => {
                 value={editForm.email}
                 onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
                 required
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Personal Phone"
+                value={editForm.personalPhone}
+                onChange={(e) => {
+                  const input = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                  let formatted = '';
+                  if (input.length > 0) {
+                    formatted = '(' + input.substring(0, 3);
+                    if (input.length >= 4) {
+                      formatted += ') ' + input.substring(3, 6);
+                    }
+                    if (input.length >= 7) {
+                      formatted += '-' + input.substring(6, 10);
+                    }
+                  }
+                  setEditForm({ ...editForm, personalPhone: formatted });
+                }}
+                placeholder="(555) 123-4567"
+                helperText="Enter 10 digits, will auto-format"
               />
             </Grid>
             <Grid item xs={12}>
@@ -1376,7 +1519,22 @@ const TeamRoster: React.FC = () => {
                 fullWidth
                 label="Personal Phone"
                 value={newMemberForm.personalPhone}
-                onChange={(e) => setNewMemberForm({...newMemberForm, personalPhone: e.target.value})}
+                onChange={(e) => {
+                  const input = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                  let formatted = '';
+                  if (input.length > 0) {
+                    formatted = '(' + input.substring(0, 3);
+                    if (input.length >= 4) {
+                      formatted += ') ' + input.substring(3, 6);
+                    }
+                    if (input.length >= 7) {
+                      formatted += '-' + input.substring(6, 10);
+                    }
+                  }
+                  setNewMemberForm({...newMemberForm, personalPhone: formatted});
+                }}
+                placeholder="(555) 123-4567"
+                helperText="Enter 10 digits, will auto-format"
               />
             </Grid>
             <Grid item xs={12} md={6}>
@@ -1486,6 +1644,158 @@ const TeamRoster: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setBulkActionDialog(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Sprint Information Dialog */}
+      <Dialog
+        open={sprintInfoDialogOpen}
+        onClose={() => setSprintInfoDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <CalendarToday sx={{ color: '#003366' }} />
+              <Typography variant="h6">Sprint Calendar & Information</Typography>
+            </Box>
+            <IconButton onClick={() => setSprintInfoDialogOpen(false)}>
+              <Close />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h6" sx={{ color: '#003366', mb: 2 }}>
+              Sprint Configuration
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <Paper sx={{ p: 2, backgroundColor: '#e3f2fd' }}>
+                  <Typography variant="subtitle2" sx={{ color: '#666', mb: 1 }}>
+                    Sprint Duration
+                  </Typography>
+                  <Typography variant="h5" sx={{ color: '#003366' }}>
+                    10 Days
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Paper sx={{ p: 2, backgroundColor: '#e3f2fd' }}>
+                  <Typography variant="subtitle2" sx={{ color: '#666', mb: 1 }}>
+                    Sprint Start Day
+                  </Typography>
+                  <Typography variant="h5" sx={{ color: '#003366' }}>
+                    Wednesday
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Paper sx={{ p: 2, backgroundColor: '#e3f2fd' }}>
+                  <Typography variant="subtitle2" sx={{ color: '#666', mb: 1 }}>
+                    First Sprint Started
+                  </Typography>
+                  <Typography variant="h5" sx={{ color: '#003366' }}>
+                    Oct 1, 2025
+                  </Typography>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Paper sx={{ p: 2, backgroundColor: '#e3f2fd' }}>
+                  <Typography variant="subtitle2" sx={{ color: '#666', mb: 1 }}>
+                    Current Sprint
+                  </Typography>
+                  <Typography variant="h5" sx={{ color: '#003366' }}>
+                    Sprint {currentSprint.number}
+                  </Typography>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Box>
+
+          <Divider sx={{ my: 3 }} />
+
+          <Typography variant="h6" sx={{ color: '#003366', mb: 2 }}>
+            Upcoming Sprint Schedule
+          </Typography>
+          <Box sx={{ maxHeight: '400px', overflowY: 'auto' }}>
+            {[0, 1, 2, 3, 4, 5].map((offset) => {
+              const sprint = offset === 0 ? currentSprint : {
+                number: currentSprint.number + offset,
+                startDate: new Date(currentSprint.startDate.getTime() + (offset * SPRINT_DURATION_DAYS * 86400000)),
+                endDate: new Date(currentSprint.startDate.getTime() + ((offset + 1) * SPRINT_DURATION_DAYS - 1) * 86400000)
+              };
+              
+              const isCurrent = offset === 0;
+              
+              return (
+                <Card 
+                  key={offset}
+                  sx={{ 
+                    mb: 2, 
+                    border: isCurrent ? '2px solid #1976d2' : '1px solid #e0e0e0',
+                    backgroundColor: isCurrent ? '#e3f2fd' : 'white'
+                  }}
+                >
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                          <Typography variant="h6" sx={{ color: '#003366' }}>
+                            Sprint {sprint.number}
+                          </Typography>
+                          {isCurrent && (
+                            <Chip 
+                              label="CURRENT" 
+                              size="small" 
+                              sx={{ backgroundColor: '#1976d2', color: 'white' }}
+                            />
+                          )}
+                        </Box>
+                        <Typography variant="body2" sx={{ color: '#666' }}>
+                          Start: {sprint.startDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#666' }}>
+                          End: {sprint.endDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+                        </Typography>
+                      </Box>
+                      <Chip 
+                        label="10 Days" 
+                        sx={{ 
+                          backgroundColor: isCurrent ? '#1976d2' : '#666',
+                          color: 'white'
+                        }}
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </Box>
+
+          <Box sx={{ mt: 3, p: 2, backgroundColor: '#fff3e0', borderRadius: 1 }}>
+            <Typography variant="subtitle2" sx={{ color: '#e65100', fontWeight: 'bold', mb: 1 }}>
+              📌 Sprint Planning Notes
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+              • Each sprint is exactly 10 days long
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+              • Sprints start on Wednesday and end on Friday (10 days later)
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#666', mb: 1 }}>
+              • Team member utilization is calculated based on assignments overlapping with sprint dates
+            </Typography>
+            <Typography variant="body2" sx={{ color: '#666' }}>
+              • Use "Next Sprint" view to plan upcoming capacity and assignments
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSprintInfoDialogOpen(false)} variant="contained" sx={{ backgroundColor: '#003366' }}>
+            Close
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

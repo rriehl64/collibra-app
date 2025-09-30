@@ -47,6 +47,7 @@ const domains = require('./server/routes/domains');
 const portfolios = require('./server/routes/portfolios');
 const programDocumentation = require('./server/routes/programDocumentation');
 const teamManagement = require('./server/routes/teamManagement');
+const janusGraph = require('./server/routes/janusgraph');
 
 const app = express();
 
@@ -168,6 +169,7 @@ app.use('/api/v1/domains', domains);
 app.use('/api/v1/portfolios', portfolios);
 app.use('/api/v1/program-documentation', programDocumentation);
 app.use('/api/v1/team-management', teamManagement);
+app.use('/api/v1/janusgraph', janusGraph);
 
 // Serve generated TTS audio cache
 app.use('/tts-cache', express.static(path.join(__dirname, 'public', 'tts-cache')));

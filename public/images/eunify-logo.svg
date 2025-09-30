@@ -1,0 +1,40 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="60" fill="white" rx="4"/>
+  
+  <!-- Icon: Connected nodes representing data unification -->
+  <g transform="translate(10, 15)">
+    <!-- Central node (larger) -->
+    <circle cx="15" cy="15" r="6" fill="#003366" opacity="0.9"/>
+    
+    <!-- Surrounding nodes -->
+    <circle cx="5" cy="5" r="3.5" fill="#2196f3" opacity="0.8"/>
+    <circle cx="25" cy="5" r="3.5" fill="#2196f3" opacity="0.8"/>
+    <circle cx="5" cy="25" r="3.5" fill="#2196f3" opacity="0.8"/>
+    <circle cx="25" cy="25" r="3.5" fill="#2196f3" opacity="0.8"/>
+    
+    <!-- Connection lines -->
+    <line x1="5" y1="5" x2="15" y2="15" stroke="#003366" stroke-width="1.5" opacity="0.4"/>
+    <line x1="25" y1="5" x2="15" y2="15" stroke="#003366" stroke-width="1.5" opacity="0.4"/>
+    <line x1="5" y1="25" x2="15" y2="15" stroke="#003366" stroke-width="1.5" opacity="0.4"/>
+    <line x1="25" y1="25" x2="15" y2="15" stroke="#003366" stroke-width="1.5" opacity="0.4"/>
+    
+    <!-- Center highlight -->
+    <circle cx="15" cy="15" r="2" fill="white" opacity="0.8"/>
+  </g>
+  
+  <!-- Text: E-Unify -->
+  <text x="50" y="28" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#003366">
+    E-Unify
+  </text>
+  
+  <!-- Tagline -->
+  <text x="50" y="45" font-family="Arial, sans-serif" font-size="10" fill="#666" font-style="italic">
+    Your Pathway to Benefit
+  </text>
+  
+  <!-- USCIS indicator -->
+  <rect x="175" y="5" width="20" height="3" fill="#B31B1B" rx="1.5"/>
+  <rect x="175" y="10" width="20" height="3" fill="#003366" rx="1.5"/>
+  <rect x="175" y="15" width="20" height="3" fill="#B31B1B" rx="1.5"/>
+</svg>

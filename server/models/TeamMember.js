@@ -26,6 +26,11 @@ const teamMemberSchema = new mongoose.Schema({
     lowercase: true,
     trim: true
   },
+  personalPhone: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   role: {
     type: String,
     required: true,

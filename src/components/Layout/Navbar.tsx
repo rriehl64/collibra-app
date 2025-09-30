@@ -89,6 +89,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [settingsAnchorEl, setSettingsAnchorEl] = useState<null | HTMLElement>(null);
+  const [dataManagementAnchorEl, setDataManagementAnchorEl] = useState<null | HTMLElement>(null);
   
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -124,6 +125,19 @@ const Navbar = () => {
 
   const handleSettingsNavigation = (path: string) => {
     setSettingsAnchorEl(null);
+    navigate(path);
+  };
+
+  const handleDataManagementMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setDataManagementAnchorEl(event.currentTarget);
+  };
+
+  const handleDataManagementMenuClose = () => {
+    setDataManagementAnchorEl(null);
+  };
+
+  const handleDataManagementNavigation = (path: string) => {
+    setDataManagementAnchorEl(null);
     navigate(path);
   };
   
@@ -205,9 +219,9 @@ const Navbar = () => {
               }}
             >
               <img 
-                src="/images/eunify.png" 
-                alt="E-Unify" 
-                style={{ height: 60 }}
+                src="/images/eunify-logo.svg" 
+                alt="E-Unify - Your Pathway to Benefit" 
+                style={{ height: 60, width: 'auto' }}
               />
             </Box>
             
@@ -250,24 +264,6 @@ const Navbar = () => {
               }}
               aria-label="Utility navigation"
             >
-              <Tooltip title="About E-Unify">
-                <Button
-                  component={Link}
-                  to="/about"
-                  size="small"
-                  startIcon={<Info />}
-                  sx={{
-                    color: '#003366',
-                    textTransform: 'none',
-                    fontWeight: 500,
-                    '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
-                    '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
-                  }}
-                  aria-label="About E-Unify"
-                >
-                  About
-                </Button>
-              </Tooltip>
               <Tooltip title="Data Strategy Support Services">
                 <Button
                   component={Link}
@@ -286,12 +282,11 @@ const Navbar = () => {
                   Data Strategy
                 </Button>
               </Tooltip>
-              <Tooltip title="Data Quality Dashboard">
+              <Tooltip title="Data Management">
                 <Button
-                  component={Link}
-                  to="/data-quality"
                   size="small"
-                  startIcon={<Assessment />}
+                  startIcon={<Dashboard />}
+                  onClick={handleDataManagementMenuOpen}
                   sx={{
                     color: '#003366',
                     textTransform: 'none',
@@ -299,17 +294,45 @@ const Navbar = () => {
                     '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
                     '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
                   }}
-                  aria-label="Data Quality Dashboard"
+                  aria-label="Data Management"
                 >
-                  Data Quality
+                  Data Management
                 </Button>
               </Tooltip>
-              <Tooltip title="Data Lineage Visualization">
+              <Menu
+                anchorEl={dataManagementAnchorEl}
+                open={Boolean(dataManagementAnchorEl)}
+                onClose={handleDataManagementMenuClose}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              >
+                <MenuItem onClick={() => handleDataManagementNavigation('/data-quality')}>
+                  <ListItemIcon>
+                    <Assessment fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Data Quality</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => handleDataManagementNavigation('/data-lineage')}>
+                  <ListItemIcon>
+                    <AccountTree fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Data Lineage</ListItemText>
+                </MenuItem>
+                {user && (user.role === 'admin' || user.role === 'data-steward') && (
+                  <MenuItem onClick={() => handleDataManagementNavigation('/data-steward')}>
+                    <ListItemIcon>
+                      <AdminPanelSettings fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Data Steward</ListItemText>
+                  </MenuItem>
+                )}
+              </Menu>
+              <Tooltip title="About E-Unify">
                 <Button
                   component={Link}
-                  to="/data-lineage"
+                  to="/about"
                   size="small"
-                  startIcon={<AccountTree />}
+                  startIcon={<Info />}
                   sx={{
                     color: '#003366',
                     textTransform: 'none',
@@ -317,31 +340,11 @@ const Navbar = () => {
                     '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
                     '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
                   }}
-                  aria-label="Data Lineage Visualization"
+                  aria-label="About E-Unify"
                 >
-                  Data Lineage
+                  About
                 </Button>
               </Tooltip>
-              {user && (user.role === 'admin' || user.role === 'data-steward') && (
-                <Tooltip title="Data Steward Control Center">
-                  <Button
-                    component={Link}
-                    to="/data-steward"
-                    size="small"
-                    startIcon={<AdminPanelSettings />}
-                    sx={{
-                      color: '#003366',
-                      textTransform: 'none',
-                      fontWeight: 500,
-                      '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
-                      '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
-                    }}
-                    aria-label="Data Steward Control Center"
-                  >
-                    Data Steward
-                  </Button>
-                </Tooltip>
-              )}
               <Tooltip title="Settings & Tools">
                 <Button
                   size="small"

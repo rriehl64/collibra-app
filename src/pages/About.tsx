@@ -443,11 +443,41 @@ function About() {
                   p: 3,
                   mb: 4,
                   borderLeft: '4px solid #003366',
-                  backgroundColor: '#f8f9fa'
+                  backgroundColor: '#f8f9fa',
+                  position: 'relative'
                 }}
                 aria-labelledby="branding-section-heading"
               >
-                <Grid container spacing={3} alignItems="center">
+                {/* Logo in top right corner */}
+                <Box 
+                  sx={{ 
+                    position: 'absolute',
+                    top: 16,
+                    right: 16,
+                    p: 2, 
+                    bgcolor: 'white',
+                    border: '2px solid #003366',
+                    borderRadius: 2,
+                    display: { xs: 'none', md: 'flex' },
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(0,51,102,0.1)',
+                    maxWidth: 220
+                  }}
+                  role="img"
+                  aria-labelledby="branding-logo-label"
+                >
+                  <Typography id="branding-logo-label" sx={{ width: '1px', height: '1px', overflow: 'hidden', position: 'absolute' }}>
+                    E-Unify logo with tagline Your Pathway to Benefit
+                  </Typography>
+                  <img 
+                    src="/images/eunify-logo.svg" 
+                    alt="E-Unify - Your Pathway to Benefit" 
+                    style={{ width: '100%', height: 'auto' }}
+                  />
+                </Box>
+
+                <Grid container spacing={3}>
                   <Grid item xs={12} md={8}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#003366', mb: 1 }} id="branding-tagline">
                       "E-Unify: Your Pathway to Benefit"
@@ -492,32 +522,29 @@ function About() {
                       />
                     </Box>
                   </Grid>
-                  <Grid item xs={12} md={4} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  
+                  {/* Mobile logo - shown below text on small screens */}
+                  <Grid item xs={12} sx={{ display: { xs: 'flex', md: 'none' }, justifyContent: 'center', mt: 2 }}>
                     <Box 
                       sx={{ 
-                        p: 3, 
-                        borderRadius: '50%', 
-                        bgcolor: '#f0f4f8',
+                        p: 2, 
+                        bgcolor: 'white',
                         border: '2px solid #003366',
+                        borderRadius: 2,
                         display: 'flex',
-                        flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: 180,
-                        height: 180
+                        boxShadow: '0 2px 8px rgba(0,51,102,0.1)',
+                        maxWidth: 250
                       }}
                       role="img"
-                      aria-labelledby="branding-logo-label"
+                      aria-label="E-Unify logo with tagline Your Pathway to Benefit"
                     >
-                      <Typography id="branding-logo-label" sx={{ width: '1px', height: '1px', overflow: 'hidden', position: 'absolute' }}>
-                        E-Unify logo with tagline Your Pathway to Benefit
-                      </Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 700, color: '#003366', mb: 1 }}>
-                        E-Unify
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: '#003366', fontStyle: 'italic', textAlign: 'center' }}>
-                        Your Pathway to Benefit
-                      </Typography>
+                      <img 
+                        src="/images/eunify-logo.svg" 
+                        alt="E-Unify - Your Pathway to Benefit" 
+                        style={{ width: '100%', height: 'auto' }}
+                      />
                     </Box>
                   </Grid>
                 </Grid>
