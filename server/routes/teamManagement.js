@@ -230,39 +230,107 @@ router.put('/members/:id/reactivate', async (req, res) => {
   }
 });
 
-// DELETE /api/v1/team-management/members/:id - Permanently delete team member
-router.delete('/members/:id', async (req, res) => {
+// PUT /api/v1/team-management/members/:id - Update team member
+router.put('/members/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { confirmation } = req.body;
-    
-    if (confirmation !== 'DELETE_PERMANENTLY') {
-      return res.status(400).json({
-        success: false,
-        message: 'Confirmation required for permanent deletion'
-      });
-    }
-    
+    const updateData = req.body;
+
     const member = await TeamMember.findById(id);
-    
+
     if (!member) {
       return res.status(404).json({
         success: false,
         message: 'Team member not found'
       });
     }
-    
+
+    // Update allowed fields
+    const allowedFields = [
+      'name', 'email', 'personalPhone', 'role', 'title', 'branch',
+      'division', 'skills', 'currentAssignments', 'capacity'
+    ];
+
+    allowedFields.forEach(field => {
+      if (updateData[field] !== undefined) {
+        member[field] = updateData[field];
+      }
+    });
+
+    // Recalculate utilization and capacity if assignments changed
+    if (updateData.currentAssignments !== undefined) {
+      const totalAllocation = updateData.currentAssignments.reduce((sum, assignment) => {
+        return sum + (assignment.allocation || 0);
+      }, 0);
+
+      member.currentUtilization = Math.min(totalAllocation, 100);
+      member.availableCapacity = Math.max(0, 100 - totalAllocation);
+
+      // Update capacity.availableHours if capacity is provided
+      if (member.capacity && member.capacity.hoursPerWeek) {
+        member.capacity.availableHours = Math.max(0, member.capacity.hoursPerWeek - Math.round((totalAllocation / 100) * member.capacity.hoursPerWeek));
+      }
+    }
+
+    const updatedMember = await member.save();
+
+    res.json({
+      success: true,
+      message: 'Team member updated successfully',
+      data: updatedMember
+    });
+
+  } catch (error) {
+    console.error('Error updating team member:', error);
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email already exists',
+        error: 'Duplicate email address'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update team member',
+      error: error.message
+    });
+  }
+});
+// DELETE /api/v1/team-management/members/:id - Permanently delete team member
+router.delete('/members/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { confirmation } = req.body;
+
+    if (confirmation !== 'DELETE_PERMANENTLY') {
+      return res.status(400).json({
+        success: false,
+        message: 'Confirmation required for permanent deletion'
+      });
+    }
+
+    const member = await TeamMember.findById(id);
+
+    if (!member) {
+      return res.status(404).json({
+        success: false,
+        message: 'Team member not found'
+      });
+    }
+
     await TeamMember.findByIdAndDelete(id);
-    
+
     res.json({
       success: true,
       message: 'Team member deleted permanently',
-      data: { 
+      data: {
         employeeId: member.employeeId,
         name: `${member.name.firstName} ${member.name.lastName}`
       }
     });
-    
+
   } catch (error) {
     console.error('Error deleting team member:', error);
     res.status(500).json({

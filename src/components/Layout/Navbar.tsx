@@ -88,7 +88,6 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [settingsAnchorEl, setSettingsAnchorEl] = useState<null | HTMLElement>(null);
   const [dataManagementAnchorEl, setDataManagementAnchorEl] = useState<null | HTMLElement>(null);
   
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -113,19 +112,6 @@ const Navbar = () => {
   const handleSettingsClick = () => {
     setAnchorEl(null);
     navigate('/settings');
-  };
-
-  const handleSettingsMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setSettingsAnchorEl(event.currentTarget);
-  };
-
-  const handleSettingsMenuClose = () => {
-    setSettingsAnchorEl(null);
-  };
-
-  const handleSettingsNavigation = (path: string) => {
-    setSettingsAnchorEl(null);
-    navigate(path);
   };
 
   const handleDataManagementMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -345,72 +331,6 @@ const Navbar = () => {
                   About
                 </Button>
               </Tooltip>
-              <Tooltip title="Settings & Tools">
-                <Button
-                  size="small"
-                  startIcon={<Settings />}
-                  onClick={handleSettingsMenuOpen}
-                  sx={{
-                    color: '#003366',
-                    textTransform: 'none',
-                    fontWeight: 500,
-                    '&:hover': { backgroundColor: 'rgba(0, 51, 102, 0.04)' },
-                    '&:focus': { outline: '2px solid #003366', outlineOffset: '2px' }
-                  }}
-                  aria-label="Settings & Tools"
-                >
-                  Settings
-                </Button>
-              </Tooltip>
-              <Menu
-                anchorEl={settingsAnchorEl}
-                open={Boolean(settingsAnchorEl)}
-                onClose={handleSettingsMenuClose}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-              >
-                <MenuItem onClick={() => handleSettingsNavigation('/tasks')}>
-                  <ListItemIcon>
-                    <Assignment fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>Open Tasks</ListItemText>
-                </MenuItem>
-                {user && (user.role === 'admin' || user.role === 'data-steward') && (
-                  <MenuItem onClick={() => handleSettingsNavigation('/access/user-management')}>
-                    <ListItemIcon>
-                      <People fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Users</ListItemText>
-                  </MenuItem>
-                )}
-                {user && user.role === 'admin' && (
-                  <MenuItem onClick={() => handleSettingsNavigation('/admin/menu-management')}>
-                    <ListItemIcon>
-                      <Settings fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Menu</ListItemText>
-                  </MenuItem>
-                )}
-                <Divider />
-                <MenuItem onClick={() => handleSettingsNavigation('/settings')}>
-                  <ListItemIcon>
-                    <Settings fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>App Settings</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={() => handleSettingsNavigation('/help')}>
-                  <ListItemIcon>
-                    <Help fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>Help Center</ListItemText>
-                </MenuItem>
-                <MenuItem onClick={() => handleSettingsNavigation('/federal-data-strategy')}>
-                  <ListItemIcon>
-                    <MenuBook fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>Federal Data Strategy</ListItemText>
-                </MenuItem>
-              </Menu>
             </Box>
             
             {/* Right side: Sign In/Admin User */}
@@ -447,20 +367,64 @@ const Navbar = () => {
                     <ListItemIcon>
                       <AccountCircle fontSize="small" />
                     </ListItemIcon>
-                    Profile
+                    <ListItemText>Profile</ListItemText>
                   </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={() => { handleMenuClose(); navigate('/tasks'); }}>
+                    <ListItemIcon>
+                      <Assignment fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Open Tasks</ListItemText>
+                  </MenuItem>
+                  {user && (user.role === 'admin' || user.role === 'data-steward') && (
+                    <MenuItem onClick={() => { handleMenuClose(); navigate('/access/user-management'); }}>
+                      <ListItemIcon>
+                        <People fontSize="small" />
+                      </ListItemIcon>
+                      <ListItemText>Users</ListItemText>
+                    </MenuItem>
+                  )}
+                  {user && user.role === 'admin' && (
+                    <>
+                      <MenuItem onClick={() => { handleMenuClose(); navigate('/admin/menu-management'); }}>
+                        <ListItemIcon>
+                          <Settings fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Menu</ListItemText>
+                      </MenuItem>
+                      <MenuItem onClick={() => { handleMenuClose(); navigate('/admin/team-roster-picklists'); }}>
+                        <ListItemIcon>
+                          <People fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Team Roster Picklists</ListItemText>
+                      </MenuItem>
+                    </>
+                  )}
+                  <Divider />
                   <MenuItem onClick={handleSettingsClick}>
                     <ListItemIcon>
                       <Settings fontSize="small" />
                     </ListItemIcon>
-                    Settings
+                    <ListItemText>App Settings</ListItemText>
+                  </MenuItem>
+                  <MenuItem onClick={() => { handleMenuClose(); navigate('/help'); }}>
+                    <ListItemIcon>
+                      <Help fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Help Center</ListItemText>
+                  </MenuItem>
+                  <MenuItem onClick={() => { handleMenuClose(); navigate('/federal-data-strategy'); }}>
+                    <ListItemIcon>
+                      <MenuBook fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Federal Data Strategy</ListItemText>
                   </MenuItem>
                   <Divider />
                   <MenuItem onClick={handleLogout}>
                     <ListItemIcon>
                       <Logout fontSize="small" />
                     </ListItemIcon>
-                    Logout
+                    <ListItemText>Logout</ListItemText>
                   </MenuItem>
                 </Menu>
               </>

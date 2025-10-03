@@ -77,13 +77,14 @@ const portfolioData = [
       {
         id: 'dr-m2',
         title: 'NIEM Compliance Automation',
-        description: 'Implement automated NIEM validation and compliance checking for all data exchanges',
+        description: 'Implement automated National Information Exchange Model validation for all data sharing agreements and interagency operations',
         dueDate: '2025-08-30',
         status: 'Not Started',
         priority: 'High',
         owner: 'Maria Santos',
         portfolioId: 'portfolio-data-request',
-        deliverables: ['NIEM Validator', 'Compliance Dashboard', 'Error Reporting', 'Documentation'],
+        dependencies: ['dr-m1'],
+        deliverables: ['NIEM Validation Engine', 'Compliance Dashboard', 'Automated Reporting', 'Training Materials'],
         riskLevel: 'Low'
       },
       {
@@ -254,6 +255,269 @@ const portfolioData = [
         description: 'Comprehensive data stewardship training and certification program'
       }
     ]
+  },
+  {
+    id: 'portfolio-data-engineering',
+    name: 'Data Enterprise Portfolio',
+    description: 'Engineering and technical programs supporting data infrastructure, analytics, and specialized data services',
+    manager: 'Patricia Miller',
+    totalBudget: '$4.2M',
+    status: 'Active',
+    currentState: 'Legacy systems, manual data pipelines, fragmented analytics infrastructure',
+    futureState: 'Modern cloud-native architecture, automated pipelines, unified analytics platform',
+    aiReadiness: 85,
+    kpis: [
+      { name: 'System Uptime', current: 99.2, target: 99.9, unit: '%', trend: 'up', status: 'warning' },
+      { name: 'Data Pipeline Efficiency', current: 82, target: 95, unit: '%', trend: 'up', status: 'warning' },
+      { name: 'Processing Speed', current: 4.8, target: 2.0, unit: 'hrs', trend: 'down', status: 'critical' },
+      { name: 'Infrastructure Cost Optimization', current: 68, target: 85, unit: '%', trend: 'up', status: 'warning' }
+    ],
+    okr: {
+      objective: 'Build modern, scalable data infrastructure with AI-first automation',
+      keyResults: [
+        { description: 'Achieve 99.9% system uptime across all platforms', current: 99.2, target: 99.9, unit: '%' },
+        { description: 'Reduce data processing time to <2 hours', current: 4.8, target: 2.0, unit: 'hrs' },
+        { description: 'Automate 95% of data pipeline operations', current: 82, target: 95, unit: '%' }
+      ]
+    },
+    risks: [
+      { id: 'de-r1', title: 'Cloud Migration Complexity', level: 'High', category: 'Technical', mitigation: 'Phased migration with rollback plans', owner: 'Steven Clark' },
+      { id: 'de-r2', title: 'Legacy System Dependencies', level: 'Medium', category: 'Technical', mitigation: 'API abstraction layer development', owner: 'Michelle Lee' },
+      { id: 'de-r3', title: 'Skills Gap in Modern Technologies', level: 'Medium', category: 'Organizational', mitigation: 'Comprehensive training program', owner: 'Angela White' },
+      { id: 'de-r4', title: 'Data Security During Migration', level: 'High', category: 'Compliance', mitigation: 'Enhanced encryption and monitoring', owner: 'Daniel Harris' }
+    ],
+    innovations: [
+      { id: 'de-i1', title: 'Auto-Scaling Data Pipelines', type: 'Automation', impact: 'High', aiFirst: true, description: 'AI-driven automatic scaling based on data volume and processing needs' },
+      { id: 'de-i2', title: 'Predictive Infrastructure Monitoring', type: 'AI/ML', impact: 'High', aiFirst: true, description: 'ML models predict and prevent infrastructure failures' },
+      { id: 'de-i3', title: 'Intelligent Data Routing', type: 'AI/ML', impact: 'Medium', aiFirst: true, description: 'AI optimizes data flow paths for performance and cost' },
+      { id: 'de-i4', title: 'Graph Analytics Engine', type: 'Analytics', impact: 'High', aiFirst: false, description: 'Advanced relationship analysis for fraud detection and network insights' },
+      { id: 'de-i5', title: 'Real-time Stream Processing', type: 'Process', impact: 'Medium', aiFirst: true, description: 'AI-enhanced real-time data processing and alerting' }
+    ],
+    milestones: [
+      {
+        id: 'de-m1',
+        title: 'Cloud Infrastructure Migration Phase 1',
+        description: 'Migrate core data pipelines and ETL processes to cloud-native architecture with enhanced scalability and performance',
+        dueDate: '2025-06-30',
+        status: 'In Progress',
+        priority: 'Critical',
+        owner: 'Steven Clark',
+        portfolioId: 'portfolio-data-engineering',
+        deliverables: ['Cloud Infrastructure Setup', 'Data Pipeline Migration', 'Performance Testing', 'Rollback Procedures'],
+        riskLevel: 'High'
+      },
+      {
+        id: 'de-m2',
+        title: 'AI-Powered Pipeline Automation',
+        description: 'Deploy machine learning models for automatic pipeline scaling, optimization, and failure prediction',
+        dueDate: '2025-08-15',
+        status: 'Not Started',
+        priority: 'High',
+        owner: 'Michelle Lee',
+        portfolioId: 'portfolio-data-engineering',
+        dependencies: ['de-m1'],
+        deliverables: ['ML Scaling Models', 'Predictive Monitoring', 'Auto-Remediation System', 'Performance Dashboard'],
+        riskLevel: 'Medium'
+      },
+      {
+        id: 'de-m3',
+        title: 'Graph Analytics Platform Launch',
+        description: 'Launch enterprise graph database services for advanced relationship and network analysis capabilities',
+        dueDate: '2025-10-30',
+        status: 'In Progress',
+        priority: 'High',
+        owner: 'Daniel Harris',
+        portfolioId: 'portfolio-data-engineering',
+        deliverables: ['Graph Database Deployment', 'Query API', 'Analytics Tools', 'User Documentation'],
+        riskLevel: 'Medium'
+      },
+      {
+        id: 'de-m4',
+        title: 'Real-time Stream Processing Engine',
+        description: 'Implement AI-enhanced real-time data processing capabilities for immediate insights and alerting',
+        dueDate: '2025-09-15',
+        status: 'Not Started',
+        priority: 'Medium',
+        owner: 'Laura Thompson',
+        portfolioId: 'portfolio-data-engineering',
+        dependencies: ['de-m1'],
+        deliverables: ['Stream Processing Engine', 'Real-time Analytics', 'Alert System', 'Integration APIs'],
+        riskLevel: 'Low'
+      },
+      {
+        id: 'de-m5',
+        title: 'Unified Analytics Platform',
+        description: 'Consolidate fragmented analytics tools into unified enterprise analytics platform with self-service capabilities',
+        dueDate: '2025-12-31',
+        status: 'Not Started',
+        priority: 'High',
+        owner: 'Robert Kim',
+        portfolioId: 'portfolio-data-engineering',
+        dependencies: ['de-m2', 'de-m3'],
+        deliverables: ['Unified Platform', 'Self-Service Portal', 'Advanced Visualizations', 'Training Program'],
+        riskLevel: 'Medium'
+      }
+    ],
+    projects: [
+      {
+        id: 'proj-de-1',
+        name: 'Data Engineering and Curation Program',
+        status: 'In Progress',
+        progress: 80,
+        manager: 'Steven Clark',
+        startDate: '2024-10-01',
+        endDate: '2025-07-31',
+        budget: '$680K',
+        description: 'Building and maintaining data pipelines, ETL processes, and data curation workflows'
+      },
+      {
+        id: 'proj-de-2',
+        name: 'Dashboard Support Program',
+        status: 'In Progress',
+        progress: 75,
+        manager: 'Michelle Lee',
+        startDate: '2025-01-01',
+        endDate: '2025-08-15',
+        budget: '$420K',
+        description: 'Supporting development and maintenance of executive and operational dashboards'
+      },
+      {
+        id: 'proj-de-3',
+        name: 'E22 Program',
+        status: 'In Progress',
+        progress: 90,
+        manager: 'Angela White',
+        startDate: '2024-09-01',
+        endDate: '2025-05-31',
+        budget: '$520K',
+        description: 'E22 classification system development and implementation'
+      },
+      {
+        id: 'proj-de-4',
+        name: 'Graph Data Services (GDS)',
+        status: 'In Progress',
+        progress: 65,
+        manager: 'Daniel Harris',
+        startDate: '2025-01-15',
+        endDate: '2025-10-30',
+        budget: '$580K',
+        description: 'Advanced graph database services for relationship and network analysis'
+      },
+      {
+        id: 'proj-de-5',
+        name: 'National Production Dataset',
+        status: 'In Progress',
+        progress: 85,
+        manager: 'Laura Thompson',
+        startDate: '2024-11-01',
+        endDate: '2025-06-30',
+        budget: '$750K',
+        description: 'Maintaining and enhancing the national production dataset infrastructure'
+      },
+      {
+        id: 'proj-de-6',
+        name: 'Streamlined Case Processing (SCP) Program',
+        status: 'In Progress',
+        progress: 70,
+        manager: 'Robert Kim',
+        startDate: '2025-02-01',
+        endDate: '2025-11-15',
+        budget: '$620K',
+        description: 'Optimizing case processing workflows through data-driven improvements'
+      },
+      {
+        id: 'proj-de-7',
+        name: 'Relationship Network Analytics Product Delivery',
+        status: 'Planning',
+        progress: 30,
+        manager: 'Sarah Williams',
+        startDate: '2025-03-15',
+        endDate: '2025-12-31',
+        budget: '$480K',
+        description: 'Delivering advanced relationship and network analytics capabilities'
+      },
+      {
+        id: 'proj-de-8',
+        name: 'DBIS Product Owner',
+        status: 'In Progress',
+        progress: 60,
+        manager: 'James Wilson',
+        startDate: '2025-01-01',
+        endDate: '2025-09-30',
+        budget: '$380K',
+        description: 'Database and Business Intelligence Systems product ownership and management'
+      }
+    ]
+  },
+  {
+    id: 'portfolio-data-product',
+    name: 'Data Product Management',
+    description: 'Managing contracts, change processes, communications, and project management office operations',
+    manager: 'Thomas Anderson',
+    totalBudget: '$1.9M',
+    status: 'Active',
+    currentState: 'Manual contract processes, reactive change management, siloed communications',
+    futureState: 'Automated contract lifecycle, proactive change orchestration, integrated communications hub',
+    aiReadiness: 58,
+    kpis: [
+      { name: 'Contract Processing Time', current: 12, target: 5, unit: 'days', trend: 'down', status: 'critical' },
+      { name: 'Change Success Rate', current: 78, target: 92, unit: '%', trend: 'up', status: 'warning' },
+      { name: 'Stakeholder Engagement', current: 3.6, target: 4.2, unit: '/5', trend: 'up', status: 'warning' },
+      { name: 'PMO Efficiency', current: 85, target: 95, unit: '%', trend: 'up', status: 'good' }
+    ],
+    okr: {
+      objective: 'Optimize organizational effectiveness through streamlined processes and communications',
+      keyResults: [
+        { description: 'Reduce contract processing time to <5 days', current: 12, target: 5, unit: 'days' },
+        { description: 'Achieve 92% change management success rate', current: 78, target: 92, unit: '%' },
+        { description: 'Reach 4.2/5 stakeholder engagement score', current: 3.6, target: 4.2, unit: '/5' }
+      ]
+    },
+    risks: [
+      { id: 'dp-r1', title: 'Vendor Dependency', level: 'Medium', category: 'Financial', mitigation: 'Diversified vendor portfolio strategy', owner: 'Maria Garcia' },
+      { id: 'dp-r2', title: 'Change Resistance', level: 'High', category: 'Organizational', mitigation: 'Enhanced stakeholder engagement program', owner: 'Ryan Martinez' },
+      { id: 'dp-r3', title: 'Communication Gaps', level: 'Medium', category: 'Organizational', mitigation: 'Integrated communication platform', owner: 'Jessica Park' }
+    ],
+    innovations: [
+      { id: 'dp-i1', title: 'AI Contract Analysis', type: 'AI/ML', impact: 'High', aiFirst: true, description: 'AI-powered contract review and risk assessment automation' },
+      { id: 'dp-i2', title: 'Predictive Change Impact', type: 'Analytics', impact: 'Medium', aiFirst: true, description: 'ML models predict change impacts and success probability' },
+      { id: 'dp-i3', title: 'Automated Stakeholder Notifications', type: 'Automation', impact: 'Medium', aiFirst: true, description: 'Smart notification system based on stakeholder preferences and priorities' }
+    ],
+    projects: [
+      {
+        id: 'proj-dp-1',
+        name: 'Contract Management',
+        status: 'In Progress',
+        progress: 75,
+        manager: 'Maria Garcia',
+        startDate: '2024-12-01',
+        endDate: '2025-08-31',
+        budget: '$520K',
+        description: 'Managing data-related contracts, vendor relationships, and procurement processes'
+      },
+      {
+        id: 'proj-dp-2',
+        name: 'Change Management & Communications',
+        status: 'In Progress',
+        progress: 80,
+        manager: 'Ryan Martinez',
+        startDate: '2025-01-15',
+        endDate: '2025-09-30',
+        budget: '$420K',
+        description: 'Managing organizational change and communications for data initiatives'
+      },
+      {
+        id: 'proj-dp-3',
+        name: 'Project Management Office',
+        status: 'In Progress',
+        progress: 85,
+        manager: 'Jessica Park',
+        startDate: '2024-11-01',
+        endDate: '2025-07-31',
+        budget: '$480K',
+        description: 'Centralized project management office supporting all data portfolio initiatives'
+      }
+    ]
   }
 ];
 
@@ -261,15 +525,15 @@ const portfolioData = [
 const seedPortfolios = async () => {
   try {
     console.log('🌱 Starting portfolio seeding...');
-    
+
     // Clear existing portfolios
     await Portfolio.deleteMany({});
     console.log('✅ Cleared existing portfolios');
-    
+
     // Insert new portfolios
     const createdPortfolios = await Portfolio.insertMany(portfolioData);
     console.log(`✅ Created ${createdPortfolios.length} portfolios`);
-    
+
     // Log created portfolios
     createdPortfolios.forEach(portfolio => {
       console.log(`   📁 ${portfolio.name} (${portfolio.id})`);
@@ -279,7 +543,7 @@ const seedPortfolios = async () => {
       console.log(`      - Projects: ${portfolio.projects?.length || 0}`);
       console.log(`      - Milestones: ${portfolio.milestones?.length || 0}`);
     });
-    
+
     console.log('🎉 Portfolio seeding completed successfully!');
     process.exit(0);
   } catch (error) {

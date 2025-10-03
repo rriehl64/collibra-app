@@ -247,10 +247,43 @@ class DataStrategyPlanningService {
   async getTeamCapacity(): Promise<TeamCapacityData> {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/data-strategy/team/capacity`,
+        `${API_BASE_URL}/team-management/members`,
         this.getAuthHeaders()
       );
-      return response.data.data;
+
+      // Transform the data to match TeamCapacityData interface
+      const members = response.data.data || [];
+      const branchSummary: Record<string, any> = {};
+
+      members.forEach((member: any) => {
+        const branch = member.branch;
+        if (!branchSummary[branch]) {
+          branchSummary[branch] = {
+            totalMembers: 0,
+            totalCapacity: 0,
+            usedCapacity: 0,
+            availableCapacity: 0
+          };
+        }
+
+        branchSummary[branch].totalMembers++;
+        const memberCapacity = member.capacity?.fteAllocation || 1;
+        const utilization = member.currentUtilization || 0;
+
+        branchSummary[branch].totalCapacity += memberCapacity * 100;
+        branchSummary[branch].usedCapacity += (memberCapacity * 100 * utilization) / 100;
+        branchSummary[branch].availableCapacity += (memberCapacity * 100 * (100 - utilization)) / 100;
+      });
+
+      return {
+        teamMembers: members.map((member: any) => ({
+          ...member,
+          availableCapacity: member.availableCapacity || 0,
+          assignments: member.currentAssignments || []
+        })),
+        branchSummary,
+        totalTeamSize: members.length
+      };
     } catch (error) {
       console.error('Error fetching team capacity:', error);
       throw error;
@@ -271,7 +304,7 @@ class DataStrategyPlanningService {
       }
       
       const response = await axios.get(
-        `${API_BASE_URL}/data-strategy/team/members?${params.toString()}`,
+        `${API_BASE_URL}/team-management/members?${params.toString()}`,
         this.getAuthHeaders()
       );
       return response.data.data;
@@ -284,7 +317,7 @@ class DataStrategyPlanningService {
   async createTeamMember(member: Partial<TeamMember>): Promise<TeamMember> {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/data-strategy/team/members`,
+        `${API_BASE_URL}/team-management/members`,
         member,
         this.getAuthHeaders()
       );
@@ -298,7 +331,7 @@ class DataStrategyPlanningService {
   async updateTeamMember(id: string, member: Partial<TeamMember>): Promise<TeamMember> {
     try {
       const response = await axios.put(
-        `${API_BASE_URL}/data-strategy/team/members/${id}`,
+        `${API_BASE_URL}/team-management/members/${id}`,
         member,
         this.getAuthHeaders()
       );

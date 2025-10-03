@@ -76,6 +76,7 @@ import DataStewardCenter from './pages/DataStewardCenter';
 import AdminMenuManagement from './pages/AdminMenuManagement';
 import DataStrategyPlanning from './pages/DataStrategyPlanning';
 import TeamRoster from './pages/TeamRoster';
+import TeamRosterPicklistManagement from './pages/TeamRosterPicklistManagement';
 import JanusGraphVisualization from './pages/JanusGraphVisualization';
 import OpenTasks from './pages/OpenTasks';
 import FederalDataStrategy from './pages/FederalDataStrategy';
@@ -303,6 +304,7 @@ function App() {
                 
                 {/* Team Roster Management */}
                 <Route path="/admin/team-roster" element={<TeamRoster />} />
+                <Route path="/admin/team-roster-picklists" element={<TeamRosterPicklistManagement />} />
                 
                 {/* JanusGraph Visualization */}
                 <Route path="/admin/janusgraph" element={<JanusGraphVisualization />} />

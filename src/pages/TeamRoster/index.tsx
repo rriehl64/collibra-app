@@ -41,7 +41,6 @@ import {
   Archive,
   Restore,
   Code,
-  Storage,
   Analytics,
   Computer,
   Language,
@@ -57,7 +56,9 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import dataStrategyPlanningService from '../../services/dataStrategyPlanningService';
+import teamRosterPicklistService from '../../services/teamRosterPicklistService';
 import SprintPlanning from '../../components/teamRoster/SprintPlanning';
+import api from '../../services/api';
 
 interface TeamMember {
   _id: string;
@@ -201,64 +202,69 @@ const TeamRoster: React.FC = () => {
     }>
   });
 
-  const branches = [
-    'Front Office',
-    'Data Management', 
-    'Data Analytics',
-    'Data Engineering',
-    'Data Science',
-    'Business Intelligence',
-    'Data Governance',
-    'Product & Design'
-  ];
-
-  const roles = [
-    'Data Scientist',
-    'Data Engineer', 
-    'Data Analyst',
-    'Business Analyst',
-    'Technical Lead',
-    'Solution Architect',
-    'Product Manager',
-    'Program Manager',
-    'Data Steward'
-  ];
+  const [branches, setBranches] = useState<string[]>([]);
+  const [roles, setRoles] = useState<string[]>([]);
+  const [positionTitles, setPositionTitles] = useState<string[]>([]);
 
   useEffect(() => {
+    loadPicklists();
     loadTeamData();
   }, [statusFilter]);
 
+  // Filter members whenever filter criteria changes
   useEffect(() => {
     filterMembers();
-  }, [teamMembers, searchTerm, branchFilter, roleFilter]);
+  }, [searchTerm, branchFilter, roleFilter, teamMembers]);
+
+  const loadPicklists = async () => {
+    try {
+      const picklists = await teamRosterPicklistService.getAll();
+
+      const rolePicklist = picklists.find(p => p.type === 'role');
+      const branchPicklist = picklists.find(p => p.type === 'branch');
+      const titlePicklist = picklists.find(p => p.type === 'positionTitle');
+
+      if (rolePicklist) {
+        setRoles(rolePicklist.values.filter(v => v.isActive).map(v => v.value));
+      }
+      if (branchPicklist) {
+        setBranches(branchPicklist.values.filter(v => v.isActive).map(v => v.value));
+      }
+      if (titlePicklist) {
+        setPositionTitles(titlePicklist.values.filter(v => v.isActive).map(v => v.value));
+      }
+    } catch (error) {
+      console.error('Error loading picklists:', error);
+      // Fallback to default values if API fails
+      setBranches(['Front Office', 'Data Management', 'Data Analytics', 'Data Engineering', 'Data Science', 'Business Intelligence', 'Data Governance', 'Product & Design']);
+      setRoles(['Data Scientist', 'Data Engineer', 'Data Analyst', 'Business Analyst', 'Technical Lead', 'Solution Architect', 'Product Manager', 'Program Manager', 'Data Steward']);
+    }
+  };
 
   const loadTeamData = async () => {
     try {
       setLoading(true);
-      
-      // Use the new team management API
-      const response = await fetch(`http://localhost:3002/api/v1/team-management/members?status=${statusFilter}`);
-      const result = await response.json();
-      
-      if (!result.success) {
-        throw new Error(result.message || 'Failed to load team data');
-      }
-      
+
+      // Use the configured API instance with authentication
+      const response = await api.get(`/team-management/members?status=${statusFilter}`);
+
       // Map the API response to match our interface
-      const mappedMembers = (result.data || []).map((member: any) => ({
+      const mappedMembers = (response.data.data || []).map((member: any) => ({
         ...member,
-        name: typeof member.name === 'string' 
-          ? member.name 
+        name: typeof member.name === 'string'
+          ? member.name
           : `${member.name?.firstName || ''} ${member.name?.lastName || ''}`.trim(),
         isActive: member.isActive !== false, // Default to true if not specified
         currentUtilization: member.currentUtilization || 0,
-        availableCapacity: member.availableCapacity || 100
+        availableCapacity: member.availableCapacity || 100,
+        assignments: member.currentAssignments || [] // Map currentAssignments to assignments
       }));
-      
+
       setTeamMembers(mappedMembers);
-      
-      // Also update filtered members to ensure immediate UI refresh
-      setFilteredMembers(mappedMembers);
+
+      // Filter members after teamMembers state is updated
+      filterMembers();
+
     } catch (error) {
       console.error('Load team data error:', error);
       setSaveStatus('❌ Error loading data');
@@ -271,6 +277,7 @@ const TeamRoster: React.FC = () => {
     let filtered = teamMembers;
 
     if (searchTerm) {
+      const beforeSearch = filtered.length;
       filtered = filtered.filter(member =>
         member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -279,10 +286,12 @@ const TeamRoster: React.FC = () => {
     }
 
     if (branchFilter) {
+      const beforeBranch = filtered.length;
       filtered = filtered.filter(member => member.branch === branchFilter);
     }
 
     if (roleFilter) {
+      const beforeRole = filtered.length;
       filtered = filtered.filter(member => member.role === roleFilter);
     }
 
@@ -309,7 +318,7 @@ const TeamRoster: React.FC = () => {
   const getSkillIcon = (skillName: string) => {
     const skill = skillName.toLowerCase();
     if (skill.includes('python') || skill.includes('r') || skill.includes('javascript')) return <Code />;
-    if (skill.includes('sql') || skill.includes('database') || skill.includes('mongodb')) return <Storage />;
+    if (skill.includes('sql') || skill.includes('database') || skill.includes('mongodb')) return <DataObject />;
     if (skill.includes('analytics') || skill.includes('tableau') || skill.includes('power bi')) return <Analytics />;
     if (skill.includes('machine learning') || skill.includes('ai') || skill.includes('data science')) return <Psychology />;
     if (skill.includes('cloud') || skill.includes('aws') || skill.includes('azure')) return <CloudQueue />;
@@ -395,8 +404,8 @@ const TeamRoster: React.FC = () => {
           priorityId: a.priorityId || undefined,
           priorityName: a.priorityName,
           allocation: Number(a.allocation) || 0,
-          startDate: a.startDate || new Date().toISOString().split('T')[0],
-          endDate: a.endDate || '',
+          startDate: a.startDate ? new Date(a.startDate) : new Date(),
+          endDate: a.endDate ? new Date(a.endDate) : null,
           hoursAllocated: Math.round((Number(a.allocation) / 100) * 40)
         })),
         capacity: {
@@ -425,7 +434,7 @@ const TeamRoster: React.FC = () => {
   const handleAddNewMember = async () => {
     try {
       setSaveStatus('Adding new team member...');
-      
+
       const response = await fetch('http://localhost:3002/api/v1/team-management/members', {
         method: 'POST',
         headers: {
@@ -433,13 +442,13 @@ const TeamRoster: React.FC = () => {
         },
         body: JSON.stringify(newMemberForm),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to add team member');
       }
-      
+
       setSaveStatus('✅ Team member added successfully!');
-      
+
       // Reset form
       setNewMemberForm({
         firstName: '',
@@ -450,15 +459,15 @@ const TeamRoster: React.FC = () => {
         branch: '',
         skills: []
       });
-      
+
       // Reload team data
       await loadTeamData();
-      
+
       setTimeout(() => {
         setAddMemberDialog(false);
         setSaveStatus('');
       }, 800);
-      
+
     } catch (error) {
       console.error('Add member error:', error);
       setSaveStatus('❌ Error adding team member');
@@ -468,7 +477,7 @@ const TeamRoster: React.FC = () => {
   const handleArchiveMember = async (memberId: string) => {
     try {
       setSaveStatus('Archiving team member...');
-      
+
       const response = await fetch(`http://localhost:3002/api/v1/team-management/members/${memberId}/archive`, {
         method: 'PUT',
         headers: {
@@ -476,21 +485,21 @@ const TeamRoster: React.FC = () => {
         },
         body: JSON.stringify({ reason: 'Archived via Team Roster interface' }),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to archive team member');
       }
-      
+
       setSaveStatus('✅ Team member archived successfully!');
-      
+
       // Reload team data
       await loadTeamData();
-      
+
       setTimeout(() => {
         setDetailsDialog(false);
         setSaveStatus('');
       }, 800);
-      
+
     } catch (error) {
       console.error('Archive member error:', error);
       setSaveStatus('❌ Error archiving team member');
@@ -500,28 +509,26 @@ const TeamRoster: React.FC = () => {
   const handleReactivateMember = async (memberId: string) => {
     try {
       setSaveStatus('Reactivating team member...');
-      
+
       const response = await fetch(`http://localhost:3002/api/v1/team-management/members/${memberId}/reactivate`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to reactivate team member');
       }
-      
+
       setSaveStatus('✅ Team member reactivated successfully!');
-      
+
       // Reload team data
       await loadTeamData();
-      
+
       setTimeout(() => {
         setDetailsDialog(false);
         setSaveStatus('');
       }, 800);
-      
+
     } catch (error) {
       console.error('Reactivate member error:', error);
       setSaveStatus('❌ Error reactivating team member');
@@ -531,26 +538,24 @@ const TeamRoster: React.FC = () => {
   const handleBulkArchive = async () => {
     try {
       setSaveStatus('Archiving selected members...');
-      
+
       const promises = selectedMembers.map(memberId =>
-        fetch(`http://localhost:3002/api/v1/team-management/members/${memberId}/archive`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reason: 'Bulk archive operation' }),
+        api.put(`/team-management/members/${memberId}/archive`, {
+          reason: 'Bulk archive operation'
         })
       );
-      
+
       await Promise.all(promises);
       setSaveStatus(`✅ Successfully archived ${selectedMembers.length} members!`);
-      
+
       setSelectedMembers([]);
       await loadTeamData();
-      
+
       setTimeout(() => {
         setBulkActionDialog(false);
         setSaveStatus('');
       }, 800);
-      
+
     } catch (error) {
       console.error('Bulk archive error:', error);
       setSaveStatus('❌ Error archiving members');
@@ -560,25 +565,22 @@ const TeamRoster: React.FC = () => {
   const handleBulkReactivate = async () => {
     try {
       setSaveStatus('Reactivating selected members...');
-      
+
       const promises = selectedMembers.map(memberId =>
-        fetch(`http://localhost:3002/api/v1/team-management/members/${memberId}/reactivate`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-        })
+        api.put(`/team-management/members/${memberId}/reactivate`)
       );
-      
+
       await Promise.all(promises);
       setSaveStatus(`✅ Successfully reactivated ${selectedMembers.length} members!`);
-      
+
       setSelectedMembers([]);
       await loadTeamData();
-      
+
       setTimeout(() => {
         setBulkActionDialog(false);
         setSaveStatus('');
       }, 800);
-      
+
     } catch (error) {
       console.error('Bulk reactivate error:', error);
       setSaveStatus('❌ Error reactivating members');

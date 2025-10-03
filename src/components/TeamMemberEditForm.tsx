@@ -112,7 +112,11 @@ const TeamMemberEditForm: React.FC<TeamMemberEditFormProps> = ({ member, onSave,
           hoursPerWeek: member.capacity?.hoursPerWeek || 40,
           availableHours: member.capacity?.availableHours || 32
         },
-        currentAssignments: member.currentAssignments || [],
+        currentAssignments: (member.currentAssignments || []).map((assignment: any) => ({
+          ...assignment,
+          startDate: assignment.startDate ? new Date(assignment.startDate).toISOString().split('T')[0] : '',
+          endDate: assignment.endDate ? new Date(assignment.endDate).toISOString().split('T')[0] : ''
+        })),
         isActive: member.isActive !== undefined ? member.isActive : true
       });
     }

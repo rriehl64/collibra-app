@@ -745,13 +745,9 @@ const Dashboard: React.FC = () => {
                       ]}
                     />
                     <Legend 
-                      formatter={(value, entry) => {
+                      formatter={(value) => {
                         const data = getDomainDistributionData().find(d => d.name === value);
-                        return (
-                          <span style={{ color: entry.color }}>
-                            {value} ({data?.percentage}%)
-                          </span>
-                        );
+                        return `${value} (${data?.percentage}%)`;
                       }}
                       layout="vertical"
                       align="right"
@@ -792,10 +788,7 @@ const Dashboard: React.FC = () => {
                     <YAxis />
                     <Tooltip />
                     <Legend 
-                      formatter={(value, entry) => {
-                        // Use a custom formatter to avoid inactiveColor being passed to DOM
-                        return <span style={{ color: entry.color }}>{value}</span>;
-                      }}
+                      formatter={(value) => value}
                     />
                     <Bar dataKey="count" name="Asset Count" fill={theme.palette.primary.main} />
                   </BarChart>

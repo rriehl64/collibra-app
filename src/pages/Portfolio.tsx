@@ -380,6 +380,71 @@ const portfolioData: PortfolioType[] = [
       { id: 'de-i4', title: 'Graph Analytics Engine', type: 'Analytics', impact: 'High', aiFirst: false, description: 'Advanced relationship analysis for fraud detection and network insights' },
       { id: 'de-i5', title: 'Real-time Stream Processing', type: 'Process', impact: 'Medium', aiFirst: true, description: 'AI-enhanced real-time data processing and alerting' }
     ],
+    milestones: [
+      {
+        id: 'de-m1',
+        title: 'Cloud Infrastructure Migration Phase 1',
+        description: 'Migrate core data pipelines and ETL processes to cloud-native architecture with enhanced scalability and performance',
+        dueDate: '2025-06-30',
+        status: 'In Progress',
+        priority: 'Critical',
+        owner: 'Steven Clark',
+        portfolioId: 'portfolio-data-engineering',
+        deliverables: ['Cloud Infrastructure Setup', 'Data Pipeline Migration', 'Performance Testing', 'Rollback Procedures'],
+        riskLevel: 'High'
+      },
+      {
+        id: 'de-m2',
+        title: 'AI-Powered Pipeline Automation',
+        description: 'Deploy machine learning models for automatic pipeline scaling, optimization, and failure prediction',
+        dueDate: '2025-08-15',
+        status: 'Not Started',
+        priority: 'High',
+        owner: 'Michelle Lee',
+        portfolioId: 'portfolio-data-engineering',
+        dependencies: ['de-m1'],
+        deliverables: ['ML Scaling Models', 'Predictive Monitoring', 'Auto-Remediation System', 'Performance Dashboard'],
+        riskLevel: 'Medium'
+      },
+      {
+        id: 'de-m3',
+        title: 'Graph Analytics Platform Launch',
+        description: 'Launch enterprise graph database services for advanced relationship and network analysis capabilities',
+        dueDate: '2025-10-30',
+        status: 'In Progress',
+        priority: 'High',
+        owner: 'Daniel Harris',
+        portfolioId: 'portfolio-data-engineering',
+        deliverables: ['Graph Database Deployment', 'Query API', 'Analytics Tools', 'User Documentation'],
+        riskLevel: 'Medium'
+      },
+      {
+        id: 'de-m4',
+        title: 'Real-time Stream Processing Engine',
+        description: 'Implement AI-enhanced real-time data processing capabilities for immediate insights and alerting',
+        dueDate: '2025-09-15',
+        status: 'Not Started',
+        priority: 'Medium',
+        owner: 'Laura Thompson',
+        portfolioId: 'portfolio-data-engineering',
+        dependencies: ['de-m1'],
+        deliverables: ['Stream Processing Engine', 'Real-time Analytics', 'Alert System', 'Integration APIs'],
+        riskLevel: 'Low'
+      },
+      {
+        id: 'de-m5',
+        title: 'Unified Analytics Platform',
+        description: 'Consolidate fragmented analytics tools into unified enterprise analytics platform with self-service capabilities',
+        dueDate: '2025-12-31',
+        status: 'Not Started',
+        priority: 'High',
+        owner: 'Robert Kim',
+        portfolioId: 'portfolio-data-engineering',
+        dependencies: ['de-m2', 'de-m3'],
+        deliverables: ['Unified Platform', 'Self-Service Portal', 'Advanced Visualizations', 'Training Program'],
+        riskLevel: 'Medium'
+      }
+    ],
     projects: [
       {
         id: 'proj-de-1',
@@ -548,7 +613,7 @@ const Portfolio: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
   const [viewMode, setViewMode] = useState<'overview' | 'executive' | 'programs' | 'roadmap' | 'analytics'>('executive');
   const [portfolios, setPortfolios] = useState<PortfolioType[]>(portfolioData);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -605,6 +670,26 @@ const Portfolio: React.FC = () => {
   };
 
   const currentPortfolio = portfolios[selectedTab];
+
+  // Show loading state only during initial load
+  if (loading) {
+    return (
+      <Container maxWidth="xl" sx={{ py: 4, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
+
+  // Show error if no portfolios available
+  if (!currentPortfolio) {
+    return (
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Alert severity="error">
+          No portfolio data available. Please check your connection or try again later.
+        </Alert>
+      </Container>
+    );
+  }
 
   // Show success message
   const showSuccess = (message: string) => {
